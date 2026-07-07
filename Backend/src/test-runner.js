@@ -3,6 +3,7 @@ import sequelize from "./config/database/database.js";
 import "./models/authModel.js";
 import "./models/productModel.js";
 import { runAuthTests } from "./test-auth.js";
+import { runProductTests } from "./test-products.js";
 
 async function main() {
   console.log("\n=== Tests Neo Tech E-commerce ===\n");
@@ -10,6 +11,7 @@ async function main() {
   await sequelize.sync({ alter: true });
 
   await runAuthTests();
+  await runProductTests();
 
   console.log("\n=== Todos los tests completados ===\n");
 }

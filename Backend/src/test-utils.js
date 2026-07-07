@@ -32,13 +32,13 @@ export function printResumen() {
   if (errores > 0) process.exit(1);
 }
 
-export function callHandler(handler, body = {}, query = {}) {
+export function callHandler(handler, body = {}, query = {}, params = {}) {
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       reject(new Error("callHandler timed out after 5000ms"));
     }, 5000);
 
-    const req = { body, query };
+    const req = { body, query, params };
     const wrapper = {
       statusCode: 200,
       body: undefined,
