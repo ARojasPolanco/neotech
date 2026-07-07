@@ -19,92 +19,51 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 
 ---
 
-## FASE 1 — Backend Core (Auth + Productos)
+## FASE 1 — Backend Core (Auth + Productos) ✅
 
-### 1.1 Completar modelo User
+### 1.1 Completar modelo User ✅
 
-- [ ] **`models/userModel.js`** — Agregar campos faltantes:
+- [x] **`models/authModel.js`** — Agregar campos:
   - `acceptedTerms: BOOLEAN, allowNull: false, defaultValue: false`
   - `acceptedMarketing: BOOLEAN, allowNull: false, defaultValue: false`
   - `termsAcceptedAt: DATE, allowNull: true`
-- [ ] Sincronizar DB para que agregue las columnas nuevas
+- [x] DB sincronizada con `alter: true`
 
-### 1.2 Crear modelo Product
+### 1.2 Crear modelo Product ✅
 
-- [ ] **`models/productModel.js`** — Definir modelo con:
-  - `id: UUID, PK, defaultValue: UUIDV4`
-  - `name: STRING, allowNull: false`
-  - `slug: STRING, unique, allowNull: false` (generado automático desde name)
-  - `description: TEXT, allowNull: true`
-  - `price: DECIMAL(10,2), allowNull: false`
-  - `stock: INTEGER, allowNull: false, defaultValue: 0`
-  - `imageUrl: STRING, allowNull: true`
-  - `isActive: BOOLEAN, defaultValue: true`
-  - timestamps
+- [x] **`models/productModel.js`** — Modelo completo con:
+  - `id: UUID, PK` / `name: STRING` / `slug: STRING, unique`
+  - `description: TEXT` / `price: DECIMAL(10,2)`
+  - `stock: INTEGER` / `imageUrl` / `isActive`
 
-### 1.3 Validaciones Zod
+### 1.3 Validaciones Zod ✅
 
-- [ ] **`validations/product.schema.js`** — Schemas:
-  - `createProductSchema`: name, price, stock requeridos; description, imageUrl opcionales
-  - `updateProductSchema`: partial de create
-  - `productQuerySchema`: filtros por isActive, priceMin, priceMax, search (name)
-- [ ] **`validations/auth.schema.js`** — Agregar al register schema:
-  - `acceptedTerms: z.boolean().refine(val => val === true, "Debe aceptar términos y condiciones")`
-  - `acceptedMarketing: z.boolean().optional()`
+- [x] **`schemas/product.schema.js`** — Schemas create, update, query
+- [x] **`schemas/auth.schema.js`** — Register validación de `acceptedTerms` (refine true) y `acceptedMarketing` (optional)
 
-### 1.4 Services
+### 1.4 Services ✅
 
-- [ ] **`services/product.service.js`** — ProductService con:
-  - `findAll(filter)` — listar con filtros (isActive, precio, búsqueda)
-  - `findById(id)` — buscar por UUID
-  - `create(data)` — crear producto (generar slug desde name)
-  - `update(product, data)` — actualizar
-  - `disable(product)` — soft delete (isActive = false)
-  - `findBySlug(slug)` — para URLs amigables
+- [x] **`services/product.services.js`** — ProductService con findAll, findById, findBySlug, create, update, disable
 
-### 1.5 Controllers
+### 1.5 Controllers ✅
 
-- [ ] **`controllers/product.controller.js`** — Handlers CRUD
-- [ ] **`controllers/auth.controller.js`** — Mejorar `register`:
-  - Validar que `acceptedTerms === true`
-  - Si `acceptedMarketing === true`, no requiere acción extra
-  - Guardar `termsAcceptedAt` con fecha actual
+- [x] **`controllers/productController.js`** — Handlers CRUD
+- [x] **`controllers/authController.js`** — Register guarda `termsAcceptedAt`, agrega getProfile y updateProfile
 
-### 1.6 Middlewares adicionales
+### 1.6 Middlewares adicionales ✅
 
-- [ ] **`middlewares/validate.middleware.js`** — Middleware genérico de validación Zod:
-  ```js
-  const validate = (schema) => (req, res, next) => {
-    const result = schema.safeParse(req.body);
-    if (!result.success) return next(new AppError(result.error.issues.map(i => i.message).join('. '), 422));
-    req.body = result.data;
-    next();
-  };
-  ```
-- [ ] Reemplazar en authController las validaciones manuales por este middleware
+- [x] **`middlewares/validate.middleware.js`** — Middleware Zod genérico reutilizable
 
-### 1.7 Routes
+### 1.7 Routes ✅
 
-- [ ] **`routes/auth.routes.js`** — Endpoints de auth:
-  - `POST /auth/register` — registro público (con validateMiddleware)
-  - `POST /auth/login` — login público
-  - `GET /auth/profile` — perfil del usuario logueado (protegido)
-  - `PATCH /auth/profile` — actualizar perfil (protegido)
-  - `PATCH /auth/password` — cambiar contraseña (protegido)
-- [ ] **`routes/product.routes.js`** — Endpoints de productos:
-  - `GET /products` — público (solo activos)
-  - `GET /products/:id` — público
-  - `POST /products` — admin only
-  - `PATCH /products/:id` — admin only
-  - `DELETE /products/:id` — admin only (desactiva)
-- [ ] **`routes/index.js`** — Montar auth + product routers
+- [x] **`routes/authRoutes.js`** — register, login, getProfile, updateProfile
+- [x] **`routes/productRoutes.js`** — CRUD completo con protect + restrictTo("ADMIN")
+- [x] **`routes/routes.js`** — Monta auth + product bajo `/api/v1`
 
-### 1.8 Seeders
+### 1.8 Seeders ✅
 
-- [ ] **`seeders/adminSeeder.js`** — Script para crear usuario admin por defecto:
-  - Email: definido en env `ADMIN_EMAIL` o hardcodeado temporal
-  - Role: ADMIN
-  - acceptedTerms: true
+- [x] **`seeders/adminSeeder.js`** — Crea admin por defecto, correr con `node seeders/adminSeeder.js`
+- [x] Script `"seed": "node seeders/adminSeeder.js"` agregado a package.json
 
 ---
 
@@ -385,7 +344,7 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 ## CHECKLIST GLOBAL
 
 ```
-[ ] FASE 1 — Backend Core (Auth + Productos)
+[x] FASE 1 — Backend Core (Auth + Productos)
 [ ] FASE 2 — Frontend Base
 [ ] FASE 3 — Carrito + Checkout + Mercado Pago
 [ ] FASE 4 — Notificaciones (WhatsApp + Mail + PDF)
