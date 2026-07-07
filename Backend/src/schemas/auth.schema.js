@@ -9,7 +9,10 @@ const userSchema = z.object({
   email: z.string().email({ message: "Invalid type" }),
   password: z.string().min(8, { message: "Password is too short" }),
   role: z.enum(["ADMIN", "CLIENT"]).default("CLIENT"),
-  companyid: z.number().optional(),
+  acceptedTerms: z
+    .boolean()
+    .refine((val) => val === true, "Debe aceptar los términos y condiciones"),
+  acceptedMarketing: z.boolean().optional(),
 });
 
 const loginSchema = z.object({

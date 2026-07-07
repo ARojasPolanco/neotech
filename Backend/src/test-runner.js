@@ -1,9 +1,17 @@
-import "./test-utils.js";
+import "./config/enviroments/enviroments.js";
+import sequelize from "./config/database/database.js";
+import "./models/authModel.js";
+import "./models/productModel.js";
+import { runAuthTests } from "./test-auth.js";
 
 async function main() {
   console.log("\n=== Tests Neo Tech E-commerce ===\n");
-  console.log("No hay tests definidos aún.");
-  console.log('Agregalos en src/test-*.js e importalos en este archivo.\n');
+
+  await sequelize.sync({ alter: true });
+
+  await runAuthTests();
+
+  console.log("\n=== Todos los tests completados ===\n");
 }
 
 main().catch((err) => {

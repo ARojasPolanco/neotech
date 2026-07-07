@@ -28,6 +28,20 @@ const User = sequelize.define(
       type: DataTypes.ENUM("ADMIN", "CLIENT"),
       defaultValue: "CLIENT",
     },
+    acceptedTerms: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    acceptedMarketing: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    termsAcceptedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

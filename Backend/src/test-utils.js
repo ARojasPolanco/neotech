@@ -33,7 +33,11 @@ export function printResumen() {
 }
 
 export function callHandler(handler, body = {}, query = {}) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error("callHandler timed out after 5000ms"));
+    }, 5000);
+
     const req = { body, query };
     const wrapper = {
       statusCode: 200,
@@ -43,21 +47,44 @@ export function callHandler(handler, body = {}, query = {}) {
         return wrapper;
       },
       send(data) {
+        clearTimeout(timeout);
         wrapper.body = data;
         resolve({ statusCode: wrapper.statusCode, body: wrapper.body });
         return wrapper;
       },
       json(data) {
+        clearTimeout(timeout);
         wrapper.body = data;
         resolve({ statusCode: wrapper.statusCode, body: wrapper.body });
         return wrapper;
       },
       sendStatus(code) {
+        clearTimeout(timeout);
         wrapper.statusCode = code;
         resolve({ statusCode: wrapper.statusCode, body: wrapper.body });
         return wrapper;
       },
     };
-    handler(req, wrapper, () => {});
+
+    const result = handler(req, wrapper, (err) => {
+      clearTimeout(timeout);
+      if (err) {
+        wrapper.statusCode = err.statusCode || 500;
+        wrapper.body = { message: err.message };
+        resolve({ statusCode: wrapper.statusCode, body: wrapper.body });
+      } else {
+        resolve({ statusCode: wrapper.statusCode, body: wrapper.body });
+      }
+    });
+
+    if (result && typeof result.catch === "function") {
+      result.catch((err) => {
+        clearTimeout(timeout);
+        fallo("Handler threw unhandled error", err.message);
+        wrapper.statusCode = 500;
+        wrapper.body = { message: err.message };
+        resolve({ statusCode: wrapper.statusCode, body: wrapper.body });
+      });
+    }
   });
 }

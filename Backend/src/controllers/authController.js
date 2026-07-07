@@ -94,8 +94,8 @@ export const changedPassword = catchAsync(async (req, res, next) => {
   });
 
   return res.status(200).json({
-    status: "succes",
-    message: "The user password has updated succesfully",
+    status: "success",
+    message: "The user password has updated successfully",
   });
 });
 
@@ -116,6 +116,37 @@ export const deleteUser = catchAsync(async (req, res, next) => {
   });
 });
 
+export const getProfile = catchAsync(async (req, res) => {
+  const user = req.sessionUser;
+
+  return res.status(200).json({
+    id: user.id,
+    fullname: user.fullname,
+    email: user.email,
+    role: user.role,
+    acceptedTerms: user.acceptedTerms,
+    acceptedMarketing: user.acceptedMarketing,
+    termsAcceptedAt: user.termsAcceptedAt,
+  });
+});
+
+export const updateProfile = catchAsync(async (req, res, _next) => {
+  const { fullname, email } = req.body;
+  const user = req.sessionUser;
+
+  if (fullname) user.fullname = fullname;
+  if (email) user.email = email;
+
+  await user.save();
+
+  return res.status(200).json({
+    id: user.id,
+    fullname: user.fullname,
+    email: user.email,
+    role: user.role,
+  });
+});
+
 export const register = catchAsync(async (req, res) => {
   const { hasError, errorMessages, userData } = validateRegister(req.body);
 
@@ -126,7 +157,10 @@ export const register = catchAsync(async (req, res) => {
     });
   }
 
-  const user = await authService.createUser(userData);
+  const user = await authService.createUser({
+    ...userData,
+    termsAcceptedAt: new Date(),
+  });
 
   const token = await generateJWT(user.id);
 
