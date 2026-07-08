@@ -2,6 +2,8 @@ import "./config/enviroments/enviroments.js";
 import sequelize from "./config/database/database.js";
 import "./models/authModel.js";
 import "./models/productModel.js";
+import "./models/productVariantModel.js";
+import "./models/associations.js";
 import { runAuthTests } from "./test-auth.js";
 import { runProductTests } from "./test-products.js";
 

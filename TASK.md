@@ -34,7 +34,8 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 - [x] **`models/productModel.js`** — Modelo completo con:
   - `id: UUID, PK` / `name: STRING` / `slug: STRING, unique`
   - `description: TEXT` / `price: DECIMAL(10,2)`
-  - `stock: INTEGER` / `imageUrl` / `isActive`
+  - `imageUrl` / `isActive`
+  - `stock` se maneja por variante (`ProductVariant.stock`)
 
 ### 1.3 Validaciones Zod ✅
 
@@ -64,6 +65,46 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 
 - [x] **`seeders/adminSeeder.js`** — Crea admin por defecto, correr con `node seeders/adminSeeder.js`
 - [x] Script `"seed": "node seeders/adminSeeder.js"` agregado a package.json
+
+### 1.9 Variantes — Modelo ProductVariant
+
+- [ ] **`models/productVariantModel.js`** — Variante con:
+  - `id: UUID, PK`
+  - `productId: UUID, FK -> Products, allowNull: false`
+  - `color: STRING, allowNull: false` — nombre del color (ej: "Negro", "Blanco")
+  - `colorHex: STRING, allowNull: false` — código hexadecimal (ej: "#000000")
+  - `imageUrl: STRING, allowNull: true` — imagen específica de la variante
+  - `stock: INTEGER, allowNull: false, defaultValue: 0`
+  - timestamps
+- [ ] Migrar `stock` de `Product` a `ProductVariant` (el stock en Product queda como 0 o se elimina)
+- [ ] Agregar asociación: `Product.hasMany(ProductVariant)`, `ProductVariant.belongsTo(Product)`
+
+### 1.10 Variantes — Validaciones Zod
+
+- [ ] **`schemas/product.schema.js`** — Agregar schemas:
+  - `createVariantSchema`: productId, color, colorHex requeridos; imageUrl, stock opcionales
+  - `updateVariantSchema`: partial de createVariant
+  - `variantQuerySchema`: filtros por productId
+
+### 1.11 Variantes — Service + Controller
+
+- [ ] **`services/product.services.js`** — Agregar:
+  - `getVariants(productId)` — listar variantes de un producto
+  - `getVariant(id)` — buscar variante por ID
+  - `createVariant(data)` — crear variante
+  - `updateVariant(variant, data)` — actualizar
+  - `deleteVariant(variant)` — eliminar variante
+  - `decrementStock(variantId, quantity)` — descontar stock al pagar
+- [ ] **`controllers/productController.js`** — Handlers CRUD de variantes
+
+### 1.12 Variantes — Routes
+
+- [ ] **`routes/productRoutes.js`** — Agregar:
+  - `GET /products/:id/variants` — listar colores de un producto (público)
+  - `POST /products/:id/variants` — crear variante (admin)
+  - `PATCH /variants/:id` — editar variante (admin)
+  - `DELETE /variants/:id` — eliminar variante (admin)
+- [ ] **`test-products.js`** — Agregar tests de variantes
 
 ---
 
@@ -96,23 +137,29 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 ### 2.4 Páginas de Auth
 
 - [ ] **`frontend/src/pages/LoginPage.jsx`** — Formulario email + password
-- [ ] **`frontend/src/pages/RegisterPage.jsx`** — Formulario con:
+- [ ] **`frontend/src/pages/RegisterPage.jsx`** — Registro OFRECIDO como invitación (no obligatorio para comprar):
   - fullname, email, password, confirmPassword
   - Checkbox `acceptedTerms` (obligatorio, bloquea submit)
   - Checkbox `acceptedMarketing` (opcional)
-  - Mensaje de error si no acepta términos
+  - Mensaje promocional: "Creá tu cuenta y obtené descuentos exclusivos, ofertas y acceso a tu historial de pedidos."
+  - Si el email ya existe → mensaje: "Ya tenés una cuenta. Iniciá sesión para ver tu historial."
 - [ ] **`frontend/src/components/AuthLayout.jsx`** — Layout compartido para login/register
 
 ### 2.5 Catálogo de productos
 
-- [ ] **`frontend/src/services/product.service.js`** — Llamadas a la API de productos
+- [ ] **`frontend/src/services/product.service.js`** — Llamadas a la API de productos (incluye variantes)
 - [ ] **`frontend/src/pages/ProductListPage.jsx`** — Grid de productos con:
   - Cards con imagen, nombre, precio
   - Estado vacío si no hay productos
   - Estado de carga (skeleton/spinner)
   - Estado de error
-- [ ] **`frontend/src/pages/ProductDetailPage.jsx`** — Página individual del producto
+- [ ] **`frontend/src/pages/ProductDetailPage.jsx`** — Página individual del producto:
+  - Imagen principal del producto
+  - Selector de colores (círculos con colorHex) — al seleccionar, cambia la imagen a la de la variante
+  - Stock visible por color
+  - Botón "Agregar al carrito" con la variante seleccionada
 - [ ] **`frontend/src/components/ProductCard.jsx`** — Card reutilizable
+- [ ] **`frontend/src/components/ColorSelector.jsx`** — Selector de colores con círculos de colorHex
 - [ ] **`frontend/src/components/Navbar.jsx`** — Barra de navegación con logo, enlaces, carrito
 
 ---
@@ -144,7 +191,9 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
   - timestamps
 - [ ] **`models/orderItemModel.js`** — OrderItem con:
   - `id, orderId (FK), productId (FK)`
+  - `productVariantId: UUID (FK), nullable` — para identificar el color comprado
   - `productName, unitPrice, quantity, subtotal` (snapshot del producto al momento de comprar)
+  - `color: STRING, nullable` — snapshot del color seleccionado (ej: "Negro")
 
 ### 3.3 Secuencia para números de pedido
 
@@ -190,17 +239,17 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
     - `back_urls.success = ${FRONTEND_URL}/orders/${orderNumber}`
   - `processWebhook(notification)` — valida, busca orden, actualiza a paid
   - Idempotencia: si la orden ya está `paid`, no re-procesar
-  - **Stock**: al confirmar el pago, descontar stock de cada producto:
+  - **Stock**: al confirmar el pago, descontar stock de cada variante:
     ```js
     for (const item of order.Items) {
-      await Product.decrement("stock", {
+      await ProductVariant.decrement("stock", {
         by: item.quantity,
-        where: { id: item.productId },
+        where: { id: item.productVariantId },
       });
     }
     ```
     - No descontar stock antes del webhook (solo cuando el pago está confirmado)
-    - Si un producto no tiene stock suficiente, marcar la orden como `cancelled` y notificar al admin
+    - Si una variante no tiene stock suficiente, marcar la orden como `cancelled` y notificar al admin
 - [ ] **`controllers/payment.controller.js`**:
   - `createPreference` — crea orden + preferencia y devuelve init_point
   - `webhookHandler` — recibe notificación de MP, procesa async
@@ -292,13 +341,17 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
   - Búsqueda y filtros
   - Switch activo/inactivo
   - Botón editar
+  - Botón "Ver variantes" por producto
 - [ ] **`frontend/src/pages/admin/ProductFormPage.jsx`** — Formulario:
-  - Nombre, descripción, precio, stock
+  - Nombre, descripción, precio
   - Subida de imagen (drag & drop con preview)
   - Estado activo/inactivo
+  - Gestión de variantes: tabla inline para agregar/editar colores con imagen y stock
+- [ ] **`frontend/src/pages/admin/VariantFormPage.jsx`** — Formulario de variante:
+  - Color (nombre), colorHex (selector de color o input), imagen, stock
 - [ ] **`frontend/src/pages/admin/OrderListPage.jsx`** — Lista de pedidos:
   - Filtro por estado
-  - Detalle al hacer click
+  - Detalle al hacer click (incluye color de cada item)
 - [ ] **`frontend/src/components/admin/AdminLayout.jsx`** — Layout con sidebar
 
 ### 5.3 Routes admin (backend)
@@ -453,7 +506,7 @@ export function callHandler(handler, body = {}, query = {}) {
 | Archivo | Lo que testea | Ejemplos de casos |
 |---------|--------------|-------------------|
 | `test-auth.js` | register, login, profile, cambio password | ✅ registro con acceptedTerms=true, ❌ registro sin acceptedTerms, ❌ login con password incorrecta |
-| `test-products.js` | CRUD productos, filtros, permisos | ✅ crear producto como admin, ❌ crear producto sin token, ✅ filtrar por precio |
+| `test-products.js` | CRUD productos, variantes, filtros | ✅ crear producto + variante, ✅ listar colores, ❌ crear variante sin colorHex |
 | `test-orders.js` | creación de orden, orderNumber, estados | ✅ crear orden con items, ✅ orderNumber formato NT-000001, ❌ crear orden sin items |
 | `test-payments.js` | createPreference, webhook, idempotencia | ✅ webhook recibe notificación y cambia a paid, ✅ webhook duplicado no re-procesa, ❤ webhook con firma inválida |
 | `test-notifications.js` | WhatsApp, mail, PDF | ✅ sendOwnerAlert genera mensaje correcto, ✅ generateReceipt crea PDF, ❌ enviar sin WHATSAPP_TOKEN |

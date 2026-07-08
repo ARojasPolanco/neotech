@@ -4,6 +4,8 @@ import {
   validateCreateProduct,
   validateUpdateProduct,
   validateProductQuery,
+  validateCreateVariant,
+  validateUpdateVariant,
 } from "../schemas/product.schema.js";
 
 const productService = new ProductService();
@@ -86,5 +88,78 @@ export const deleteProduct = catchAsync(async (req, res, next) => {
   return res.status(200).json({
     status: "success",
     message: "Product disabled successfully",
+  });
+});
+
+export const getProductVariants = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await productService.findById(id);
+
+  if (!product) {
+    return next(new AppError("Product not found", 404));
+  }
+
+  const variants = await productService.getVariants(id);
+  return res.status(200).json(variants);
+});
+
+export const createVariant = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await productService.findById(id);
+
+  if (!product) {
+    return next(new AppError("Product not found", 404));
+  }
+
+  const { hasError, errorMessages, variantData } = validateCreateVariant(
+    req.body,
+  );
+
+  if (hasError) {
+    return res.status(422).json({
+      status: "error",
+      message: errorMessages,
+    });
+  }
+
+  const variant = await productService.createVariant(id, variantData);
+  return res.status(201).json(variant);
+});
+
+export const updateVariant = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const variant = await productService.getVariant(id);
+
+  if (!variant) {
+    return next(new AppError("Variant not found", 404));
+  }
+
+  const { hasError, errorMessages, variantData } = validateUpdateVariant(
+    req.body,
+  );
+
+  if (hasError) {
+    return res.status(422).json({
+      status: "error",
+      message: errorMessages,
+    });
+  }
+
+  const updatedVariant = await productService.updateVariant(variant, variantData);
+  return res.status(200).json(updatedVariant);
+});
+
+export const deleteVariant = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const variant = await productService.getVariant(id);
+
+  if (!variant) {
+    return next(new AppError("Variant not found", 404));
+  }
+
+  await productService.deleteVariant(variant);
+  return res.status(200).json({
+    status: "success",
+    message: "Variant deleted successfully",
   });
 });

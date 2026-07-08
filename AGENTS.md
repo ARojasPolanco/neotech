@@ -54,11 +54,22 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 ## Reglas de negocio clave
 
 ### Registro de usuarios
-- Dos checkboxes separados en el registro:
+- **El registro NO es obligatorio para comprar.** Un guest puede completar la compra solo con nombre, email y teléfono.
+- El registro se ofrece como invitación post-compra o durante el checkout, con beneficios: descuentos, ofertas, historial de pedidos.
+- Si el email ya existe en `Users`, mostrar mensaje: "Ya tenés una cuenta. Iniciá sesión para ver tu historial."
+- Para quienes se registren, dos checkboxes separados:
   - `acceptedTerms` (**obligatorio**, bloquea el submit si no está marcado): Términos y Condiciones + Política de Privacidad.
   - `acceptedMarketing` (**opcional**): consentimiento para recibir ofertas por mail.
 - Guardar en el modelo `User` ambos campos como booleanos, más la fecha de aceptación (`termsAcceptedAt`).
 - Nunca mandar mail de ofertas a un usuario con `acceptedMarketing: false`.
+
+### Variantes de producto (colores)
+- Un mismo producto puede tener múltiples variantes (ej: "iPhone 15" en Negro, Blanco, Azul).
+- Cada variante tiene: `color`, `colorHex` (código hexadecimal), `imageUrl` (imagen específica), `stock` (stock individual).
+- El precio es el mismo para todas las variantes y vive en el producto base (`Product.price`).
+- Al mostrar un producto, el frontend debe listar los colores disponibles. Al seleccionar un color, la imagen cambia.
+- En la orden (`OrderItem`) se guarda el `variantId` + `color` para que el detalle incluya el color seleccionado.
+- El stock se descuenta de `ProductVariant.stock`, no de `Product.stock`.
 
 ### Números de pedido
 - Formato: `NT-000001`, incremental, generado en el momento de crear la orden (no antes).
@@ -86,6 +97,7 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 ### Panel de administración
 - Rutas protegidas con JWT + verificación de rol `admin`.
 - CRUD de productos: nombre, precio, descripción corta, imagen (subida a Cloudinary), stock, estado (activo/inactivo).
+- Gestión de variantes por producto: agregar/editar colores, imagen específica, stock individual por variante.
 - No permitir borrar productos con pedidos asociados: solo desactivar (`isActive: false`).
 
 ## Convenciones de código
