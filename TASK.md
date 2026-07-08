@@ -190,6 +190,17 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
     - `back_urls.success = ${FRONTEND_URL}/orders/${orderNumber}`
   - `processWebhook(notification)` — valida, busca orden, actualiza a paid
   - Idempotencia: si la orden ya está `paid`, no re-procesar
+  - **Stock**: al confirmar el pago, descontar stock de cada producto:
+    ```js
+    for (const item of order.Items) {
+      await Product.decrement("stock", {
+        by: item.quantity,
+        where: { id: item.productId },
+      });
+    }
+    ```
+    - No descontar stock antes del webhook (solo cuando el pago está confirmado)
+    - Si un producto no tiene stock suficiente, marcar la orden como `cancelled` y notificar al admin
 - [ ] **`controllers/payment.controller.js`**:
   - `createPreference` — crea orden + preferencia y devuelve init_point
   - `webhookHandler` — recibe notificación de MP, procesa async

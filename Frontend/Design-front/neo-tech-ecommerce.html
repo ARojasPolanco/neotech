@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neo Tech — E-commerce System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --surface: #F5F5F5;
+      --fg: #0A0A0A;
+      --muted: #6B6B6B;
+      --border: #E0E0E0;
+      --accent: #A8E05F;
+      --accent-dark: #8BC34A;
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    .launcher {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    .launcher-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 42px;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .logo span { color: var(--fg); font-weight: 700; }
+
+    .launcher-subtitle {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .launcher-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--fg);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 999px;
+    }
+
+    .screens-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .screen-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--fg);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .screen-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .screen-preview {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .screen-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .screen-label {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      color: var(--fg);
+    }
+
+    .screen-info {
+      padding: 16px 20px;
+    }
+    .screen-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .screen-desc {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .launcher-footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .launcher { padding: 40px 16px; }
+      .logo { font-size: 32px; }
+      .screens-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="launcher">
+    <div class="launcher-header">
+      <div class="logo">NEO<span>TECH</span></div>
+      <p class="launcher-subtitle">Sistema de pantallas — E-commerce de electrónica</p>
+      <span class="launcher-badge">4 pantallas · Desktop + Mobile</span>
+    </div>
+
+    <div class="screens-grid">
+      <a href="home.html" class="screen-card">
+        <div class="screen-preview">
+          <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80" alt="Home">
+          <span class="screen-label">01</span>
+        </div>
+        <div class="screen-info">
+          <div class="screen-name">Home</div>
+          <div class="screen-desc">Hero, categorías y productos destacados</div>
+        </div>
+      </a>
+
+      <a href="catalogo.html" class="screen-card">
+        <div class="screen-preview">
+          <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=80" alt="Catálogo">
+          <span class="screen-label">02</span>
+        </div>
+        <div class="screen-info">
+          <div class="screen-name">Catálogo</div>
+          <div class="screen-desc">Filtros, grilla de productos y ordenamiento</div>
+        </div>
+      </a>
+
+      <a href="detalle.html" class="screen-card">
+        <div class="screen-preview">
+          <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=80" alt="Detalle">
+          <span class="screen-label">03</span>
+        </div>
+        <div class="screen-info">
+          <div class="screen-name">Detalle de Producto</div>
+          <div class="screen-desc">Galería, specs, precio y agregar al carrito</div>
+        </div>
+      </a>
+
+      <a href="carrito.html" class="screen-card">
+        <div class="screen-preview">
+          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80" alt="Carrito">
+          <span class="screen-label">04</span>
+        </div>
+        <div class="screen-info">
+          <div class="screen-name">Carrito de Compras</div>
+          <div class="screen-desc">Items, resumen, cupón y checkout</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="launcher-footer">
+      Neo Tech · Sistema de diseño para e-commerce
+    </div>
+  </div>
+
+</body>
+</html>

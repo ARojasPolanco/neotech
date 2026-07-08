@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neo Tech — Tienda de Electrónica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --surface: #F5F5F5;
+      --fg: #0A0A0A;
+      --muted: #6B6B6B;
+      --border: #E0E0E0;
+      --accent: #A8E05F;
+      --accent-dark: #8BC34A;
+      --success: #22C55E;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+    }
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 64px;
+    }
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 28px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--fg); font-weight: 700; }
+    .search-bar {
+      flex: 1;
+      max-width: 560px;
+      position: relative;
+    }
+    .search-bar input {
+      width: 100%;
+      height: 44px;
+      padding: 0 16px 0 44px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--fg);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input:focus {
+      border-color: var(--accent);
+    }
+    .search-bar input::placeholder { color: var(--muted); }
+    .search-bar svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--muted);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-left: auto;
+    }
+    .header-actions a, .header-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--fg);
+      position: relative;
+      padding: 8px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .header-actions a:hover, .header-actions button:hover {
+      background: var(--surface);
+    }
+    .header-actions svg { width: 24px; height: 24px; }
+    .cart-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: var(--accent);
+      color: var(--fg);
+      font-size: 11px;
+      font-weight: 600;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hamburger { display: none; }
+
+    /* ===== HERO ===== */
+    .hero {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+    .hero-card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      border-radius: 20px;
+      padding: 48px 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-content { flex: 1; max-width: 520px; }
+    .hero-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--fg);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .hero-subtitle {
+      font-size: 16px;
+      color: #999;
+      margin-bottom: 28px;
+      max-width: 400px;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: var(--fg);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .hero-cta:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .hero-image {
+      flex-shrink: 0;
+      width: 380px;
+      height: 320px;
+      background: url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80') center/cover;
+      border-radius: 16px;
+    }
+
+    /* ===== CATEGORIES ===== */
+    .section {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 20px 32px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: -0.3px;
+    }
+    .section-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent-dark);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .section-link:hover { color: var(--accent); }
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+    .category-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--fg);
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .category-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .category-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 12px;
+      background: var(--surface);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .category-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* ===== PRODUCTS GRID ===== */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--fg);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .product-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .product-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--accent);
+      color: var(--fg);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .product-info {
+      padding: 16px;
+    }
+    .product-name {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .product-price {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--fg);
+    }
+    .product-price-old {
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: line-through;
+      font-weight: 400;
+      margin-left: 8px;
+    }
+    .product-installments {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ===== MOBILE NAV ===== */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+      z-index: 100;
+    }
+    .mobile-nav-inner {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .mobile-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+    }
+    .mobile-nav a.active { color: var(--accent-dark); }
+    .mobile-nav svg { width: 24px; height: 24px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .hero-card { padding: 36px 40px; }
+      .hero-image { width: 300px; height: 260px; }
+    }
+
+    @media (max-width: 768px) {
+      .search-bar { display: none; }
+      .hamburger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        color: var(--fg);
+      }
+      .hamburger svg { width: 24px; height: 24px; }
+      .header-inner { height: 56px; gap: 12px; }
+      .logo { font-size: 22px; }
+
+      .hero-card {
+        flex-direction: column;
+        padding: 28px 24px;
+        text-align: center;
+        align-items: stretch;
+      }
+      .hero-content { max-width: 100%; }
+      .hero-subtitle { max-width: 100%; }
+      .hero-image { width: 100%; height: 200px; order: -1; }
+
+      .categories-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .category-card { padding: 16px 8px; }
+      .category-icon { width: 44px; height: 44px; font-size: 22px; }
+      .category-name { font-size: 12px; }
+
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .product-info { padding: 12px; }
+      .product-name { font-size: 13px; }
+      .product-price { font-size: 18px; }
+
+      .mobile-nav { display: block; }
+      body { padding-bottom: 72px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero { padding: 16px 16px; }
+      .section { padding: 0 16px 24px; }
+      .hero-badge { font-size: 11px; }
+      .hero-title { font-size: 28px; }
+      .hero-subtitle { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <button class="hamburger" aria-label="Menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+      </button>
+      <a href="#" class="logo">NEO<span>TECH</span></a>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Buscar celulares, auriculares, gadgets...">
+      </div>
+      <div class="header-actions">
+        <a href="#" aria-label="Mi cuenta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </a>
+        <a href="carrito.html" aria-label="Carrito">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          <span class="cart-badge">3</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-content">
+        <span class="hero-badge">Oferta del día</span>
+        <h1 class="hero-title">iPhone 15 Pro Max</h1>
+        <p class="hero-subtitle">El smartphone más potente de Apple. Titanio, chip A17 Pro y cámara de 48MP.</p>
+        <a href="detalle.html" class="hero-cta">
+          Ver oferta
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+      <div class="hero-image"></div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">Categorías</h2>
+      <a href="catalogo.html" class="section-link">Ver todas →</a>
+    </div>
+    <div class="categories-grid">
+      <a href="catalogo.html" class="category-card">
+        <div class="category-icon">📱</div>
+        <div class="category-name">Celulares</div>
+      </a>
+      <a href="catalogo.html" class="category-card">
+        <div class="category-icon">🎧</div>
+        <div class="category-name">Audio</div>
+      </a>
+      <a href="catalogo.html" class="category-card">
+        <div class="category-icon">⌚</div>
+        <div class="category-name">Smartwatch</div>
+      </a>
+      <a href="catalogo.html" class="category-card">
+        <div class="category-icon">🎮</div>
+        <div class="category-name">Gaming</div>
+      </a>
+      <a href="catalogo.html" class="category-card">
+        <div class="category-icon">🔌</div>
+        <div class="category-name">Accesorios</div>
+      </a>
+      <a href="catalogo.html" class="category-card">
+        <div class="category-icon">💻</div>
+        <div class="category-name">Computación</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURED PRODUCTS -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">Productos destacados</h2>
+      <a href="catalogo.html" class="section-link">Ver todos →</a>
+    </div>
+    <div class="products-grid">
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <span class="product-badge">-15%</span>
+          <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&q=80" alt="Samsung Galaxy S24">
+        </div>
+        <div class="product-info">
+          <div class="product-name">Samsung Galaxy S24 Ultra 256GB</div>
+          <div class="product-price">$1.299.999 <span class="product-price-old">$1.529.999</span></div>
+          <div class="product-installments">12x $108.333 sin interés</div>
+        </div>
+      </a>
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80" alt="AirPods Pro">
+        </div>
+        <div class="product-info">
+          <div class="product-name">Apple AirPods Pro 2 USB-C</div>
+          <div class="product-price">$349.999</div>
+          <div class="product-installments">6x $58.333 sin interés</div>
+        </div>
+      </a>
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <span class="product-badge">Nuevo</span>
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="Apple Watch">
+        </div>
+        <div class="product-info">
+          <div class="product-name">Apple Watch Series 9 GPS 45mm</div>
+          <div class="product-price">$599.999</div>
+          <div class="product-installments">12x $49.999 sin interés</div>
+        </div>
+      </a>
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=600&q=80" alt="Notebook">
+        </div>
+        <div class="product-info">
+          <div class="product-name">MacBook Air M3 15" 256GB</div>
+          <div class="product-price">$2.199.999</div>
+          <div class="product-installments">12x $183.333 sin interés</div>
+        </div>
+      </a>
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <span class="product-badge">-20%</span>
+          <img src="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&q=80" alt="Smart TV">
+        </div>
+        <div class="product-info">
+          <div class="product-name">Samsung Smart TV 55" 4K UHD</div>
+          <div class="product-price">$639.999 <span class="product-price-old">$799.999</span></div>
+          <div class="product-installments">12x $53.333 sin interés</div>
+        </div>
+      </a>
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&q=80" alt="Auriculares Sony">
+        </div>
+        <div class="product-info">
+          <div class="product-name">Sony WH-1000XM5 ANC</div>
+          <div class="product-price">$449.999</div>
+          <div class="product-installments">6x $74.999 sin interés</div>
+        </div>
+      </a>
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&q=80" alt="iPad">
+        </div>
+        <div class="product-info">
+          <div class="product-name">iPad 10.ª generación 64GB</div>
+          <div class="product-price">$749.999</div>
+          <div class="product-installments">12x $62.499 sin interés</div>
+        </div>
+      </a>
+      <a href="detalle.html" class="product-card">
+        <div class="product-image">
+          <span class="product-badge">Nuevo</span>
+          <img src="https://images.unsplash.com/photo-1628815113969-0487917e8b76?w=600&q=80" alt="Cargador">
+        </div>
+        <div class="product-info">
+          <div class="product-name">Cargador MagSafe 30W Apple</div>
+          <div class="product-price">$89.999</div>
+          <div class="product-installments">3x $29.999 sin interés</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <a href="#" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9,22 9,12 15,12 15,22"/>
+        </svg>
+        Inicio
+      </a>
+      <a href="catalogo.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Catálogo
+      </a>
+      <a href="carrito.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        Carrito
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Cuenta
+      </a>
+    </div>
+  </nav>
+
+</body>
+</html>
