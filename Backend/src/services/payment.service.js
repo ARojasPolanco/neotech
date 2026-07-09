@@ -18,9 +18,9 @@ export class PaymentService {
         external_reference: order.orderNumber,
         notification_url: `${process.env.BASE_URL || "https://api.neotech.com"}/api/v1/payments/webhook`,
         back_urls: {
-          success: `${frontendUrl}/orders/${order.orderNumber}`,
+          success: `${frontendUrl}/payment-result`,
           failure: `${frontendUrl}/cart`,
-          pending: `${frontendUrl}/orders/${order.orderNumber}`,
+          pending: `${frontendUrl}/payment-result`,
         },
       },
     });

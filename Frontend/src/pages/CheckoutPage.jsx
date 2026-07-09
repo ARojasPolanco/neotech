@@ -36,6 +36,7 @@ export default function CheckoutPage() {
       };
 
       const res = await api.post("/payments/create-preference", payload);
+      sessionStorage.setItem("lastOrderNumber", res.data.orderNumber);
       clearCart();
       window.location.href = res.data.initPoint;
     } catch (err) {
