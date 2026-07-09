@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../config/api.js";
 
 const MAX_ATTEMPTS = 15;
 
 export default function PaymentResultPage() {
+  const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("checking");
   const [order, setOrder] = useState(null);
   const [orderNumber, setOrderNumber] = useState("");
   const [attempts, setAttempts] = useState(0);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [error, setError] = useState(null);
+
+  const paymentId = searchParams.get("payment_id") || searchParams.get("collection_id") || "";
 
   useEffect(() => {
     api.get("/config/whatsapp").then((res) => {
@@ -28,12 +31,14 @@ export default function PaymentResultPage() {
     setOrderNumber(storedOrderNumber);
 
     let cancelled = false;
+    let timedOut = false;
     let timer;
 
     async function poll() {
-      if (cancelled) return;
+      if (cancelled || timedOut) return;
       try {
-        const res = await api.get(`/payments/verify/${storedOrderNumber}`);
+        const url = `/payments/verify/${storedOrderNumber}${paymentId ? `?paymentId=${paymentId}` : ""}`;
+        const res = await api.get(url);
         if (res.data.status === "paid" && !cancelled) {
           const orderRes = await api.get(`/orders/number/${storedOrderNumber}`);
           setOrder(orderRes.data);
@@ -47,27 +52,28 @@ export default function PaymentResultPage() {
         }
       }
 
-      setAttempts((prev) => {
-        const next = prev + 1;
-        if (next >= MAX_ATTEMPTS && !cancelled) {
-          setStatus("delayed");
-          return next;
-        }
-        return next;
-      });
+      setAttempts((prev) => prev + 1);
 
-      if (!cancelled && status !== "delayed") {
+      if (!cancelled && !timedOut) {
         timer = setTimeout(poll, 3000);
       }
     }
+
+    const maxAttemptsTimer = setTimeout(() => {
+      timedOut = true;
+      clearTimeout(timer);
+      setStatus("delayed");
+    }, MAX_ATTEMPTS * 3000);
 
     poll();
 
     return () => {
       cancelled = true;
+      timedOut = true;
       clearTimeout(timer);
+      clearTimeout(maxAttemptsTimer);
     };
-  }, []);
+  }, [paymentId]);
 
   if (status === "no-order") {
     return (

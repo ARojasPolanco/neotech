@@ -1,6 +1,21 @@
 import { client, Preference } from "../config/mercadopago.js";
 import ProductVariant from "../models/productVariantModel.js";
 
+async function fetchPaymentById(paymentId) {
+  const response = await fetch(
+    `https://api.mercadopago.com/v1/payments/${paymentId}`,
+    { headers: { Authorization: `Bearer ${client.accessToken}` } },
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "unknown");
+    console.error(`[fetchPaymentById] MP error: ${response.status} ${errorText}`);
+    return null;
+  }
+
+  return await response.json();
+}
+
 async function handleOrderPaid(order) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
@@ -72,17 +87,9 @@ export class PaymentService {
   async processWebhook(notification) {
     if (notification.type !== "payment") return;
 
-    const paymentId = notification.data.id;
-    const response = await fetch(
-      `https://api.mercadopago.com/v1/payments/${paymentId}`,
-      { headers: { Authorization: `Bearer ${client.accessToken}` } },
-    );
+    const payment = await fetchPaymentById(notification.data.id);
 
-    if (!response.ok) return;
-
-    const payment = await response.json();
-
-    if (payment.status === "approved") {
+    if (payment?.status === "approved") {
       const { OrderService } = await import("./order.service.js");
       const orderService = new OrderService();
       const order = await orderService.findByOrderNumber(
@@ -92,8 +99,8 @@ export class PaymentService {
     }
   }
 
-  async verifyAndProcessOrder(orderNumber) {
-    console.log(`[verifyAndProcessOrder] checking order ${orderNumber}`);
+  async verifyAndProcessOrder(orderNumber, paymentId) {
+    console.log(`[verifyAndProcessOrder] checking order ${orderNumber}, paymentId: ${paymentId || "none"}`);
     const { OrderService } = await import("./order.service.js");
     const orderService = new OrderService();
     const order = await orderService.findByOrderNumber(orderNumber);
@@ -106,6 +113,20 @@ export class PaymentService {
     if (order.status === "paid") {
       console.log(`[verifyAndProcessOrder] order ${orderNumber} already paid`);
       return { found: true, status: "paid" };
+    }
+
+    if (paymentId) {
+      console.log(`[verifyAndProcessOrder] fetching payment ${paymentId} directly`);
+      const payment = await fetchPaymentById(paymentId);
+
+      if (payment?.status === "approved") {
+        if (payment.external_reference === orderNumber) {
+          console.log(`[verifyAndProcessOrder] direct payment matches order ${orderNumber}`);
+          await handleOrderPaid(order);
+          return { found: true, status: "paid" };
+        }
+        console.warn(`[verifyAndProcessOrder] payment ${paymentId} external_reference mismatch: ${payment.external_reference} !== ${orderNumber}`);
+      }
     }
 
     const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(orderNumber)}&sort=date_created&criteria=desc`;
