@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalPrice } = useCart();
+  const navigate = useNavigate();
 
   if (items.length === 0) {
     return (
@@ -78,7 +79,10 @@ export default function CartPage() {
         <p className="text-2xl font-bold">${totalPrice.toLocaleString("es-AR")}</p>
       </div>
 
-      <button className="mt-4 w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark">
+      <button
+        onClick={() => navigate("/checkout")}
+        className="mt-4 w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+      >
         Finalizar Compra
       </button>
     </div>

@@ -12,6 +12,8 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1),
   JWT_EXPIRES_IN: z.string().default("24h"),
   WEBHOOK_VERIFY_TOKEN: z.string().min(1),
+  MP_ACCESS_TOKEN: z.string().min(1),
+  MP_PUBLIC_KEY: z.string().min(1),
 });
 
 export const envs = envSchema.parse(process.env);
