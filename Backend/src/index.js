@@ -8,12 +8,21 @@ import "./models/orderModel.js";
 import "./models/orderItemModel.js";
 import "./models/associations.js";
 import { ensureSequence } from "./services/order.service.js";
+import transporter from "./config/mailer.js";
 
 async function main() {
   try {
     await authenticate();
     await syncUp();
     await ensureSequence();
+
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error("[SMTP] Transporter verification failed:", error);
+      } else {
+        console.log("[SMTP] Transporter ready:", success);
+      }
+    });
 
     app.listen(envs.PORT, () => {
       console.log(`Server running on ${envs.PORT}`);

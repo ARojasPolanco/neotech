@@ -3,6 +3,7 @@ import { envs } from "../config/enviroments/enviroments.js";
 
 export class MailService {
   async sendOwnerAlert(order) {
+    console.log(`[MailService] preparing owner alert for ${order.orderNumber} to ${envs.OWNER_EMAIL}`);
     const items = order.OrderItems.map(
       (item) =>
         `- ${item.productName}${item.color ? ` (${item.color})` : ""} x${item.quantity} = $${Number(item.subtotal).toLocaleString("es-AR")}`,
@@ -20,15 +21,19 @@ export class MailService {
       `Contacto: ${order.customerEmail} / ${order.customerPhone}`,
     ].join("\n");
 
-    await transporter.sendMail({
+    const result = await transporter.sendMail({
       from: `"Neo Tech" <${envs.MAIL_FROM}>`,
       to: envs.OWNER_EMAIL,
       subject: `🛒 Nuevo pedido ${order.orderNumber} - ${order.customerName}`,
       text,
     });
+
+    console.log(`[MailService] owner alert sent for ${order.orderNumber}: ${result.messageId}`);
+    return result;
   }
 
   async sendReceipt(order, pdfBuffer) {
+    console.log(`[MailService] preparing receipt for ${order.orderNumber} to ${order.customerEmail}`);
     const items = order.OrderItems.map(
       (item) =>
         `- ${item.productName}${item.color ? ` (${item.color})` : ""} x${item.quantity}: $${Number(item.subtotal).toLocaleString("es-AR")}`,
@@ -49,7 +54,7 @@ export class MailService {
       `Si tenés dudas, respondé este mail.`,
     ].join("\n");
 
-    await transporter.sendMail({
+    const result = await transporter.sendMail({
       from: `"Neo Tech" <${envs.MAIL_FROM}>`,
       to: order.customerEmail,
       subject: `Tu pedido Neo Tech ${order.orderNumber} fue confirmado`,
@@ -62,5 +67,8 @@ export class MailService {
         },
       ],
     });
+
+    console.log(`[MailService] receipt sent for ${order.orderNumber}: ${result.messageId}`);
+    return result;
   }
 }

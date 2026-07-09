@@ -64,3 +64,13 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
   console.log(`[verifyPayment] order ${orderNumber} status: ${result.status}`);
   return res.status(200).json({ status: result.status });
 });
+
+export const simulatePayment = catchAsync(async (req, res, next) => {
+  if (process.env.NODE_ENV === "production") {
+    return next(new AppError("Simulation not allowed in production", 403));
+  }
+
+  const { orderNumber } = req.params;
+  const result = await paymentService.simulateOrderPaid(orderNumber);
+  return res.status(200).json(result);
+});

@@ -16,6 +16,57 @@ async function fetchPaymentById(paymentId) {
   return await response.json();
 }
 
+async function fetchMerchantOrders(orderNumber) {
+  const searchUrl = `https://api.mercadopago.com/merchant_orders/search?external_reference=${encodeURIComponent(orderNumber)}&sort=date_created&criteria=desc`;
+  console.log(`[fetchMerchantOrders] querying MP: ${searchUrl}`);
+  const response = await fetch(searchUrl, {
+    headers: { Authorization: `Bearer ${client.accessToken}` },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "unknown");
+    console.error(`[fetchMerchantOrders] MP error: ${response.status} ${errorText}`);
+    return [];
+  }
+
+  const data = await response.json();
+  console.log(`[fetchMerchantOrders] MP returned ${data.results?.length || 0} merchant orders`);
+  return data.results || [];
+}
+
+async function findApprovedPayment(orderNumber) {
+  // Try payments search first
+  const paymentsUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(orderNumber)}&sort=date_created&criteria=desc`;
+  console.log(`[findApprovedPayment] querying payments: ${paymentsUrl}`);
+  const paymentsResponse = await fetch(paymentsUrl, {
+    headers: { Authorization: `Bearer ${client.accessToken}` },
+  });
+
+  if (paymentsResponse.ok) {
+    const paymentsData = await paymentsResponse.json();
+    console.log(`[findApprovedPayment] payments returned ${paymentsData.results?.length || 0} results`);
+    const approvedPayment = paymentsData.results?.find((p) => p.status === "approved");
+    if (approvedPayment) return { source: "payments", payment: approvedPayment };
+  } else {
+    const errorText = await paymentsResponse.text().catch(() => "unknown");
+    console.error(`[findApprovedPayment] payments search failed: ${paymentsResponse.status} ${errorText}`);
+  }
+
+  // Fallback to merchant orders
+  const merchantOrders = await fetchMerchantOrders(orderNumber);
+  for (const mo of merchantOrders) {
+    if (mo.status === "closed" || mo.status === "opened") {
+      const approvedPayment = mo.payments?.find((p) => p.status === "approved");
+      if (approvedPayment) {
+        console.log(`[findApprovedPayment] approved payment found via merchant_order ${mo.id}: ${approvedPayment.id}`);
+        return { source: "merchant_order", payment: approvedPayment, merchantOrder: mo };
+      }
+    }
+  }
+
+  return null;
+}
+
 async function handleOrderPaid(order) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
@@ -129,29 +180,37 @@ export class PaymentService {
       }
     }
 
-    const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(orderNumber)}&sort=date_created&criteria=desc`;
-    console.log(`[verifyAndProcessOrder] querying MP: ${searchUrl}`);
-    const response = await fetch(searchUrl, {
-      headers: { Authorization: `Bearer ${client.accessToken}` },
-    });
+    const approvedResult = await findApprovedPayment(orderNumber);
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "unknown");
-      console.error(`[verifyAndProcessOrder] MP search failed: ${response.status} ${errorText}`);
-      return { found: true, status: order.status };
-    }
-
-    const data = await response.json();
-    console.log(`[verifyAndProcessOrder] MP returned ${data.results?.length || 0} payments`);
-    const approved = data.results?.find((p) => p.status === "approved");
-
-    if (approved) {
-      console.log(`[verifyAndProcessOrder] approved payment found for ${orderNumber}: ${approved.id}`);
+    if (approvedResult) {
+      console.log(`[verifyAndProcessOrder] approved payment found for ${orderNumber} via ${approvedResult.source}: ${approvedResult.payment.id}`);
       await handleOrderPaid(order);
       return { found: true, status: "paid" };
     }
 
     console.log(`[verifyAndProcessOrder] no approved payment yet for ${orderNumber}`);
     return { found: true, status: order.status };
+  }
+
+  async simulateOrderPaid(orderNumber) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Payment simulation is not allowed in production");
+    }
+
+    console.log(`[simulateOrderPaid] simulating payment for ${orderNumber}`);
+    const { OrderService } = await import("./order.service.js");
+    const orderService = new OrderService();
+    const order = await orderService.findByOrderNumber(orderNumber);
+
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    if (order.status === "paid") {
+      return { simulated: false, status: "paid", message: "Order already paid" };
+    }
+
+    await handleOrderPaid(order);
+    return { simulated: true, status: "paid" };
   }
 }
