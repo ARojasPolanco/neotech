@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "nodemailer": {
+      "source": "aidotnet/moyucode",
+      "sourceType": "github",
+      "skillPath": "skills/tools/nodemailer/SKILL.md",
+      "computedHash": "762dcaa61fee58838c57caf1f082a5bb5ea8022b75525abb04d03885e11dcba7"
+    }
+  }
+}

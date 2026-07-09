@@ -71,4 +71,18 @@ export class MailService {
     console.log(`[MailService] receipt sent for ${order.orderNumber}: ${result.messageId}`);
     return result;
   }
+
+  async sendTestEmail(to) {
+    console.log(`[MailService] sending test email to ${to}`);
+    const result = await transporter.sendMail({
+      from: `"Neo Tech" <${envs.MAIL_FROM}>`,
+      to,
+      subject: "Test de conexión SMTP - Neo Tech",
+      text: "Si recibís este mail, la configuración SMTP de Neo Tech funciona correctamente.",
+      html: "<p>Si recibís este mail, la configuración SMTP de Neo Tech funciona correctamente.</p>",
+    });
+
+    console.log(`[MailService] test email sent to ${to}: ${result.messageId}`);
+    return result;
+  }
 }

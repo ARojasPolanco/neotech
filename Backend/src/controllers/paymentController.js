@@ -71,6 +71,34 @@ export const simulatePayment = catchAsync(async (req, res, next) => {
   }
 
   const { orderNumber } = req.params;
-  const result = await paymentService.simulateOrderPaid(orderNumber);
+  const { force } = req.query;
+  console.log(`[simulatePayment] order ${orderNumber}, force: ${force || false}`);
+  const result = await paymentService.simulateOrderPaid(orderNumber, force === "true");
+  return res.status(200).json(result);
+});
+
+export const resendNotifications = catchAsync(async (req, res, next) => {
+  if (process.env.NODE_ENV === "production") {
+    return next(new AppError("Resend not allowed in production", 403));
+  }
+
+  const { orderNumber } = req.params;
+  console.log(`[resendNotifications] order ${orderNumber}`);
+  const result = await paymentService.resendOrderNotifications(orderNumber);
+  return res.status(200).json(result);
+});
+
+export const sendTestEmail = catchAsync(async (req, res, next) => {
+  if (process.env.NODE_ENV === "production") {
+    return next(new AppError("Test email not allowed in production", 403));
+  }
+
+  const { to } = req.body;
+  if (!to) {
+    return next(new AppError("Missing 'to' email address", 400));
+  }
+
+  console.log(`[sendTestEmail] request to ${to}`);
+  const result = await paymentService.sendTestEmail(to);
   return res.status(200).json(result);
 });
