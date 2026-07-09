@@ -108,59 +108,47 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 
 ---
 
-## FASE 2 — Frontend Base
+## FASE 2 — Frontend Base ✅
 
-### 2.1 Setup del proyecto
+### 2.1 Setup del proyecto ✅
 
-- [ ] Crear `frontend/` con Vite + React
-- [ ] Instalar e configurar Tailwind CSS v4
-- [ ] Configurar proxy en `vite.config.js` para `/api` → `http://localhost:3000`
-- [ ] Instalar dependencias: `react-router-dom`, `axios`, `lucide-react` (iconos)
+- [x] **`Frontend/`** — Vite + React creado
+- [x] **Tailwind CSS v4** — Instalado y configurado con `@tailwindcss/vite`
+- [x] **Proxy** — Configurado en `vite.config.js` para `/api` → `http://localhost:3000`
+- [x] **Dependencias** — react-router-dom, axios, @fontsource/barlow-condensed, @fontsource-variable/inter
 
-### 2.2 Estructura base
+### 2.2 Estructura base ✅
 
-- [ ] **`frontend/src/main.jsx`** — Entry point con RouterProvider
-- [ ] **`frontend/src/App.jsx`** — Layout raíz con outlet
-- [ ] **`frontend/src/routes.jsx`** — Definición de rutas
-- [ ] **`frontend/src/config/api.js`** — Instancia de axios con baseURL
+- [x] **`src/main.jsx`** — Entry point con BrowserRouter, AuthProvider, CartProvider
+- [x] **`src/App.jsx`** — Layout con Navbar + Routes + Footer
+- [x] **`src/config/api.js`** — Axios con interceptor JWT
+- [x] **`src/config/auth.js`** — Funciones loginRequest, registerRequest, getProfileRequest
 
-### 2.3 Auth context
+### 2.3 Auth context ✅
 
-- [ ] **`frontend/src/context/AuthContext.jsx`** — Contexto de autenticación:
-  - Estado: user, token, loading
-  - Acciones: login, register, logout, loadUser
-  - Token guardado en localStorage
-  - Al iniciar: si hay token, cargar perfil del usuario
-- [ ] **`frontend/src/components/ProtectedRoute.jsx`** — Redirect a login si no hay token
-- [ ] **`frontend/src/components/AdminRoute.jsx`** — Redirect si role !== ADMIN
+- [x] **`src/context/AuthContext.jsx`** — Contexto con user, token, loading, login, logout
+- [x] **Estados**: carga (loading), autenticado, no autenticado
 
-### 2.4 Páginas de Auth
+### 2.4 Páginas de Auth ✅
 
-- [ ] **`frontend/src/pages/LoginPage.jsx`** — Formulario email + password
-- [ ] **`frontend/src/pages/RegisterPage.jsx`** — Registro OFRECIDO como invitación (no obligatorio para comprar):
-  - fullname, email, password, confirmPassword
-  - Checkbox `acceptedTerms` (obligatorio, bloquea submit)
-  - Checkbox `acceptedMarketing` (opcional)
-  - Mensaje promocional: "Creá tu cuenta y obtené descuentos exclusivos, ofertas y acceso a tu historial de pedidos."
-  - Si el email ya existe → mensaje: "Ya tenés una cuenta. Iniciá sesión para ver tu historial."
-- [ ] **`frontend/src/components/AuthLayout.jsx`** — Layout compartido para login/register
+- [x] **`src/pages/LoginPage.jsx`** — Formulario email + password con manejo de errores
+- [x] **`src/pages/RegisterPage.jsx`** — Registro promocional con mensaje de beneficios, checkboxes T&C y marketing
+- [x] **Banner promocional**: "Creá tu cuenta y obtené descuentos exclusivos, ofertas y acceso a tu historial"
 
-### 2.5 Catálogo de productos
+### 2.5 Catálogo de productos ✅
 
-- [ ] **`frontend/src/services/product.service.js`** — Llamadas a la API de productos (incluye variantes)
-- [ ] **`frontend/src/pages/ProductListPage.jsx`** — Grid de productos con:
-  - Cards con imagen, nombre, precio
-  - Estado vacío si no hay productos
-  - Estado de carga (skeleton/spinner)
-  - Estado de error
-- [ ] **`frontend/src/pages/ProductDetailPage.jsx`** — Página individual del producto:
-  - Imagen principal del producto
-  - Selector de colores (círculos con colorHex) — al seleccionar, cambia la imagen a la de la variante
-  - Stock visible por color
-  - Botón "Agregar al carrito" con la variante seleccionada
-- [ ] **`frontend/src/components/ProductCard.jsx`** — Card reutilizable
-- [ ] **`frontend/src/components/ColorSelector.jsx`** — Selector de colores con círculos de colorHex
-- [ ] **`frontend/src/components/Navbar.jsx`** — Barra de navegación con logo, enlaces, carrito
+- [x] **`src/services/product.service.js`** — getProducts, getProduct, getProductVariants
+- [x] **`src/pages/CatalogPage.jsx`** — Grid con loading (skeleton), empty, error states
+- [x] **`src/pages/ProductDetailPage.jsx`** — Selector de colores, stock por variante, botón agregar
+- [x] **`src/components/ProductCard.jsx`** — Card con imagen, nombre, precio, hover
+- [x] **`src/components/ColorSelector.jsx`** — Círculos de color con colorHex
+- [x] **`src/components/Navbar.jsx`** — Logo, links, carrito con badge, login/logout
+- [x] **`src/components/Footer.jsx`** — Footer simple con copyright
+
+### 2.6 Carrito
+
+- [x] **`src/context/CartContext.jsx`** — Contexto con addItem, removeItem, updateQuantity, persistencia localStorage
+- [x] **`src/pages/CartPage.jsx`** — Lista con controles de cantidad, total, estados vacío/lleno
 
 ---
 
@@ -409,7 +397,7 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 
 ```
 [x] FASE 1 — Backend Core (Auth + Productos)
-[ ] FASE 2 — Frontend Base
+[x] FASE 2 — Frontend Base
 [ ] FASE 3 — Carrito + Checkout + Mercado Pago
 [ ] FASE 4 — Notificaciones (WhatsApp + Mail + PDF)
 [ ] FASE 5 — Panel de Administración
