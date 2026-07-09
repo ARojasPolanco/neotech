@@ -1,6 +1,40 @@
 import { client, Preference } from "../config/mercadopago.js";
 import ProductVariant from "../models/productVariantModel.js";
 
+async function handleOrderPaid(order) {
+  const { OrderService } = await import("./order.service.js");
+  const orderService = new OrderService();
+
+  if (!order || order.status === "paid") return;
+
+  await orderService.updateStatus(order, "paid");
+
+  for (const item of order.OrderItems) {
+    if (item.productVariantId) {
+      await ProductVariant.decrement("stock", {
+        by: item.quantity,
+        where: { id: item.productVariantId },
+      });
+    }
+  }
+
+  setImmediate(async () => {
+    try {
+      const { MailService } = await import("./mail.service.js");
+      const { PdfService } = await import("./pdf.service.js");
+      const mailService = new MailService();
+      const pdfService = new PdfService();
+      const pdfBuffer = await pdfService.generateReceipt(order);
+      await Promise.all([
+        mailService.sendOwnerAlert(order),
+        mailService.sendReceipt(order, pdfBuffer),
+      ]);
+    } catch (err) {
+      console.error("Post-payment notification error:", err);
+    }
+  });
+}
+
 export class PaymentService {
   async createPreference(order, frontendUrl) {
     const items = order.OrderItems.map((item) => ({
@@ -47,35 +81,33 @@ export class PaymentService {
       const order = await orderService.findByOrderNumber(
         payment.external_reference,
       );
-
-      if (!order || order.status === "paid") return;
-
-      await orderService.updateStatus(order, "paid");
-
-      for (const item of order.OrderItems) {
-        if (item.productVariantId) {
-          await ProductVariant.decrement("stock", {
-            by: item.quantity,
-            where: { id: item.productVariantId },
-          });
-        }
-      }
-
-      setImmediate(async () => {
-        try {
-          const { MailService } = await import("./mail.service.js");
-          const { PdfService } = await import("./pdf.service.js");
-          const mailService = new MailService();
-          const pdfService = new PdfService();
-          const pdfBuffer = await pdfService.generateReceipt(order);
-          await Promise.all([
-            mailService.sendOwnerAlert(order),
-            mailService.sendReceipt(order, pdfBuffer),
-          ]);
-        } catch (err) {
-          console.error("Post-payment notification error:", err);
-        }
-      });
+      await handleOrderPaid(order);
     }
+  }
+
+  async verifyAndProcessOrder(orderNumber) {
+    const { OrderService } = await import("./order.service.js");
+    const orderService = new OrderService();
+    const order = await orderService.findByOrderNumber(orderNumber);
+
+    if (!order) return { found: false };
+    if (order.status === "paid") return { found: true, wasPaid: true };
+
+    const response = await fetch(
+      `https://api.mercadopago.com/v1/payments/search?external_reference=${orderNumber}&sort=date_created&criteria=desc`,
+      { headers: { Authorization: `Bearer ${client.accessToken}` } },
+    );
+
+    if (!response.ok) return { found: true, status: order.status };
+
+    const data = await response.json();
+    const approved = data.results?.find((p) => p.status === "approved");
+
+    if (approved) {
+      await handleOrderPaid(order);
+      return { found: true, status: "paid" };
+    }
+
+    return { found: true, status: order.status };
   }
 }

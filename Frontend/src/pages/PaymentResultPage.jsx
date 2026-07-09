@@ -27,21 +27,22 @@ export default function PaymentResultPage() {
     async function poll() {
       if (cancelled) return;
       try {
-        const res = await api.get(`/orders/number/${orderNumber}`);
-        if (res.data.id && !cancelled) {
-          setOrder(res.data);
+        const res = await api.get(`/payments/verify/${orderNumber}`);
+        if (res.data.status === "paid" && !cancelled) {
+          const orderRes = await api.get(`/orders/number/${orderNumber}`);
+          setOrder(orderRes.data);
           setStatus("found");
           sessionStorage.removeItem("lastOrderNumber");
           return;
         }
       } catch {
-        // order not found yet, keep polling
+        // keep polling
       }
 
       setAttempts((prev) => prev + 1);
 
       if (!cancelled) {
-        timer = setTimeout(poll, 2000);
+        timer = setTimeout(poll, 3000);
       }
     }
 
