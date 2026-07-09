@@ -153,140 +153,59 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 
 ---
 
-## FASE 3 — Carrito + Checkout + Mercado Pago
+## FASE 3 — Carrito + Checkout + Mercado Pago ✅
 
-### 3.1 Carrito (client-side)
+### 3.1 Carrito (client-side) ✅
 
-- [ ] **`frontend/src/context/CartContext.jsx`** — Estado del carrito:
-  - items: [{ product, quantity }]
-  - totalItems, totalPrice
-  - addItem(product, quantity)
-  - removeItem(productId)
-  - updateQuantity(productId, quantity)
-  - clearCart()
-  - Persistencia en localStorage
-- [ ] **`frontend/src/components/CartDrawer.jsx`** — Panel lateral con items del carrito
-- [ ] **`frontend/src/pages/CartPage.jsx`** — Página completa del carrito
+- [x] **`frontend/src/context/CartContext.jsx`** — Estado del carrito con persistencia en localStorage
+- [x] **`frontend/src/pages/CartPage.jsx`** — Lista con controles de cantidad, total, vacío
 
-### 3.2 Modelo Order (backend)
+### 3.2 Modelo Order (backend) ✅
 
-- [ ] **`models/orderModel.js`** — Order con:
-  - `id: UUID, PK`
-  - `orderNumber: STRING, unique` — ej: `NT-000001`
-  - `userId: UUID, FK -> Users` (nullable para clientes no logueados)
-  - `status: ENUM("pending", "paid", "cancelled"), defaultValue: "pending"`
-  - `total: DECIMAL(10,2)`
-  - `customerName, customerEmail, customerPhone` — datos del comprador
-  - timestamps
-- [ ] **`models/orderItemModel.js`** — OrderItem con:
-  - `id, orderId (FK), productId (FK)`
-  - `productVariantId: UUID (FK), nullable` — para identificar el color comprado
-  - `productName, unitPrice, quantity, subtotal` (snapshot del producto al momento de comprar)
-  - `color: STRING, nullable` — snapshot del color seleccionado (ej: "Negro")
+- [x] **`models/orderModel.js`** — Order con orderNumber, userId nullable, status, total, datos cliente
+- [x] **`models/orderItemModel.js`** — OrderItem con productVariantId + color + snapshot
 
-### 3.3 Secuencia para números de pedido
+### 3.3 Secuencia para números de pedido ✅
 
-- [ ] **`database/migrations/001-create-order-sequence.js`** — SQL:
-  ```sql
-  CREATE SEQUENCE IF NOT EXISTS order_numbers START 1;
-  ```
-- [ ] En OrderService: `getNextOrderNumber()` que hace:
-  ```sql
-  SELECT nextval('order_numbers') as num
-  ```
-  y formatea como `NT-${String(num).padStart(6, '0')}`
+- [x] Secuencia `order_numbers` en Postgres con `ensureSequence()`
+- [x] `getNextOrderNumber()` formatea `NT-000001`
 
-### 3.4 Order Service (backend)
+### 3.4 Order Service (backend) ✅
 
-- [ ] **`services/order.service.js`** — OrderService con:
-  - `create(data, items)` — crear orden + orderItems + generar orderNumber en transacción
-  - `findById(id)` — buscar con items incluidos
-  - `findByOrderNumber(number)` — buscar por número
-  - `findByUser(userId)` — historial del usuario
-  - `updateStatus(order, status)` — cambiar estado
+- [x] **`services/order.service.js`** — create, findById, findByOrderNumber, findByUser, updateStatus
 
-### 3.5 Orden controller + routes
+### 3.5 Orden controller + routes ✅
 
-- [ ] **`controllers/order.controller.js`** — Handlers
-- [ ] **`routes/order.routes.js`**:
-  - `POST /orders` — crear orden (público, recibe carrito + datos de contacto)
-  - `GET /orders/:id` — ver orden (protegido, solo dueño o admin)
-  - `GET /orders/my-orders` — historial del usuario (protegido)
+- [x] **`controllers/orderController.js`** + **`routes/orderRoutes.js`**
+- [x] POST /orders, GET /orders/:id, GET /orders/number/:orderNumber, GET /orders/my-orders
 
-### 3.6 Integración Mercado Pago
+### 3.6 Integración Mercado Pago ✅
 
-- [ ] **`config/mercadopago.js`** — Inicializar SDK:
-  ```js
-  import { MercadoPagoConfig, Preference } from "mercadopago";
-  const client = new MercadoPagoConfig({ accessToken: envs.MP_ACCESS_TOKEN });
-  export { client, Preference };
-  ```
-- [ ] **`services/payment.service.js`** — PaymentService:
-  - `createPreference(order)` — crea la preferencia en MP con items de la orden
-    - `external_reference = order.orderNumber`
-    - `notification_url = ${BASE_URL}/api/v1/payments/webhook`
-    - `back_urls.success = ${FRONTEND_URL}/orders/${orderNumber}`
-  - `processWebhook(notification)` — valida, busca orden, actualiza a paid
-  - Idempotencia: si la orden ya está `paid`, no re-procesar
-  - **Stock**: al confirmar el pago, descontar stock de cada variante:
-    ```js
-    for (const item of order.Items) {
-      await ProductVariant.decrement("stock", {
-        by: item.quantity,
-        where: { id: item.productVariantId },
-      });
-    }
-    ```
-    - No descontar stock antes del webhook (solo cuando el pago está confirmado)
-    - Si una variante no tiene stock suficiente, marcar la orden como `cancelled` y notificar al admin
-- [ ] **`controllers/payment.controller.js`**:
-  - `createPreference` — crea orden + preferencia y devuelve init_point
-  - `webhookHandler` — recibe notificación de MP, procesa async
-- [ ] **`routes/payment.routes.js`**:
-  - `POST /payments/create-preference` — crea preference (público)
-  - `POST /payments/webhook` — webhook de MP (público, sin auth)
+- [x] **`config/mercadopago.js`** — SDK inicializado con MP_ACCESS_TOKEN
+- [x] **`services/payment.service.js`** — createPreference + processWebhook
+- [x] **`controllers/paymentController.js`** — createPreference + webhookHandler
+- [x] **`routes/paymentRoutes.js`** — POST /payments/create-preference, POST /payments/webhook
+- [x] Stock: descontar de `ProductVariant.stock` al confirmar pago
 
-### 3.7 Checkout frontend
+### 3.7 Checkout frontend ✅
 
-- [ ] **`frontend/src/pages/CheckoutPage.jsx`** — Formulario con datos del comprador:
-  - Nombre, email, teléfono
-  - Resumen del carrito
-  - Botón "Pagar con Mercado Pago" → llama a createPreference → redirige a init_point
-- [ ] **`frontend/src/pages/OrderSuccessPage.jsx`** — Pantalla de confirmación:
-  - Número de pedido
-  - Mensaje: "Te enviaremos el recibo por mail"
-- [ ] **`frontend/src/pages/OrderDetailPage.jsx`** — Detalle del pedido (protegido)
+- [x] **`pages/CheckoutPage.jsx`** — Formulario datos + resumen carrito, abre MP en pestaña nueva
+- [x] **`pages/PaymentResultPage.jsx`** — Polling hasta que la orden pasa a paid
+- [x] **`pages/OrderSuccessPage.jsx`** — Confirmación con número de pedido
 
 ---
 
-## FASE 4 — Notificaciones: WhatsApp + Mail + PDF
+## FASE 4 — Notificaciones: Mail + PDF + WhatsApp
 
-### 4.1 WhatsApp Cloud API
+### 4.1 Alerta al dueño por mail
 
-- [ ] **`services/whatsapp.service.js`** — WhatsappService:
-  - `sendMessage(to, text)` — envía mensaje de texto vía WhatsApp Cloud API
-    - `POST https://graph.facebook.com/v21.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`
-    - Headers: `Authorization: Bearer ${WHATSAPP_TOKEN}`
-    - Body: `{ messaging_product: "whatsapp", to, type: "text", text: { body: text } }`
-  - `sendOwnerAlert(order)` — arma y envía el mensaje al dueño:
-    ```
-    🛒 Nuevo pedido: ${orderNumber}
-    Cliente: ${customerName}
-    Productos:
-    - ${item1.productName} x ${item1.quantity} = $${item1.subtotal}
-    Total: $${order.total}
-    Contacto: ${customerEmail} / ${customerPhone}
-    ```
-
-### 4.2 Email (Nodemailer)
-
-- [ ] **`config/mailer.js`** — Crear transporter con Nodemailer (SMTP)
 - [ ] **`services/mail.service.js`** — MailService:
-  - `sendReceipt(order, pdfBuffer)` — envía mail al cliente con PDF adjunto
-  - Asunto: "Tu pedido Neo Tech #${orderNumber} fue confirmado"
-  - Body: texto simple con datos del pedido
+  - `sendOwnerAlert(order)` — envía mail al dueño con detalle del pedido
+    - Destinatario: `OWNER_EMAIL` desde env
+    - Asunto: "🛒 Nuevo pedido NT-000001 de Juan Perez"
+    - Body: número de pedido, productos (con color), cantidades, total, datos del cliente
 
-### 4.3 PDF (pdf-lib)
+### 4.2 Recibo PDF al cliente
 
 - [ ] **`services/pdf.service.js`** — PdfService:
   - `generateReceipt(order)` — genera PDF con:
@@ -295,21 +214,48 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
     - Tabla de items: producto, cantidad, precio unitario, subtotal
     - Total
     - Datos del emprendimiento
-  - Devuelve: `Uint8Array` (el buffer del PDF)
+  - Devuelve: `Uint8Array` (buffer del PDF)
 
-### 4.4 Orquestación post-pago
+### 4.3 Envío de recibo por mail al cliente
+
+- [ ] **`config/mailer.js`** — Transporter de Nodemailer (SMTP)
+- [ ] En `mail.service.js`:
+  - `sendReceipt(order, pdfBuffer)` — envía mail al cliente con PDF adjunto
+  - Asunto: "Tu pedido Neo Tech #NT-000001 fue confirmado"
+
+### 4.4 WhatsApp: link `wa.me` en pantalla de confirmación
+
+- [ ] **`pages/PaymentResultPage.jsx`** — Agregar botón:
+  ```jsx
+  <a href={`https://wa.me/${WHATSAPP_OWNER_NUMBER}?text=Hola, quiero informar mi compra. Número de pedido: ${orderNumber}`}>
+    Informar mi compra por WhatsApp
+  </a>
+  ```
+- [ ] Sin API, sin SDK, sin tokens. Link HTML simple.
+
+### 4.5 Orquestación post-pago
 
 - [ ] En `payment.service.js` → `processWebhook`:
   ```js
-  // Cuando orden pasa de pending a paid:
-  // 1. Disparar notificaciones de forma asíncrona
   setImmediate(async () => {
-    await whatsappService.sendOwnerAlert(order);
+    await mailService.sendOwnerAlert(order);
     const pdfBuffer = await pdfService.generateReceipt(order);
     await mailService.sendReceipt(order, pdfBuffer);
   });
   ```
 - [ ] Garantizar idempotencia: checkear `order.status !== "paid"` antes de procesar
+
+### 4.6 Variables de entorno necesarias
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=tuemail@gmail.com
+SMTP_PASS=contraseña_de_aplicacion
+MAIL_FROM=tuemail@gmail.com
+OWNER_EMAIL=email_del_dueno@gmail.com
+WHATSAPP_OWNER_NUMBER=54911XXXXXXXX
+```
 
 ---
 
@@ -367,16 +313,10 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 - [ ] CORS: configurar orígenes permitidos desde env
 - [ ] Helmet: `npm install helmet && app.use(helmet())`
 - [ ] Rate limiting: `npm install express-rate-limit`
-- [ ] Morgan: activar en development (opcional)
 - [ ] Error handler: verificar que en producción NO se expongan stack traces
 - [ ] Validar que todas las rutas protegidas tengan `protect` middleware
 
-### 6.3 Meta Business Verification
-
-- [ ] Iniciar verificación de negocio en Meta Business Manager (proceso paralelo, no bloquea)
-- [ ] Una vez verificada: crear plantillas de WhatsApp aprobadas para mensajes fuera de ventana 24h
-
-### 6.4 Deploy a Render
+### 6.3 Deploy a Render
 
 - [ ] Crear cuenta en render.com
 - [ ] Conectar repositorio de GitHub
@@ -399,8 +339,8 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 ```
 [x] FASE 1 — Backend Core (Auth + Productos)
 [x] FASE 2 — Frontend Base
-[ ] FASE 3 — Carrito + Checkout + Mercado Pago
-[ ] FASE 4 — Notificaciones (WhatsApp + Mail + PDF)
+[x] FASE 3 — Carrito + Checkout + Mercado Pago
+[ ] FASE 4 — Notificaciones (Mail + PDF + WhatsApp)
 [ ] FASE 5 — Panel de Administración
 [ ] FASE 6 — Producción y Deploy
 ```
