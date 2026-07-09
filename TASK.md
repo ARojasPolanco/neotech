@@ -195,7 +195,7 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 
 ---
 
-## FASE 4 — Notificaciones: Mail + PDF + WhatsApp
+## FASE 4 — Notificaciones: Mail + PDF + WhatsApp ✅
 
 ### 4.1 Alerta al dueño por mail
 
@@ -340,7 +340,7 @@ WHATSAPP_OWNER_NUMBER=54911XXXXXXXX
 [x] FASE 1 — Backend Core (Auth + Productos)
 [x] FASE 2 — Frontend Base
 [x] FASE 3 — Carrito + Checkout + Mercado Pago
-[ ] FASE 4 — Notificaciones (Mail + PDF + WhatsApp)
+[x] FASE 4 — Notificaciones (Mail + PDF + WhatsApp)
 [ ] FASE 5 — Panel de Administración
 [ ] FASE 6 — Producción y Deploy
 ```
