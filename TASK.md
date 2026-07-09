@@ -63,8 +63,9 @@ Este archivo contiene el paso a paso completo para desarrollar el e-commerce des
 
 ### 1.8 Seeders ✅
 
-- [x] **`seeders/adminSeeder.js`** — Crea admin por defecto, correr con `node seeders/adminSeeder.js`
-- [x] Script `"seed": "node seeders/adminSeeder.js"` agregado a package.json
+- [x] **`seeders/adminSeeder.js`** — Crea admin por defecto
+- [x] **`seeders/productSeeder.js`** — Crea 8 productos con variantes de color
+- [x] Script `"seed": "node seeders/adminSeeder.js && node seeders/productSeeder.js"` en package.json
 
 ### 1.9 Variantes — Modelo ProductVariant
 
