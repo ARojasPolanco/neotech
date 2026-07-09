@@ -22,7 +22,6 @@ export class PaymentService {
           failure: `${frontendUrl}/cart`,
           pending: `${frontendUrl}/orders/${order.orderNumber}`,
         },
-        auto_return: "approved",
       },
     });
 
