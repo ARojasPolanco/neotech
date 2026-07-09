@@ -8,8 +8,8 @@
     "dev": "nodemon src/index.js",
     "test": "node src/test-runner.js",
     "seed": "node seeders/adminSeeder.js && node seeders/productSeeder.js",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
+    "lint": "eslint src/ seeders/",
+    "lint:fix": "eslint src/ seeders/ --fix",
     "format": "prettier --write src/"
   },
   "keywords": [],

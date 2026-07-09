@@ -4,7 +4,7 @@ import js from "@eslint/js";
 export default [
   js.configs.recommended,
   {
-    files: ["src/**/*.js"],
+    files: ["src/**/*.js", "seeders/**/*.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
