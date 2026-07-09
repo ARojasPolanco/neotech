@@ -5,8 +5,12 @@ async function handleOrderPaid(order) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
 
-  if (!order || order.status === "paid") return;
+  if (!order || order.status === "paid") {
+    console.log(`[handleOrderPaid] order ${order?.orderNumber} already paid or not found, skipping`);
+    return;
+  }
 
+  console.log(`[handleOrderPaid] marking order ${order.orderNumber} as paid`);
   await orderService.updateStatus(order, "paid");
 
   for (const item of order.OrderItems) {
@@ -24,13 +28,16 @@ async function handleOrderPaid(order) {
       const { PdfService } = await import("./pdf.service.js");
       const mailService = new MailService();
       const pdfService = new PdfService();
+      console.log(`[handleOrderPaid] generating PDF for ${order.orderNumber}`);
       const pdfBuffer = await pdfService.generateReceipt(order);
+      console.log(`[handleOrderPaid] sending mails for ${order.orderNumber}`);
       await Promise.all([
         mailService.sendOwnerAlert(order),
         mailService.sendReceipt(order, pdfBuffer),
       ]);
+      console.log(`[handleOrderPaid] mails sent successfully for ${order.orderNumber}`);
     } catch (err) {
-      console.error("Post-payment notification error:", err);
+      console.error("[handleOrderPaid] Post-payment notification error:", err);
     }
   });
 }
@@ -86,28 +93,44 @@ export class PaymentService {
   }
 
   async verifyAndProcessOrder(orderNumber) {
+    console.log(`[verifyAndProcessOrder] checking order ${orderNumber}`);
     const { OrderService } = await import("./order.service.js");
     const orderService = new OrderService();
     const order = await orderService.findByOrderNumber(orderNumber);
 
-    if (!order) return { found: false };
-    if (order.status === "paid") return { found: true, wasPaid: true };
+    if (!order) {
+      console.log(`[verifyAndProcessOrder] order ${orderNumber} not found`);
+      return { found: false };
+    }
 
-    const response = await fetch(
-      `https://api.mercadopago.com/v1/payments/search?external_reference=${orderNumber}&sort=date_created&criteria=desc`,
-      { headers: { Authorization: `Bearer ${client.accessToken}` } },
-    );
+    if (order.status === "paid") {
+      console.log(`[verifyAndProcessOrder] order ${orderNumber} already paid`);
+      return { found: true, status: "paid" };
+    }
 
-    if (!response.ok) return { found: true, status: order.status };
+    const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(orderNumber)}&sort=date_created&criteria=desc`;
+    console.log(`[verifyAndProcessOrder] querying MP: ${searchUrl}`);
+    const response = await fetch(searchUrl, {
+      headers: { Authorization: `Bearer ${client.accessToken}` },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "unknown");
+      console.error(`[verifyAndProcessOrder] MP search failed: ${response.status} ${errorText}`);
+      return { found: true, status: order.status };
+    }
 
     const data = await response.json();
+    console.log(`[verifyAndProcessOrder] MP returned ${data.results?.length || 0} payments`);
     const approved = data.results?.find((p) => p.status === "approved");
 
     if (approved) {
+      console.log(`[verifyAndProcessOrder] approved payment found for ${orderNumber}: ${approved.id}`);
       await handleOrderPaid(order);
       return { found: true, status: "paid" };
     }
 
+    console.log(`[verifyAndProcessOrder] no approved payment yet for ${orderNumber}`);
     return { found: true, status: order.status };
   }
 }

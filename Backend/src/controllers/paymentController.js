@@ -52,11 +52,14 @@ export const webhookHandler = catchAsync(async (req, res) => {
 
 export const verifyPayment = catchAsync(async (req, res, next) => {
   const { orderNumber } = req.params;
+  console.log(`[verifyPayment] received request for ${orderNumber}`);
   const result = await paymentService.verifyAndProcessOrder(orderNumber);
 
   if (!result.found) {
+    console.log(`[verifyPayment] order ${orderNumber} not found`);
     return next(new AppError("Order not found", 404));
   }
 
+  console.log(`[verifyPayment] order ${orderNumber} status: ${result.status}`);
   return res.status(200).json({ status: result.status });
 });
