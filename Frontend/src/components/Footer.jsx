@@ -9,7 +9,7 @@ export default function Footer() {
           Tecnología al alcance de todos
         </p>
         <p className="mt-4 text-xs text-muted">
-          &copy; {new Date().getFullYear()} Neo Tech. Todos los derechos reservados.
+          &copy; {new Date().getFullYear()} LIER. Todos los derechos reservados.
         </p>
       </div>
     </footer>

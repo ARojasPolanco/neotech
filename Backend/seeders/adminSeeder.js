@@ -1,7 +1,7 @@
-import "../config/enviroments/enviroments.js";
-import sequelize from "../config/database/database.js";
-import "../models/authModel.js";
-import User from "../models/authModel.js";
+import "../src/config/enviroments/enviroments.js";
+import sequelize from "../src/config/database/database.js";
+import "../src/models/authModel.js";
+import User from "../src/models/authModel.js";
 
 async function main() {
   await sequelize.sync();
