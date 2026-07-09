@@ -6,6 +6,13 @@ export default function PaymentResultPage() {
   const [status, setStatus] = useState("checking");
   const [order, setOrder] = useState(null);
   const [attempts, setAttempts] = useState(0);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+
+  useEffect(() => {
+    api.get("/config/whatsapp").then((res) => {
+      setWhatsappNumber(res.data.number);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const orderNumber = sessionStorage.getItem("lastOrderNumber");
@@ -92,19 +99,29 @@ export default function PaymentResultPage() {
         Si creás una cuenta, podés seguir tu pedido y recibir ofertas exclusivas.
       </p>
 
-      <div className="mt-8 flex justify-center gap-4">
-        <Link
-          to="/register"
-          className="rounded-lg border border-border px-6 py-2 text-sm font-medium transition-colors hover:bg-surface"
+      <div className="mt-8 flex flex-col items-center gap-3">
+        <a
+          href={`https://wa.me/${whatsappNumber}?text=Hola,%20quiero%20informar%20mi%20compra.%20N%C3%BAmero%20de%20pedido:%20${order.orderNumber}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1ebe57]"
         >
-          Crear cuenta
-        </Link>
-        <Link
-          to="/products"
-          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
-        >
-          Seguir comprando
-        </Link>
+          💬 Informar mi compra por WhatsApp
+        </a>
+        <div className="flex gap-4">
+          <Link
+            to="/register"
+            className="rounded-lg border border-border px-6 py-2 text-sm font-medium transition-colors hover:bg-surface"
+          >
+            Crear cuenta
+          </Link>
+          <Link
+            to="/products"
+            className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          >
+            Seguir comprando
+          </Link>
+        </div>
       </div>
     </div>
   );

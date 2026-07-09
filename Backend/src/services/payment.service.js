@@ -60,6 +60,22 @@ export class PaymentService {
           });
         }
       }
+
+      setImmediate(async () => {
+        try {
+          const { MailService } = await import("./mail.service.js");
+          const { PdfService } = await import("./pdf.service.js");
+          const mailService = new MailService();
+          const pdfService = new PdfService();
+          const pdfBuffer = await pdfService.generateReceipt(order);
+          await Promise.all([
+            mailService.sendOwnerAlert(order),
+            mailService.sendReceipt(order, pdfBuffer),
+          ]);
+        } catch (err) {
+          console.error("Post-payment notification error:", err);
+        }
+      });
     }
   }
 }
