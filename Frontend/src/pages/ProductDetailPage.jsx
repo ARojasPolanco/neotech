@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import ColorSelector from "../components/ColorSelector.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import { getProduct, getProductVariants } from "../services/product.service.js";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const { addItem } = useCart();
+  const { showToast } = useToast();
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -26,6 +28,11 @@ export default function ProductDetailPage() {
 
   const handleAdd = () => {
     addItem(product, selected, 1);
+    showToast(`${product.name} agregado al carrito`, {
+      actionLabel: "Ver carrito",
+      actionHref: "/cart",
+      duration: 3000,
+    });
   };
 
   if (loading) {
