@@ -37,6 +37,11 @@ export const findProductById = catchAsync(async (req, res, next) => {
   return res.status(200).json(product);
 });
 
+export const findFeaturedProducts = catchAsync(async (req, res) => {
+  const products = await productService.findFeatured(6);
+  return res.status(200).json(products);
+});
+
 export const createProduct = catchAsync(async (req, res) => {
   const { hasError, errorMessages, productData } = validateCreateProduct(
     req.body,

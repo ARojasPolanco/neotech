@@ -14,3 +14,8 @@ export async function getProductVariants(productId) {
   const res = await api.get(`/products/${productId}/variants`);
   return res.data;
 }
+
+export async function getFeaturedProducts() {
+  const res = await api.get("/products/featured");
+  return res.data;
+}

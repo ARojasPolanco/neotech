@@ -3,6 +3,7 @@ import { protect, restrictTo } from "../middlewares/auth.middleware.js";
 import {
   findAllProducts,
   findProductById,
+  findFeaturedProducts,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -15,6 +16,7 @@ import {
 export const router = Router();
 
 router.get("/", findAllProducts);
+router.get("/featured", findFeaturedProducts);
 router.get("/:id", findProductById);
 router.get("/:id/variants", getProductVariants);
 router.post("/", protect, restrictTo("ADMIN"), createProduct);

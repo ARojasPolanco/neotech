@@ -1,6 +1,6 @@
 import Product from "../models/productModel.js";
 import ProductVariant from "../models/productVariantModel.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 
 function generateSlug(name) {
   return name
@@ -49,6 +49,14 @@ export class ProductService {
 
   async findBySlug(slug) {
     return await Product.findOne({ where: { slug, isActive: true } });
+  }
+
+  async findFeatured(limit = 6) {
+    return await Product.findAll({
+      where: { isActive: true },
+      order: Sequelize.literal("RANDOM()"),
+      limit,
+    });
   }
 
   async create(data) {
