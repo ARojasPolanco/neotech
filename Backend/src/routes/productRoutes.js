@@ -7,6 +7,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  permanentDeleteProduct,
   getProductVariants,
   createVariant,
   updateVariant,
@@ -24,4 +25,5 @@ router.post("/:id/variants", protect, restrictTo("ADMIN"), createVariant);
 router.patch("/:id", protect, restrictTo("ADMIN"), updateProduct);
 router.patch("/variants/:id", protect, restrictTo("ADMIN"), updateVariant);
 router.delete("/:id", protect, restrictTo("ADMIN"), deleteProduct);
+router.delete("/:id/permanent", protect, restrictTo("ADMIN"), permanentDeleteProduct);
 router.delete("/variants/:id", protect, restrictTo("ADMIN"), deleteVariant);

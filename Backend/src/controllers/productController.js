@@ -96,6 +96,33 @@ export const deleteProduct = catchAsync(async (req, res, next) => {
   });
 });
 
+export const permanentDeleteProduct = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await productService.findById(id);
+
+  if (!product) {
+    return next(new AppError("Product not found", 404));
+  }
+
+  try {
+    await productService.permanentDelete(product);
+    return res.status(200).json({
+      status: "success",
+      message: "Product permanently deleted",
+    });
+  } catch (err) {
+    if (err.message === "PRODUCT_HAS_ORDERS") {
+      return next(
+        new AppError(
+          "No se puede eliminar: el producto tiene pedidos asociados. Desactivalo en su lugar.",
+          409,
+        ),
+      );
+    }
+    throw err;
+  }
+});
+
 export const getProductVariants = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const product = await productService.findById(id);
