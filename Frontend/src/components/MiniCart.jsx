@@ -10,21 +10,13 @@ export default function MiniCart({ isOpen, onClose }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/20"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="absolute right-0 top-full z-50 mt-2 w-80 rounded-card border border-border bg-white p-4 shadow-xl"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="absolute right-0 top-full z-50 mt-2 w-80 rounded-card border border-border bg-white p-4 shadow-xl"
+        >
             <div className="mb-3 flex items-center justify-between">
               <p className="font-heading text-lg font-semibold">
                 Carrito ({totalItems})
@@ -85,7 +77,6 @@ export default function MiniCart({ isOpen, onClose }) {
               </>
             )}
           </motion.div>
-        </>
       )}
     </AnimatePresence>
   );

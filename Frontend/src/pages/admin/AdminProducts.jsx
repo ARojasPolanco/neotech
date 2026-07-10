@@ -11,7 +11,7 @@ export default function AdminProducts() {
   const loadProducts = () => {
     setLoading(true);
     api
-      .get("/products", { params: { isActive: false } })
+      .get("/products")
       .then((res) => setProducts(res.data))
       .catch(() => setError("Error al cargar productos"))
       .finally(() => setLoading(false));

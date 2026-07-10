@@ -8,7 +8,7 @@ const createProductSchema = z.object({
     .max(100, { message: "Name is too long" }),
   description: z.string().optional(),
   price: z.number().positive({ message: "Price must be positive" }),
-  imageUrl: z.string().url({ message: "Invalid image URL" }).optional(),
+  imageUrl: z.string().url({ message: "Invalid image URL" }).optional().or(z.literal("")),
 });
 
 const updateProductSchema = createProductSchema.partial();
@@ -31,7 +31,7 @@ const createVariantSchema = z.object({
   colorHex: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/, { message: "Invalid hex color" }),
-  imageUrl: z.string().url({ message: "Invalid image URL" }).optional(),
+  imageUrl: z.string().url({ message: "Invalid image URL" }).optional().or(z.literal("")),
   stock: z.number().int().min(0, { message: "Stock cannot be negative" }).default(0),
 });
 

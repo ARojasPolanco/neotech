@@ -3,12 +3,14 @@ import ProductVariant from "../models/productVariantModel.js";
 import { Op, Sequelize } from "sequelize";
 
 function generateSlug(name) {
-  return name
+  const base = name
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .trim();
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return `${base}-${suffix}`;
 }
 
 export class ProductService {

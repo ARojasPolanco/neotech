@@ -93,8 +93,8 @@ export default function AdminProductForm() {
       color: variantForm.color,
       colorHex: variantForm.colorHex,
       stock: Number(variantForm.stock),
-      imageUrl,
     };
+    if (imageUrl) payload.imageUrl = imageUrl;
 
     if (editingVariant) {
       if (isEdit) {
@@ -146,13 +146,14 @@ export default function AdminProductForm() {
         imageUrl = await uploadImage(imageFile);
       }
 
+      const priceStr = form.price.replace(/\./g, "").replace(",", ".");
       const payload = {
         name: form.name,
         description: form.description,
-        price: Number(form.price),
-        imageUrl,
+        price: Number(priceStr),
         isActive: form.isActive,
       };
+      if (imageUrl) payload.imageUrl = imageUrl;
 
       let productId;
       if (isEdit) {
@@ -163,12 +164,13 @@ export default function AdminProductForm() {
         productId = res.data.id;
 
         for (const v of variants) {
-          await api.post(`/products/${productId}/variants`, {
+          const variantPayload = {
             color: v.color,
             colorHex: v.colorHex,
             stock: Number(v.stock),
-            imageUrl: v.imageUrl,
-          });
+          };
+          if (v.imageUrl) variantPayload.imageUrl = v.imageUrl;
+          await api.post(`/products/${productId}/variants`, variantPayload);
         }
       }
 
