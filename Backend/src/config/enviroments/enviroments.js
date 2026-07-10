@@ -20,6 +20,9 @@ const envSchema = z.object({
   SMTP_PASS: z.string().min(1),
   MAIL_FROM: z.string().min(1),
   OWNER_EMAIL: z.string().min(1),
+  CLOUDINARY_CLOUD_NAME: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1),
+  CLOUDINARY_API_SECRET: z.string().min(1),
 });
 
 export const envs = envSchema.parse(process.env);
