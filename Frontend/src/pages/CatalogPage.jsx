@@ -10,7 +10,7 @@ export default function CatalogPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const filters = { isActive: "true" };
+    const filters = { isActive: "true", includeVariants: "true" };
     const search = searchParams.get("search");
     if (search) filters.search = search;
 

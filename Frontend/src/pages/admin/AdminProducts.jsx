@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Trash2 } from "lucide-react";
 import api from "../../config/api.js";
+import ConfirmModal from "../../components/ConfirmModal.jsx";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const loadProducts = () => {
     setLoading(true);
@@ -33,6 +36,19 @@ export default function AdminProducts() {
       );
     } catch {
       setError("Error al actualizar producto");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await api.delete(`/products/${deleteTarget.id}/permanent`);
+      setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (err) {
+      const msg = err.response?.data?.message || "Error al eliminar producto";
+      setError(msg);
+      setDeleteTarget(null);
     }
   };
 
@@ -129,6 +145,13 @@ export default function AdminProducts() {
                 >
                   {product.isActive ? "Desactivar" : "Activar"}
                 </button>
+                <button
+                  onClick={() => setDeleteTarget(product)}
+                  className="cursor-pointer rounded-lg border border-error/30 px-2 py-1.5 text-xs text-error transition-colors hover:bg-error/10"
+                  title="Eliminar permanentemente"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             </motion.div>
           ))}
@@ -140,6 +163,16 @@ export default function AdminProducts() {
           </p>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        title="Eliminar producto"
+        message={`¿Estás seguro de eliminar "${deleteTarget?.name}"? Esta acción es permanente y no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

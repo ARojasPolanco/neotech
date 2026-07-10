@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Camera, Pencil } from "lucide-react";
 import api from "../../config/api.js";
 
 export default function AdminProductForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
+  const imageInputRef = useRef(null);
+  const variantImageInputRef = useRef(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -262,27 +265,36 @@ export default function AdminProductForm() {
 
         <div>
           <label className="mb-1 block text-sm font-medium">Imagen principal</label>
-          <div className="flex items-start gap-4">
-            <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-border bg-surface">
-              {imagePreview ? (
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => imageInputRef.current?.click()}
+            className="group relative h-28 w-28 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed border-border bg-surface transition-colors hover:border-accent"
+          >
+            {imagePreview ? (
+              <>
                 <img
                   src={imagePreview}
                   alt="Preview"
                   className="h-full w-full object-cover"
                 />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-xs text-muted">
-                  Sin imagen
-                </div>
-              )}
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="text-sm"
-            />
-          </div>
+                <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                  <Pencil size={20} className="text-white" />
+                </span>
+              </>
+            ) : (
+              <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-muted">
+                <Camera size={24} />
+                <span className="text-xs">Subir imagen</span>
+              </div>
+            )}
+          </button>
         </div>
 
         <div className="border-t border-border pt-5">
@@ -432,23 +444,35 @@ export default function AdminProductForm() {
                       <label className="mb-1 block text-xs font-medium">
                         Imagen
                       </label>
-                      <div className="flex items-center gap-2">
-                        <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded border border-border bg-surface">
-                          {variantImagePreview ? (
+                      <input
+                        ref={variantImageInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleVariantImageChange}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => variantImageInputRef.current?.click()}
+                        className="group relative h-12 w-12 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed border-border bg-surface transition-colors hover:border-accent"
+                      >
+                        {variantImagePreview ? (
+                          <>
                             <img
                               src={variantImagePreview}
                               alt="Preview"
                               className="h-full w-full object-cover"
                             />
-                          ) : null}
-                        </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleVariantImageChange}
-                          className="text-xs"
-                        />
-                      </div>
+                            <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                              <Pencil size={12} className="text-white" />
+                            </span>
+                          </>
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-muted">
+                            <Camera size={14} />
+                          </div>
+                        )}
+                      </button>
                     </div>
                   </div>
                   <div className="mt-3 flex gap-2">

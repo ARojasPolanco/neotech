@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import VariantDots from "./VariantDots.jsx";
 
-export default function ProductCard({ product }) {
+export default function FeaturedCard({ product }) {
   const [imageIndex, setImageIndex] = useState(-1);
   const variants = product.ProductVariants || [];
   const placeholder = "https://placehold.co/400x400/e0e0e0/666?text=Neo+Tech";
@@ -29,9 +29,9 @@ export default function ProductCard({ product }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-card border border-border bg-white transition-shadow hover:shadow-lg"
+      className="group block w-64 overflow-hidden rounded-card border border-border bg-white shadow-sm transition-shadow hover:shadow-lg"
     >
-      <div className="relative aspect-square overflow-hidden bg-surface">
+      <div className="relative aspect-[4/3] overflow-hidden bg-surface">
         <img
           src={currentImg}
           alt={product.name}
@@ -42,28 +42,28 @@ export default function ProductCard({ product }) {
           <>
             <button
               onClick={prevImage}
-              className="absolute left-1 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute left-1 top-1/2 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
             >
-              <ChevronLeft size={16} />
+              <ChevronLeft size={14} />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
             >
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
           </>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-1 p-4">
-        <h3 className="font-heading text-lg font-semibold leading-tight">
+      <div className="p-4">
+        <h3 className="font-heading text-lg font-semibold leading-tight line-clamp-1">
           {product.name}
         </h3>
         {product.description && (
-          <p className="line-clamp-2 text-sm text-muted">{product.description}</p>
+          <p className="mt-1 line-clamp-2 text-sm text-muted">{product.description}</p>
         )}
-        <div className="mt-auto flex items-center justify-between pt-2">
+        <div className="mt-2 flex items-center justify-between">
           <p className="text-xl font-bold">
             ${Number(product.price).toLocaleString("es-AR")}
           </p>

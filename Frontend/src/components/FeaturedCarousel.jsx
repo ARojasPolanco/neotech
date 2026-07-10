@@ -1,69 +1,49 @@
 import { useRef } from "react";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import FeaturedCard from "./FeaturedCard.jsx";
 
 export default function FeaturedCarousel({ products }) {
-  const carouselRef = useRef(null);
+  const scrollRef = useRef(null);
 
   if (!products || products.length === 0) return null;
 
+  const scrollBy = (dir) => {
+    if (!scrollRef.current) return;
+    const cardWidth = 272;
+    scrollRef.current.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
+  };
+
   return (
-    <div className="relative">
-      <motion.div
-        ref={carouselRef}
-        className="flex cursor-grab gap-4 overflow-x-hidden py-2 active:cursor-grabbing"
-        whileTap={{ cursor: "grabbing" }}
-      >
-        <motion.div
-          drag="x"
-          dragConstraints={carouselRef}
-          className="flex gap-4"
+    <div className="group relative">
+      <div className="absolute -left-3 top-1/2 z-10 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          onClick={() => scrollBy(-1)}
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-surface"
         >
-          {products.map((product) => (
-            <FeaturedCard key={product.id} product={product} />
-          ))}
-        </motion.div>
-      </motion.div>
+          <ChevronLeft size={18} />
+        </button>
+      </div>
 
-      <p className="mt-2 text-center text-xs text-muted md:hidden">
-        Deslizá para ver más
-      </p>
-    </div>
-  );
-}
-
-function FeaturedCard({ product }) {
-  const img = product.imageUrl || "https://placehold.co/400x400/e0e0e0/666?text=Neo+Tech";
-
-  return (
-    <motion.div
-      whileHover={{ y: -6 }}
-      transition={{ type: "spring", stiffness: 300 }}
-      className="w-64 flex-shrink-0"
-    >
-      <Link
-        to={`/products/${product.id}`}
-        className="group block overflow-hidden rounded-card border border-border bg-white shadow-sm transition-shadow hover:shadow-lg"
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+        style={{ scrollSnapType: "x mandatory", scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="aspect-[4/3] overflow-hidden bg-surface">
-          <img
-            src={img}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        </div>
-        <div className="p-4">
-          <h3 className="font-heading text-lg font-semibold leading-tight line-clamp-1">
-            {product.name}
-          </h3>
-          {product.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-muted">{product.description}</p>
-          )}
-          <p className="mt-3 text-xl font-bold">
-            ${Number(product.price).toLocaleString("es-AR")}
-          </p>
-        </div>
-      </Link>
-    </motion.div>
+        {products.map((product) => (
+          <div key={product.id} style={{ scrollSnapAlign: "start" }} className="flex-shrink-0">
+            <FeaturedCard product={product} />
+          </div>
+        ))}
+      </div>
+
+      <div className="absolute -right-3 top-1/2 z-10 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          onClick={() => scrollBy(1)}
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-surface"
+        >
+          <ChevronRight size={18} />
+        </button>
+      </div>
+    </div>
   );
 }

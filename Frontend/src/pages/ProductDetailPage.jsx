@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import ColorSelector from "../components/ColorSelector.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
@@ -20,7 +21,6 @@ export default function ProductDetailPage() {
       .then(([prod, varts]) => {
         setProduct(prod);
         setVariants(varts);
-        if (varts.length > 0) setSelected(varts[0]);
       })
       .catch(() => setError("Error al cargar el producto"))
       .finally(() => setLoading(false));
@@ -34,6 +34,46 @@ export default function ProductDetailPage() {
       duration: 3000,
     });
   };
+
+  const handleSelectVariant = (variant) => {
+    setSelected(variant);
+  };
+
+  const handleDeselect = () => {
+    setSelected(null);
+  };
+
+  const placeholder = "https://placehold.co/600x600/e0e0e0/666?text=Neo+Tech";
+  const displayImg = selected?.imageUrl || product?.imageUrl || placeholder;
+
+  const imageList = [
+    product?.imageUrl || placeholder,
+    ...variants.filter((v) => v.imageUrl).map((v) => v.imageUrl),
+  ];
+
+  const currentImageIndex = selected
+    ? variants.filter((v) => v.imageUrl).indexOf(selected) + 1
+    : 0;
+
+  const nextImage = () => {
+    const nextIdx = (currentImageIndex + 1) % imageList.length;
+    if (nextIdx === 0) {
+      setSelected(null);
+    } else {
+      setSelected(variants.filter((v) => v.imageUrl)[nextIdx - 1]);
+    }
+  };
+
+  const prevImage = () => {
+    const prevIdx = (currentImageIndex - 1 + imageList.length) % imageList.length;
+    if (prevIdx === 0) {
+      setSelected(null);
+    } else {
+      setSelected(variants.filter((v) => v.imageUrl)[prevIdx - 1]);
+    }
+  };
+
+  const stock = selected ? selected.stock : null;
 
   if (loading) {
     return (
@@ -56,18 +96,32 @@ export default function ProductDetailPage() {
     );
   }
 
-  const displayImg = selected?.imageUrl || product.imageUrl || "https://placehold.co/600x600/e0e0e0/666?text=Neo+Tech";
-  const stock = selected ? selected.stock : null;
-
   return (
     <div className="mx-auto max-w-4xl">
-      <Link to="/products" className="mb-4 inline-block text-sm text-muted hover:text-fg">
-        &larr; Volver
+      <Link to="/products" className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-fg">
+        <ChevronLeft size={14} /> Volver
       </Link>
 
       <div className="flex flex-col gap-8 md:flex-row">
-        <div className="aspect-square overflow-hidden rounded-card bg-surface md:w-1/2">
+        <div className="relative aspect-square overflow-hidden rounded-card bg-surface md:w-1/2">
           <img src={displayImg} alt={product.name} className="h-full w-full object-cover" />
+
+          {imageList.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 shadow transition-colors hover:bg-white"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 shadow transition-colors hover:bg-white"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </>
+          )}
         </div>
 
         <div className="flex flex-1 flex-col gap-5">
@@ -85,7 +139,13 @@ export default function ProductDetailPage() {
             </p>
           )}
 
-          <ColorSelector variants={variants} selected={selected} onSelect={setSelected} />
+          <ColorSelector
+            product={product}
+            variants={variants}
+            selected={selected}
+            onSelect={handleSelectVariant}
+            onDeselect={handleDeselect}
+          />
 
           <button
             onClick={handleAdd}
