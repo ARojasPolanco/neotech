@@ -136,8 +136,14 @@ export default function PaymentResultPage() {
 
   if (status === "delayed") {
     return (
-      <div className="mx-auto max-w-md py-20 text-center">
-        <div className="mb-6 text-5xl">⏳</div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-auto max-w-md py-20 text-center"
+      >
+        <div className="mb-6 flex justify-center">
+          <DelayedPaymentIcon />
+        </div>
         <h1 className="mb-2 font-heading text-2xl font-bold">
           Tu pago está siendo procesado
         </h1>
@@ -167,7 +173,7 @@ export default function PaymentResultPage() {
             Refrescar estado
           </button>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -271,6 +277,47 @@ function SuccessCheckmark() {
             transition: { duration: 0.4, delay: 0.4, ease: "easeInOut" },
           },
         }}
+      />
+    </motion.svg>
+  );
+}
+
+function DelayedPaymentIcon() {
+  return (
+    <motion.svg
+      width="80"
+      height="80"
+      viewBox="0 0 80 80"
+      fill="none"
+    >
+      <motion.circle
+        cx="40"
+        cy="40"
+        r="36"
+        stroke="#d5d5d5"
+        strokeWidth="4"
+      />
+      <motion.circle
+        cx="40"
+        cy="40"
+        r="36"
+        stroke="#a8e05f"
+        strokeWidth="4"
+        strokeLinecap="round"
+        initial={{ pathLength: 0, rotate: -90 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        style={{ transformOrigin: "center" }}
+      />
+      <motion.path
+        d="M40 22V40L52 52"
+        stroke="#0a0a0a"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
       />
     </motion.svg>
   );
