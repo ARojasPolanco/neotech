@@ -1,6 +1,8 @@
 import sequelize from "../config/database/database.js";
 import Order from "../models/orderModel.js";
 import OrderItem from "../models/orderItemModel.js";
+import Product from "../models/productModel.js";
+import ProductVariant from "../models/productVariantModel.js";
 
 async function getNextOrderNumber() {
   const [result] = await sequelize.query(
@@ -13,10 +15,34 @@ async function getNextOrderNumber() {
 export class OrderService {
   async create({ customerName, customerEmail, customerPhone, items, userId }) {
     const orderNumber = await getNextOrderNumber();
-    const total = items.reduce(
-      (sum, item) => sum + Number(item.unitPrice) * item.quantity,
-      0,
-    );
+
+    const verifiedItems = [];
+    for (const item of items) {
+      const product = await Product.findByPk(item.productId);
+      if (!product || !product.isActive) {
+        throw new Error(`PRODUCT_NOT_FOUND:${item.productId}`);
+      }
+
+      let variant = null;
+      if (item.variantId) {
+        variant = await ProductVariant.findByPk(item.variantId);
+        if (!variant || variant.productId !== product.id) {
+          throw new Error(`VARIANT_NOT_FOUND:${item.variantId}`);
+        }
+      }
+
+      verifiedItems.push({
+        productId: product.id,
+        productVariantId: variant?.id || null,
+        productName: product.name,
+        color: variant?.color || item.color || null,
+        unitPrice: Number(product.price),
+        quantity: Number(item.quantity),
+        subtotal: Number(product.price) * Number(item.quantity),
+      });
+    }
+
+    const total = verifiedItems.reduce((sum, item) => sum + item.subtotal, 0);
 
     const order = await Order.create({
       orderNumber,
@@ -27,15 +53,9 @@ export class OrderService {
       total,
     });
 
-    const orderItems = items.map((item) => ({
+    const orderItems = verifiedItems.map((item) => ({
       orderId: order.id,
-      productId: item.productId,
-      productVariantId: item.variantId || null,
-      productName: item.productName,
-      color: item.color || null,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity,
-      subtotal: Number(item.unitPrice) * item.quantity,
+      ...item,
     }));
 
     await OrderItem.bulkCreate(orderItems);

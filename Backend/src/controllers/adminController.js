@@ -18,12 +18,13 @@ export const getStats = catchAsync(async (req, res) => {
 });
 
 export const getOrders = catchAsync(async (req, res) => {
-  const { page, limit, status } = req.query;
-  const result = await adminService.getOrders({
-    page: Number(page) || 1,
-    limit: Number(limit) || 20,
-    status,
-  });
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20));
+  const status = ["pending", "paid", "cancelled"].includes(req.query.status)
+    ? req.query.status
+    : undefined;
+
+  const result = await adminService.getOrders({ page, limit, status });
   return res.status(200).json(result);
 });
 

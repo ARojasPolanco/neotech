@@ -14,15 +14,25 @@ export const createOrder = catchAsync(async (req, res, next) => {
     return next(new AppError("Cart is empty", 400));
   }
 
-  const order = await orderService.create({
-    customerName,
-    customerEmail,
-    customerPhone,
-    items,
-    userId: req.sessionUser?.id || null,
-  });
+  try {
+    const order = await orderService.create({
+      customerName,
+      customerEmail,
+      customerPhone,
+      items,
+      userId: req.sessionUser?.id || null,
+    });
 
-  return res.status(201).json(order);
+    return res.status(201).json(order);
+  } catch (err) {
+    if (err.message?.startsWith("PRODUCT_NOT_FOUND")) {
+      return next(new AppError(`Producto no encontrado: ${err.message.split(":")[1]}`, 400));
+    }
+    if (err.message?.startsWith("VARIANT_NOT_FOUND")) {
+      return next(new AppError(`Variante no encontrada: ${err.message.split(":")[1]}`, 400));
+    }
+    throw err;
+  }
 });
 
 export const getOrder = catchAsync(async (req, res, next) => {
@@ -47,6 +57,24 @@ export const getOrderByNumber = catchAsync(async (req, res, next) => {
 
   if (!order) {
     return next(new AppError("Order not found", 404));
+  }
+
+  if (!req.sessionUser) {
+    return res.status(200).json({
+      id: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      total: order.total,
+      createdAt: order.createdAt,
+      OrderItems: order.OrderItems?.map((item) => ({
+        id: item.id,
+        productName: item.productName,
+        color: item.color,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+      })),
+    });
   }
 
   return res.status(200).json(order);

@@ -9,59 +9,6 @@ import {
 import { encryptedPassword, verifyPassword } from "../config/plugins/encrypted-password.js";
 import { authService } from "./injection.js";
 
-export const findAllUsers = catchAsync(async (req, res) => {
-  const users = await authService.findAllUser();
-
-  return res.status(200).json(users);
-});
-
-export const findUserByEmail = catchAsync(async (req, res, next) => {
-  const { email } = req.query;
-
-  const userEmail = await authService.findOneUserByEmail(email);
-
-  if (!userEmail) {
-    return next(new AppError("User email not found", 404));
-  }
-
-  return res.status(200).json(userEmail);
-});
-
-export const findUserById = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-
-  const userId = await authService.findOneUserById(id);
-
-  if (!userId) {
-    return next(new AppError("User id not found", 404));
-  }
-
-  return res.status(200).json(userId);
-});
-
-export const updateUser = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-
-  const user = await authService.findOneUserById(id);
-
-  if (!user) {
-    return next(new AppError("User id not found", 404));
-  }
-
-  const { hasError, errorMessages, userData } = validateUpdate(req.body);
-
-  if (hasError) {
-    return res.status(422).json({
-      status: "error",
-      message: errorMessages,
-    });
-  }
-
-  const updatedUser = await authService.updateUser(user, userData);
-
-  return res.status(200).json(updatedUser);
-});
-
 export const changedPassword = catchAsync(async (req, res, next) => {
   const { hasError, errorMessages, userData } = validateChangePassword(req.body);
 
@@ -99,23 +46,6 @@ export const changedPassword = catchAsync(async (req, res, next) => {
   });
 });
 
-export const deleteUser = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-
-  const user = await authService.findOneUserById(id);
-
-  if (!user) {
-    return next(new AppError("User id not found", 404));
-  }
-
-  await authService.deleteUser(user);
-
-  return res.status(200).json({
-    status: "success",
-    message: "User deleted successfully",
-  });
-});
-
 export const getProfile = catchAsync(async (req, res) => {
   const user = req.sessionUser;
 
@@ -131,11 +61,19 @@ export const getProfile = catchAsync(async (req, res) => {
 });
 
 export const updateProfile = catchAsync(async (req, res, _next) => {
-  const { fullname, email } = req.body;
+  const { hasError, errorMessages, userData } = validateUpdate(req.body);
+
+  if (hasError) {
+    return res.status(422).json({
+      status: "error",
+      message: errorMessages,
+    });
+  }
+
   const user = req.sessionUser;
 
-  if (fullname) user.fullname = fullname;
-  if (email) user.email = email;
+  if (userData.fullname) user.fullname = userData.fullname;
+  if (userData.email) user.email = userData.email;
 
   await user.save();
 
@@ -188,7 +126,7 @@ export const login = catchAsync(async (req, res, next) => {
   const userEmail = await authService.findOneUserByEmail(userData.email);
 
   if (!userEmail) {
-    return next(new AppError("User email not found", 404));
+    return next(new AppError("Email or password invalid", 401));
   }
 
   const isCorrectPassword = await verifyPassword(userData.password, userEmail.password);

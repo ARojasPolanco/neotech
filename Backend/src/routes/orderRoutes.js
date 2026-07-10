@@ -12,4 +12,4 @@ export const router = Router();
 router.post("/", createOrder);
 router.get("/my-orders", protect, getMyOrders);
 router.get("/number/:orderNumber", getOrderByNumber);
-router.get("/:id", getOrder);
+router.get("/:id", protect, getOrder);

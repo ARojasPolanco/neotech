@@ -1,6 +1,8 @@
 import { AppError, catchAsync } from "../errors/indexError.js";
 import { OrderService } from "../services/order.service.js";
 import { PaymentService } from "../services/payment.service.js";
+import { envs } from "../config/enviroments/enviroments.js";
+import crypto from "crypto";
 
 const orderService = new OrderService();
 const paymentService = new PaymentService();
@@ -38,6 +40,29 @@ export const webhookHandler = catchAsync(async (req, res) => {
   const notification = req.body;
 
   if (notification.type === "payment") {
+    const xSignature = req.headers["x-signature"];
+    const xRequestId = req.headers["x-request-id"];
+
+    if (xSignature && envs.MP_WEBHOOK_SECRET) {
+      const parts = xSignature.split(",").reduce((acc, part) => {
+        const [key, val] = part.split("=").map((s) => s.trim());
+        if (key === "ts") acc.ts = val;
+        if (key === "v1") acc.v1 = val;
+        return acc;
+      }, {});
+
+      const manifest = `id:${notification.data?.id};request-id:${xRequestId};ts:${parts.ts};`;
+      const expectedSignature = crypto
+        .createHmac("sha256", envs.MP_WEBHOOK_SECRET)
+        .update(manifest)
+        .digest("hex");
+
+      if (parts.v1 !== expectedSignature) {
+        console.warn("[webhookHandler] Invalid signature from", req.ip);
+        return res.status(401).send("Invalid signature");
+      }
+    }
+
     setImmediate(async () => {
       try {
         await paymentService.processWebhook(notification);
