@@ -44,6 +44,15 @@ export default function Navbar() {
             Productos
           </Link>
 
+          {user?.role === "ADMIN" && (
+            <Link
+              to="/admin"
+              className="text-sm font-medium text-accent-dark transition-colors hover:text-fg"
+            >
+              Admin
+            </Link>
+          )}
+
           <div
             className="relative"
             onMouseEnter={() => setCartOpen(true)}
@@ -157,9 +166,18 @@ export default function Navbar() {
                 <div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
                   <span className="px-3 text-sm text-muted">{user.fullname}</span>
                   {user.role === "ADMIN" && (
-                    <span className="ml-3 w-fit rounded-full bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent-dark">
-                      Admin
-                    </span>
+                    <>
+                      <span className="ml-3 w-fit rounded-full bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent-dark">
+                        Admin
+                      </span>
+                      <Link
+                        to="/admin"
+                        onClick={() => setMobileOpen(false)}
+                        className="rounded-lg px-3 py-2 text-sm font-medium text-accent-dark transition-colors hover:bg-surface hover:text-fg"
+                      >
+                        Panel Admin
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={() => {
