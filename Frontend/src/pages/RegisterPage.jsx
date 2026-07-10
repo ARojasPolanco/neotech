@@ -72,11 +72,11 @@ export default function RegisterPage() {
             className="mt-0.5"
           />
           Acepto los{" "}
-          <a href="/terms" className="underline underline-offset-2 hover:text-fg">
+          <a href="/terminos" className="underline underline-offset-2 hover:text-fg">
             Términos y Condiciones
           </a>{" "}
           y la{" "}
-          <a href="/privacy" className="underline underline-offset-2 hover:text-fg">
+          <a href="/privacidad" className="underline underline-offset-2 hover:text-fg">
             Política de Privacidad
           </a>
         </label>
