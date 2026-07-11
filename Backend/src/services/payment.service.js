@@ -1,5 +1,6 @@
 import { client, Preference } from "../config/mercadopago.js";
 import ProductVariant from "../models/productVariantModel.js";
+import { envs } from "../config/enviroments/enviroments.js";
 
 async function fetchPaymentById(paymentId) {
   const response = await fetch(
@@ -123,7 +124,7 @@ export class PaymentService {
       body: {
         items,
         external_reference: order.orderNumber,
-        notification_url: `${process.env.BASE_URL || "https://api.neotech.com"}/api/v1/payments/webhook`,
+        notification_url: `${envs.BASE_URL || "https://api.neotech.com"}/api/v1/payments/webhook`,
         back_urls: {
           success: `${frontendUrl}/payment-result`,
           failure: `${frontendUrl}/cart`,
