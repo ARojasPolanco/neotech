@@ -25,6 +25,13 @@ export const protect = catchAsync(async (req, res, next) => {
     return next(new AppError("The owner of this token is not longer available", 401));
   }
 
+  if (user.changedPasswordAt) {
+    const changedTimestamp = Math.floor(new Date(user.changedPasswordAt).getTime() / 1000);
+    if (decoded.iat < changedTimestamp) {
+      return next(new AppError("Password recently changed. Please login again.", 401));
+    }
+  }
+
   req.sessionUser = user;
   next();
 });
@@ -38,25 +45,3 @@ export const restrictTo = (...roles) => {
   };
 };
 
-export const protectAccountOwner = (req, res, next) => {
-  const { user, sessionUser } = req;
-
-  if (user.id !== sessionUser.id) {
-    return next(new AppError("You do not own this account", 401));
-  }
-
-  next();
-};
-
-export const validExistUser = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-
-  const user = await authService.findOneUserById(id);
-
-  if (!user) {
-    return next(new AppError("User not found", 404));
-  }
-
-  req.user = user;
-  next();
-});

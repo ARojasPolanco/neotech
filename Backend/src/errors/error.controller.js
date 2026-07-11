@@ -21,7 +21,6 @@ const sendErrorProd = async (err, req, res) => {
   await Error.create({
     status: err.status,
     message: err.message,
-    stack: err.stack,
   });
 
   logger.error({
@@ -36,12 +35,6 @@ const sendErrorProd = async (err, req, res) => {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
-    });
-
-    logger.error({
-      message: err.message,
-      status: err.status,
-      stack: err.stack,
     });
   } else {
     res.status(500).json({

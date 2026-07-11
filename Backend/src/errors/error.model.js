@@ -19,7 +19,7 @@ const Error = sequelize.define("errors", {
   },
   stack: {
     type: DataTypes.TEXT,
-    allowNull: false,
+    allowNull: true,
   },
 });
 

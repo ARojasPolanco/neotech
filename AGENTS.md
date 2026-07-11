@@ -6,8 +6,8 @@ Este archivo es la fuente de verdad para cualquier agente de IA (opencode, Claud
 
 Neo Tech es un e-commerce de productos electrónicos. El dueño necesita:
 1. Vender online con carrito y pago con Mercado Pago.
-2. Recibir una alerta por WhatsApp cada vez que se confirma un pago, con el detalle del pedido.
-3. Que el cliente reciba un número de pedido y un recibo en PDF.
+2. Recibir una alerta por mail cada vez que se confirma un pago, con el detalle del pedido.
+3. Que el cliente reciba un número de pedido, un recibo en PDF por mail, y la opción de informar su compra por WhatsApp.
 4. Un panel simple para cargar/editar productos (nombre, precio, imagen) sin tocar código.
 
 No es un proyecto de portfolio ni un demo: va a producción real, así que priorizar simplicidad y robustez por sobre "impresionar".
@@ -21,7 +21,7 @@ No es un proyecto de portfolio ni un demo: va a producción real, así que prior
 - **Frontend:** React (Vite) + Tailwind CSS.
 - **Imágenes:** Cloudinary (subida desde el panel admin vía `multer` + `cloudinary` SDK).
 - **Pagos:** Mercado Pago (`mercadopago` SDK) — Checkout Pro + webhook de notificaciones.
-- **WhatsApp:** WhatsApp Cloud API de Meta (HTTP directo, sin SDK de terceros).
+- **WhatsApp:** link `wa.me` (sin API, sin SDK, sin tokens) — el cliente informa su compra al dueño vía mensaje predefinido.
 - **Mail:** Nodemailer.
 - **PDF:** `pdf-lib`.
 - **Auth:** JWT (access token) + bcrypt para hash de contraseñas.
@@ -54,11 +54,22 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 ## Reglas de negocio clave
 
 ### Registro de usuarios
-- Dos checkboxes separados en el registro:
+- **El registro NO es obligatorio para comprar.** Un guest puede completar la compra solo con nombre, email y teléfono.
+- El registro se ofrece como invitación post-compra o durante el checkout, con beneficios: descuentos, ofertas, historial de pedidos.
+- Si el email ya existe en `Users`, mostrar mensaje: "Ya tenés una cuenta. Iniciá sesión para ver tu historial."
+- Para quienes se registren, dos checkboxes separados:
   - `acceptedTerms` (**obligatorio**, bloquea el submit si no está marcado): Términos y Condiciones + Política de Privacidad.
   - `acceptedMarketing` (**opcional**): consentimiento para recibir ofertas por mail.
 - Guardar en el modelo `User` ambos campos como booleanos, más la fecha de aceptación (`termsAcceptedAt`).
 - Nunca mandar mail de ofertas a un usuario con `acceptedMarketing: false`.
+
+### Variantes de producto (colores)
+- Un mismo producto puede tener múltiples variantes (ej: "iPhone 15" en Negro, Blanco, Azul).
+- Cada variante tiene: `color`, `colorHex` (código hexadecimal), `imageUrl` (imagen específica), `stock` (stock individual).
+- El precio es el mismo para todas las variantes y vive en el producto base (`Product.price`).
+- Al mostrar un producto, el frontend debe listar los colores disponibles. Al seleccionar un color, la imagen cambia.
+- En la orden (`OrderItem`) se guarda el `variantId` + `color` para que el detalle incluya el color seleccionado.
+- El stock se descuenta de `ProductVariant.stock`, no de `Product.stock`.
 
 ### Números de pedido
 - Formato: `NT-000001`, incremental, generado en el momento de crear la orden (no antes).
@@ -70,14 +81,19 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 3. El frontend redirige al `init_point` de Mercado Pago.
 4. Mercado Pago llama al webhook (`POST /api/payments/webhook`) al confirmarse el pago.
 5. El webhook valida la notificación, busca la orden por `external_reference`, actualiza el estado a `paid`.
-6. Solo cuando el estado pasa a `paid` se disparan: alerta WhatsApp al dueño + generación y envío de recibo al cliente. **Nunca disparar estas acciones antes de la confirmación real del webhook.**
-7. El webhook debe responder rápido (200 OK) y hacer el trabajo pesado (WhatsApp, mail, PDF) de forma asíncrona, para no arriesgar timeouts ni reintentos duplicados de Mercado Pago.
-8. Idempotencia: si el webhook llega dos veces para la misma orden ya pagada, no volver a mandar WhatsApp/mail duplicados.
+6. Solo cuando el estado pasa a `paid` se disparan: alerta por mail al dueño + generación y envío de recibo al cliente. **Nunca disparar estas acciones antes de la confirmación real del webhook.**
+7. El webhook debe responder rápido (200 OK) y hacer el trabajo pesado (mail, PDF) de forma asíncrona, para no arriesgar timeouts ni reintentos duplicados de Mercado Pago.
+8. Idempotencia: si el webhook llega dos veces para la misma orden ya pagada, no volver a mandar mail duplicados.
 
-### Alerta al dueño por WhatsApp
-- Mensaje de texto simple con: número de pedido, productos, cantidades, total, y datos de contacto del cliente.
-- Usar plantillas de WhatsApp (`message templates`) aprobadas por Meta si se manda fuera de la ventana de 24hs; para notificaciones inmediatas post-pago no hace falta plantilla.
-- Número destino: `WHATSAPP_OWNER_NUMBER` desde variables de entorno (no hardcodear).
+### Alerta al dueño por mail
+- Al confirmarse un pago, se envía un mail automático al dueño (`OWNER_EMAIL` desde variables de entorno) con: número de pedido, productos (incluyendo color), cantidades, total, y datos de contacto del cliente.
+- El envío se hace desde el mismo servicio de mail (Nodemailer) que envía el recibo al cliente, pero a una cuenta distinta.
+- No hardcodear el mail del dueño: usar `OWNER_EMAIL` desde env.
+
+### WhatsApp para informar la compra
+- El cliente puede informar su compra al dueño mediante un link `wa.me` que se muestra en la pantalla de confirmación post-pago.
+- El link usa un mensaje predefinido: "Hola, quiero informar mi compra. Número de pedido: NT-000001".
+- Sin API, sin SDK, sin tokens. Es un simple link HTML con `href="https://wa.me/{numero}?text={mensaje}"`.
 
 ### Recibo del cliente
 - Generar un PDF simple: número de pedido, fecha, items, precios unitarios, total, datos del emprendimiento (Neo Tech).
@@ -86,6 +102,7 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 ### Panel de administración
 - Rutas protegidas con JWT + verificación de rol `admin`.
 - CRUD de productos: nombre, precio, descripción corta, imagen (subida a Cloudinary), stock, estado (activo/inactivo).
+- Gestión de variantes por producto: agregar/editar colores, imagen específica, stock individual por variante.
 - No permitir borrar productos con pedidos asociados: solo desactivar (`isActive: false`).
 
 ## Convenciones de código
@@ -107,4 +124,4 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 
 ## Estado actual
 
-Proyecto en **Fase 0 — Planeación**. Ver `README.md` para el roadmap completo por fases.
+Proyecto avanzado — Fase 3 completada. Backend con auth, productos, variantes, órdenes y Mercado Pago funcionando. Frontend con catálogo, carrito y checkout integrados. Docker Compose configurado. Próximo paso: Fase 4 (mail, PDF, link de WhatsApp).
