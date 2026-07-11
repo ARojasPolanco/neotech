@@ -5,15 +5,19 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  getProductVariants,
+  createVariant,
+  deleteVariant,
 } from "./controllers/productController.js";
 import Product from "./models/productModel.js";
+import "./models/productVariantModel.js";
+import "./models/associations.js";
 import sequelize from "./config/database/database.js";
 
 const productData = {
   name: "Smartphone Test",
   description: "Un smartphone para testear",
   price: 599.99,
-  stock: 10,
 };
 
 export async function runProductTests() {
@@ -22,6 +26,7 @@ export async function runProductTests() {
 
   await sequelize.sync({ alter: true });
   let createdId;
+  let variantId;
 
   // ── POSITIVOS ──
 
@@ -63,6 +68,50 @@ export async function runProductTests() {
     fallo("Update product failed", updateRes.body);
   }
 
+  // ── Variant tests ──
+
+  const variantRes = await callHandler(
+    createVariant,
+    { color: "Negro", colorHex: "#000000", stock: 10 },
+    {},
+    { id: createdId },
+  );
+
+  if (variantRes.statusCode === 201 && variantRes.body.id) {
+    ok(`Variant created: ${variantRes.body.color}`);
+    variantId = variantRes.body.id;
+  } else {
+    fallo("Create variant failed", variantRes.body);
+  }
+
+  const getVariantsRes = await callHandler(
+    getProductVariants,
+    {},
+    {},
+    { id: createdId },
+  );
+
+  if (getVariantsRes.statusCode === 200 && Array.isArray(getVariantsRes.body)) {
+    ok("Get product variants returns array");
+  } else {
+    fallo("Get variants failed", getVariantsRes.body);
+  }
+
+  const variantDeleted = await callHandler(
+    deleteVariant,
+    {},
+    {},
+    { id: variantId },
+  );
+
+  if (variantDeleted.statusCode === 200 && variantDeleted.body.status === "success") {
+    ok("Delete variant returns success");
+  } else {
+    fallo("Delete variant failed", variantDeleted.body);
+  }
+
+  // ── Disable / soft delete product ──
+
   const disableRes = await callHandler(deleteProduct, {}, {}, { id: createdId });
 
   if (disableRes.statusCode === 200 && disableRes.body.status === "success") {
@@ -71,7 +120,6 @@ export async function runProductTests() {
     fallo("Disable product failed", disableRes.body);
   }
 
-  // Verify it's disabled (not found in active list)
   const afterDisable = await Product.findOne({
     where: { id: createdId, isActive: true },
   });
@@ -97,9 +145,8 @@ export async function runProductTests() {
   }
 
   const createInvalid = await callHandler(createProduct, {
-    name: "No Price",
+    name: "Negative Price",
     price: -10,
-    stock: 5,
   });
 
   if (createInvalid.statusCode === 422) {
@@ -110,7 +157,6 @@ export async function runProductTests() {
 
   const createNoName = await callHandler(createProduct, {
     price: 100,
-    stock: 5,
   });
 
   if (createNoName.statusCode === 422) {
@@ -129,6 +175,21 @@ export async function runProductTests() {
     ok("Filter products by isActive works");
   } else {
     fallo("Filter products by isActive failed", listFiltered.body);
+  }
+
+  // ── Variant negative tests ──
+
+  const variantInvalid = await callHandler(
+    createVariant,
+    { color: "Rojo", colorHex: "rojo", stock: 5 },
+    {},
+    { id: createdId },
+  );
+
+  if (variantInvalid.statusCode === 422) {
+    rechazo("Create variant with invalid hex rejected correctly");
+  } else {
+    fallo("Create variant with invalid hex should return 422", variantInvalid.body);
   }
 
   // Cleanup
