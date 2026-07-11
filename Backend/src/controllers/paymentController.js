@@ -91,11 +91,14 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
 });
 
 export const simulatePayment = catchAsync(async (req, res, next) => {
-  if (process.env.NODE_ENV === "production") {
+  const isProdWithoutSimulate = envs.NODE_ENV === "production" && process.env.ALLOW_SIMULATE_DEV !== "true";
+  if (isProdWithoutSimulate) {
     return next(new AppError("Simulation not allowed in production", 403));
   }
 
   const { orderNumber } = req.params;
-  const result = await paymentService.simulateOrderPaid(orderNumber);
+  const { force } = req.query;
+  console.log(`[simulatePayment] order ${orderNumber}, force: ${force || false}`);
+  const result = await paymentService.simulateOrderPaid(orderNumber, force === "true");
   return res.status(200).json(result);
 });

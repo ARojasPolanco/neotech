@@ -192,12 +192,13 @@ export class PaymentService {
     return { found: true, status: order.status };
   }
 
-  async simulateOrderPaid(orderNumber) {
-    if (process.env.NODE_ENV === "production") {
+  async simulateOrderPaid(orderNumber, force = false) {
+    const isProdWithoutSimulate = process.env.NODE_ENV === "production" && process.env.ALLOW_SIMULATE_DEV !== "true";
+    if (isProdWithoutSimulate) {
       throw new Error("Payment simulation is not allowed in production");
     }
 
-    console.log(`[simulateOrderPaid] simulating payment for ${orderNumber}`);
+    console.log(`[simulateOrderPaid] simulating payment for ${orderNumber}, force: ${force}`);
     const { OrderService } = await import("./order.service.js");
     const orderService = new OrderService();
     const order = await orderService.findByOrderNumber(orderNumber);
@@ -206,8 +207,8 @@ export class PaymentService {
       throw new Error("Order not found");
     }
 
-    if (order.status === "paid") {
-      return { simulated: false, status: "paid", message: "Order already paid" };
+    if (order.status === "paid" && !force) {
+      return { simulated: false, status: "paid", message: "Order already paid. Use ?force=true to resend notifications." };
     }
 
     await handleOrderPaid(order);
