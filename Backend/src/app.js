@@ -8,8 +8,15 @@ import { envs } from "./config/enviroments/enviroments.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(helmet());
-app.use(cors());
+
+const corsOrigin = envs.NODE_ENV === "production"
+  ? (process.env.CORS_ORIGIN || "https://neotech-api-xnjy.onrender.com")
+  : true;
+
+app.use(cors({ origin: corsOrigin }));
 
 const globalLimiter = rateLimit({
   windowMs: 60 * 1000,
