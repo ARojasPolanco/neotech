@@ -12,8 +12,26 @@ app.set("trust proxy", 1);
 
 app.use(helmet());
 
-const corsOrigin = envs.NODE_ENV === "production"
-  ? (process.env.CORS_ORIGIN || "https://neotech-api-xnjy.onrender.com")
+const rawOrigin = process.env.CORS_ORIGIN || "";
+
+const corsOrigin = envs.NODE_ENV === "production" && rawOrigin
+  ? function (origin, callback) {
+      const allowed = [rawOrigin];
+      // Also allow www. and non-www. variants
+      if (rawOrigin.includes("://")) {
+        const url = new URL(rawOrigin);
+        const apex = url.hostname.replace(/^www\./, "");
+        allowed.push(`${url.protocol}//${apex}`);
+        if (!url.hostname.startsWith("www.")) {
+          allowed.push(`${url.protocol}//www.${apex}`);
+        }
+      }
+      if (!origin || allowed.some((a) => origin.startsWith(a))) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    }
   : true;
 
 app.use(cors({ origin: corsOrigin }));
