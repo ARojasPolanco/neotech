@@ -57,7 +57,7 @@ async function migrateCategories() {
 async function main() {
   try {
     await authenticate();
-    await syncUp();
+    await syncUp({ alter: true });
     await ensureSequence();
 
     if (envs.NODE_ENV !== "test") {
