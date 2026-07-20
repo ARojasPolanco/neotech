@@ -33,6 +33,10 @@ const Product = sequelize.define("Product", {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 export default Product;

@@ -25,6 +25,10 @@ export class ProductService {
       where.name = { [Op.iLike]: `%${filters.search}%` };
     }
 
+    if (filters.category) {
+      where.category = filters.category;
+    }
+
     if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
       where.price = {};
       if (filters.priceMin !== undefined) {

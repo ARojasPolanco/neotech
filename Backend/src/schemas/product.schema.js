@@ -10,6 +10,7 @@ const createProductSchema = z.object({
   price: z.number().positive({ message: "Price must be positive" }),
   imageUrl: z.string().url({ message: "Invalid image URL" }).optional().or(z.literal("")),
   isActive: z.boolean().optional(),
+  category: z.string().optional(),
 });
 
 const updateProductSchema = createProductSchema.partial();
@@ -22,6 +23,7 @@ const productQuerySchema = z.object({
   priceMin: z.coerce.number().positive().optional(),
   priceMax: z.coerce.number().positive().optional(),
   search: z.string().optional(),
+  category: z.string().optional().transform((val) => val || undefined),
   includeVariants: z
     .enum(["true", "false"])
     .optional()

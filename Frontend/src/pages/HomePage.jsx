@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Headphones, Keyboard, Mic, Speaker, Zap, Cable } from "lucide-react";
 import FeaturedCarousel from "../components/FeaturedCarousel.jsx";
 import { getFeaturedProducts } from "../services/product.service.js";
 
-const featured = [
-  { name: "Auriculares", desc: "Sumergite en el sonido", emoji: "🎧" },
-  { name: "Teclados", desc: "Precisión y estilo", emoji: "⌨️" },
-  { name: "Micrófonos", desc: "Sonido profesional", emoji: "🎙️" },
-  { name: "Parlantes", desc: "Potencia y claridad", emoji: "🔊" },
-  { name: "Cargadores", desc: "Carga rápida y segura", emoji: "⚡" },
-  { name: "Accesorios", desc: "Todo lo que necesitás", emoji: "🔌" },
+const categories = [
+  { name: "Auriculares", desc: "Sumergite en el sonido", icon: Headphones },
+  { name: "Teclados", desc: "Precisión y estilo", icon: Keyboard },
+  { name: "Micrófonos", desc: "Sonido profesional", icon: Mic },
+  { name: "Parlantes", desc: "Potencia y claridad", icon: Speaker },
+  { name: "Cargadores", desc: "Carga rápida y segura", icon: Zap },
+  { name: "Accesorios", desc: "Todo lo que necesitás", icon: Cable },
 ];
 
 export default function HomePage() {
@@ -94,16 +95,20 @@ export default function HomePage() {
           Categorías
         </h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-          {featured.map((cat) => (
-            <motion.div
+          {categories.map((cat) => (
+            <Link
               key={cat.name}
-              whileHover={{ y: -4 }}
-              className="flex flex-col items-center rounded-card border border-border bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+              to={`/products?category=${cat.name}`}
             >
-              <span className="text-3xl">{cat.emoji}</span>
-              <h3 className="mt-3 font-heading text-lg font-semibold">{cat.name}</h3>
-              <p className="mt-1 text-xs text-muted">{cat.desc}</p>
-            </motion.div>
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="flex flex-col items-center rounded-card border border-border bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+              >
+                <cat.icon size={28} className="text-accent" />
+                <h3 className="mt-3 font-heading text-lg font-semibold">{cat.name}</h3>
+                <p className="mt-1 text-xs text-muted">{cat.desc}</p>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </section>

@@ -17,6 +17,7 @@ export default function AdminProductForm() {
     price: "",
     imageUrl: "",
     isActive: true,
+    category: "",
   });
   const [variants, setVariants] = useState([]);
   const [imageFile, setImageFile] = useState(null);
@@ -50,6 +51,7 @@ export default function AdminProductForm() {
           price: String(p.price),
           imageUrl: p.imageUrl || "",
           isActive: p.isActive,
+          category: p.category || "",
         });
         if (p.imageUrl) setImagePreview(p.imageUrl);
         setVariants(varRes.data);
@@ -155,6 +157,7 @@ export default function AdminProductForm() {
         description: form.description,
         price: Number(priceStr),
         isActive: form.isActive,
+        category: form.category,
       };
       if (imageUrl) payload.imageUrl = imageUrl;
 
@@ -236,6 +239,26 @@ export default function AdminProductForm() {
             rows={3}
             className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Categoría</label>
+            <select
+              value={form.category}
+              onChange={update("category")}
+              className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            >
+              <option value="">Sin categoría</option>
+              <option value="Auriculares">Auriculares</option>
+              <option value="Teclados">Teclados</option>
+              <option value="Micrófonos">Micrófonos</option>
+              <option value="Parlantes">Parlantes</option>
+              <option value="Cargadores">Cargadores</option>
+              <option value="Accesorios">Accesorios</option>
+            </select>
+          </div>
+          <div></div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

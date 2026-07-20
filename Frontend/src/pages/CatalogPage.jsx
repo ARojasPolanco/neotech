@@ -12,7 +12,9 @@ export default function CatalogPage() {
   useEffect(() => {
     const filters = { isActive: "true", includeVariants: "true" };
     const search = searchParams.get("search");
+    const category = searchParams.get("category");
     if (search) filters.search = search;
+    if (category) filters.category = category;
 
     setLoading(true);
     getProducts(filters)
@@ -20,6 +22,8 @@ export default function CatalogPage() {
       .catch(() => setError("Error al cargar productos"))
       .finally(() => setLoading(false));
   }, [searchParams]);
+
+  const categoryTitle = searchParams.get("category");
 
   if (loading) {
     return (
@@ -60,7 +64,9 @@ export default function CatalogPage() {
 
   return (
     <div>
-      <h1 className="mb-6 font-heading text-3xl font-bold">Productos</h1>
+      <h1 className="mb-6 font-heading text-3xl font-bold">
+        {categoryTitle || "Productos"}
+      </h1>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {products.map((p) => (
           <ProductCard key={p.id} product={p} />
