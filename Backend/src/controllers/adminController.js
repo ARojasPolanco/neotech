@@ -1,7 +1,9 @@
 import { AppError, catchAsync } from "../errors/indexError.js";
 import { AdminService } from "../services/admin.service.js";
+import { PaymentService } from "../services/payment.service.js";
 
 const adminService = new AdminService();
+const paymentService = new PaymentService();
 
 export const uploadImage = catchAsync(async (req, res, next) => {
   if (!req.file) {
@@ -37,4 +39,18 @@ export const getOrderById = catchAsync(async (req, res, next) => {
   }
 
   return res.status(200).json(order);
+});
+
+export const notifyOrder = catchAsync(async (req, res, next) => {
+  const { orderNumber } = req.params;
+  console.log(`[notifyOrder] admin request for ${orderNumber}`);
+  try {
+    const result = await paymentService.notifyOrder(orderNumber);
+    return res.status(200).json(result);
+  } catch (err) {
+    if (err.message === "Order not found") {
+      return next(new AppError("Order not found", 404));
+    }
+    return next(new AppError("Error sending notifications: " + err.message, 500));
+  }
 });

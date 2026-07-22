@@ -6,6 +6,7 @@ import {
   getStats,
   getOrders,
   getOrderById,
+  notifyOrder,
 } from "../controllers/adminController.js";
 
 export const router = Router();
@@ -16,3 +17,4 @@ router.post("/upload", upload.single("image"), uploadImage);
 router.get("/stats", getStats);
 router.get("/orders", getOrders);
 router.get("/orders/:id", getOrderById);
+router.post("/orders/:orderNumber/notify", notifyOrder);

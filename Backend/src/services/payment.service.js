@@ -68,43 +68,57 @@ async function findApprovedPayment(orderNumber) {
   return null;
 }
 
+async function sendOrderNotifications(order) {
+  try {
+    const { MailService } = await import("./mail.service.js");
+    const { PdfService } = await import("./pdf.service.js");
+    const mailService = new MailService();
+    const pdfService = new PdfService();
+    console.log(`[sendOrderNotifications] generating PDF for ${order.orderNumber}`);
+    const pdfBuffer = await pdfService.generateReceipt(order);
+    console.log(`[sendOrderNotifications] sending mails for ${order.orderNumber}`);
+    const [ownerResult, receiptResult] = await Promise.all([
+      mailService.sendOwnerAlert(order),
+      mailService.sendReceipt(order, pdfBuffer),
+    ]);
+    console.log(`[sendOrderNotifications] mails sent successfully for ${order.orderNumber}`);
+    return { ownerResult, receiptResult };
+  } catch (err) {
+    console.error("[sendOrderNotifications] error:", err);
+    throw err;
+  }
+}
+
 async function handleOrderPaid(order) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
 
-  if (!order || order.status === "paid") {
-    console.log(`[handleOrderPaid] order ${order?.orderNumber} already paid or not found, skipping`);
+  if (!order) {
+    console.log("[handleOrderPaid] order not found, skipping");
     return;
   }
 
-  console.log(`[handleOrderPaid] marking order ${order.orderNumber} as paid`);
-  await orderService.updateStatus(order, "paid");
+  if (order.status !== "paid") {
+    console.log(`[handleOrderPaid] marking order ${order.orderNumber} as paid`);
+    await orderService.updateStatus(order, "paid");
 
-  for (const item of order.OrderItems) {
-    if (item.productVariantId) {
-      await ProductVariant.decrement("stock", {
-        by: item.quantity,
-        where: { id: item.productVariantId },
-      });
+    for (const item of order.OrderItems) {
+      if (item.productVariantId) {
+        await ProductVariant.decrement("stock", {
+          by: item.quantity,
+          where: { id: item.productVariantId },
+        });
+      }
     }
+  } else {
+    console.log(`[handleOrderPaid] order ${order.orderNumber} already paid, sending notifications only`);
   }
 
   setImmediate(async () => {
     try {
-      const { MailService } = await import("./mail.service.js");
-      const { PdfService } = await import("./pdf.service.js");
-      const mailService = new MailService();
-      const pdfService = new PdfService();
-      console.log(`[handleOrderPaid] generating PDF for ${order.orderNumber}`);
-      const pdfBuffer = await pdfService.generateReceipt(order);
-      console.log(`[handleOrderPaid] sending mails for ${order.orderNumber}`);
-      await Promise.all([
-        mailService.sendOwnerAlert(order),
-        mailService.sendReceipt(order, pdfBuffer),
-      ]);
-      console.log(`[handleOrderPaid] mails sent successfully for ${order.orderNumber}`);
+      await sendOrderNotifications(order);
     } catch (err) {
-      console.error("[handleOrderPaid] Post-payment notification error:", err);
+      console.error("[handleOrderPaid] notification error:", err);
     }
   });
 }
@@ -214,5 +228,23 @@ export class PaymentService {
 
     await handleOrderPaid(order);
     return { simulated: true, status: "paid" };
+  }
+
+  async notifyOrder(orderNumber) {
+    console.log(`[notifyOrder] sending notifications for ${orderNumber}`);
+    const { OrderService } = await import("./order.service.js");
+    const orderService = new OrderService();
+    const order = await orderService.findByOrderNumber(orderNumber);
+
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    if (order.status !== "paid") {
+      await orderService.updateStatus(order, "paid");
+    }
+
+    await sendOrderNotifications(order);
+    return { notified: true, orderNumber, status: "paid" };
   }
 }

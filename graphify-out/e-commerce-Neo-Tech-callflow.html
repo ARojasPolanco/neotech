@@ -1,0 +1,2960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>e-commerce Neo Tech — Complete Call Flow &amp; Architecture Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --err: #f87171; --ok: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.7rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.25rem; margin: 32px 0 12px; color: var(--accent); }
+h4 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--warn); }
+p { margin: 8px 0; color: var(--muted); }
+.subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 32px; }
+.mermaid { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; position: relative; }
+.mermaid.is-enhanced { padding: 0; overflow: hidden; min-height: 260px; }
+.mermaid-viewport { padding: 54px 24px 24px; overflow: hidden; cursor: grab; touch-action: none; min-height: 260px; }
+.mermaid-viewport.is-dragging { cursor: grabbing; }
+.mermaid-viewport svg { max-width: none !important; height: auto; transform-origin: 0 0; transition: transform 120ms ease; }
+.mermaid-toolbar { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(15,23,42,0.92); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+.mermaid-toolbar button, .mermaid-toolbar .zoom-level { height: 28px; min-width: 32px; border: 1px solid var(--border); border-radius: 6px; background: #1e293b; color: var(--text); font: 600 0.78rem system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mermaid-toolbar button { cursor: pointer; }
+.mermaid-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.mermaid-toolbar .zoom-level { min-width: 52px; color: var(--muted); background: transparent; }
+.call-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+.call-table th { background: #1a2744; color: var(--accent); text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+.call-table td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; }
+.call-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.tag-async { background: #7c3aed33; color: #a78bfa; }
+.tag-class { background: #05966933; color: var(--ok); }
+.tag-func { background: #2563eb33; color: var(--accent); }
+.tag-cmd { background: #d9770633; color: var(--warn); }
+.tag-endpoint { background: #dc262633; color: var(--err); }
+.tag-hook { background: #db277733; color: #f472b6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.arrow-chain { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); padding: 10px; background: rgba(56,189,248,0.06); border-radius: 6px; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+ul, ol { margin: 8px 0 8px 24px; color: var(--muted); }
+li { margin: 4px 0; }
+a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+@media (max-width: 768px) { .container { padding: 16px; } h1 { font-size: 1.8rem; } }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>e-commerce Neo Tech — Complete Call Flow &amp; Architecture Documentation</h1>
+<p class="subtitle">Generated from graphify knowledge graph: 433 nodes, 882 edges, 16 communities. Commit: dc4bade</p>
+
+<div class="nav">
+    <a href="#overview">Architecture Overview</a>
+    <a href="#build-graph">Graph Build</a>
+    <a href="#cli-skills">CLI &amp; Skill Installers</a>
+    <a href="#serve-api">Serving API</a>
+    <a href="#tests-fixtures">Tests &amp; Fixtures</a>
+    <a href="#backend-services-paymentservicejs">Backend Services Paymentservicejs</a>
+    <a href="#frontend-components-pages">Frontend Components Pages</a>
+    <a href="#backend-errors-errormatchersjs">Backend Errors Errormatchersjs</a>
+    <a href="#backend-services-productservicesjs">Backend Services Productservicesjs</a>
+    <a href="#backend-authservicesjs-services">Backend Authservicesjs Services</a>
+    <a href="#eslintconfigjs-backend">Eslintconfigjs Backend</a>
+    <a href="#viteconfigjs-frontend">Viteconfigjs Frontend</a>
+</div>
+
+<!-- ====== Architecture Overview ====== -->
+<h2 id="overview">1. Architecture Overview</h2>
+
+<div class="mermaid">
+
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    BUILD_GRAPH_321CBB04("Graph Build<br/><small>144 nodes</small>")
+    class BUILD_GRAPH_321CBB04 module;
+    CLI_SKILLS_9964CBB8("CLI &amp; Skill Installers<br/><small>3 nodes</small>")
+    class CLI_SKILLS_9964CBB8 module;
+    SERVE_API_35EC8E86("Serving API<br/><small>120 nodes</small>")
+    class SERVE_API_35EC8E86 module;
+    TESTS_FIXTURES_B84B1DCC("Tests &amp; Fixtures<br/><small>52 nodes</small>")
+    class TESTS_FIXTURES_B84B1DCC module;
+    BACKEND_SERVICES_PAYMENTSERVICEJS_3F589E8A("Backend Services Paymentservicejs<br/><small>34 nodes</small>")
+    class BACKEND_SERVICES_PAYMENTSERVICEJS_3F589E8A module;
+    FRONTEND_COMPONENTS_PAGES_6AF2D663("Frontend Components Pages<br/><small>28 nodes</small>")
+    class FRONTEND_COMPONENTS_PAGES_6AF2D663 module;
+    BACKEND_ERRORS_ERRORMATCHERSJS_A2A5F0CA("Backend Errors Errormatchersjs<br/><small>23 nodes</small>")
+    class BACKEND_ERRORS_ERRORMATCHERSJS_A2A5F0CA module;
+    BACKEND_SERVICES_PRODUCTSERVICESJS_6D504EBB("Backend Services Productservicesjs<br/><small>16 nodes</small>")
+    class BACKEND_SERVICES_PRODUCTSERVICESJS_6D504EBB module;
+    BACKEND_AUTHSERVICESJS_SERVICES_430D7EB9("Backend Authservicesjs Services<br/><small>11 nodes</small>")
+    class BACKEND_AUTHSERVICESJS_SERVICES_430D7EB9 module;
+    ESLINTCONFIGJS_BACKEND_19DA74E4("Eslintconfigjs Backend<br/><small>1 nodes</small>")
+    class ESLINTCONFIGJS_BACKEND_19DA74E4 module;
+    VITECONFIGJS_FRONTEND_7A3F3B55("Viteconfigjs Frontend<br/><small>1 nodes</small>")
+    class VITECONFIGJS_FRONTEND_7A3F3B55 module;
+    SERVE_API_35EC8E86 -->|imports x12| TESTS_FIXTURES_B84B1DCC
+    TESTS_FIXTURES_B84B1DCC -->|imports x11| BACKEND_SERVICES_PAYMENTSERVICEJS_3F589E8A
+    TESTS_FIXTURES_B84B1DCC -->|references x11| BACKEND_SERVICES_PRODUCTSERVICESJS_6D504EBB
+    SERVE_API_35EC8E86 -->|imports x11| FRONTEND_COMPONENTS_PAGES_6AF2D663
+    BUILD_GRAPH_321CBB04 -->|imports x10| TESTS_FIXTURES_B84B1DCC
+    BACKEND_SERVICES_PAYMENTSERVICEJS_3F589E8A -->|imports x9| SERVE_API_35EC8E86
+    BACKEND_SERVICES_PAYMENTSERVICEJS_3F589E8A -->|imports x8| TESTS_FIXTURES_B84B1DCC
+    SERVE_API_35EC8E86 -->|imports x8| BUILD_GRAPH_321CBB04
+    BACKEND_AUTHSERVICESJS_SERVICES_430D7EB9 -->|imports x6| TESTS_FIXTURES_B84B1DCC
+    BUILD_GRAPH_321CBB04 -->|imports x5| SERVE_API_35EC8E86
+    BACKEND_SERVICES_PAYMENTSERVICEJS_3F589E8A -->|imports x4| BACKEND_ERRORS_ERRORMATCHERSJS_A2A5F0CA
+    SERVE_API_35EC8E86 -->|imports x3| BACKEND_ERRORS_ERRORMATCHERSJS_A2A5F0CA
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>Architecture Layers</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
+      <tr><td>Graph Build</td><td>144</td><td><code>3, 4, 5, 7, 13</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>3</td><td><code>12</code></td></tr><tr><td>Serving API</td><td>120</td><td><code>0, 2</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>52</td><td><code>1</code></td></tr><tr><td>Backend Services Paymentservicejs</td><td>34</td><td><code>6</code></td></tr><tr><td>Frontend Components Pages</td><td>28</td><td><code>8</code></td></tr><tr><td>Backend Errors Errormatchersjs</td><td>23</td><td><code>9</code></td></tr><tr><td>Backend Services Productservicesjs</td><td>16</td><td><code>10</code></td></tr><tr><td>Backend Authservicesjs Services</td><td>11</td><td><code>11</code></td></tr><tr><td>Eslintconfigjs Backend</td><td>1</td><td><code>14</code></td></tr><tr><td>Viteconfigjs Frontend</td><td>1</td><td><code>15</code></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Core Flow</h4>
+    <div class="arrow-chain">CLI &amp; Skill Installers -&gt; Graph Build -&gt; Tests &amp; Fixtures -&gt; Backend Services Productservicesjs -&gt; Serving API -&gt; Frontend Components Pages -&gt; Backend Services Paymentservicejs</div>
+  </div>
+</div>
+<hr>
+<!-- ====== 2. Graph Build ====== -->
+<h2 id="build-graph">2. Graph Build</h2>
+<p>Graph Build groups implementation around packagejson, backend, frontend, schemas, mostly in Backend/package.json, Frontend/package.json, src/controllers/productController.js. This section covers 144 nodes and 167 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Graph Build (144 nodes, 167 edges)
+    subgraph build_graph_src_schemas_product_schema_js_2b6e5f9c["src/schemas/product.schema.js"]
+        backend_src_schemas_product_schema_ddf5a04a("product.schema.js")
+        backend_src_schemas_product_schema_validatecreat_a9840b68("validateCreateProduct()<br/><small>src/schemas/product.schema.js</small>")
+        backend_src_schemas_product_schema_validateupdat_bf65ef77("validateUpdateProduct()<br/><small>src/schemas/product.schema.js</small>")
+        backend_src_schemas_product_schema_validateprodu_1afc7684("validateProductQuery()<br/><small>src/schemas/product.schema.js</small>")
+        backend_src_schemas_product_schema_validatecreat_1ba910c8("validateCreateVariant()<br/><small>src/schemas/product.schema.js</small>")
+        backend_src_schemas_product_schema_validateupdat_da2eb857("validateUpdateVariant()<br/><small>src/schemas/product.schema.js</small>")
+    end
+    subgraph build_graph_Backend_package_json_8c70cfd7["Backend/package.json"]
+        backend_package_dependencies_bcrypt_7783307b("bcrypt<br/><small>Backend/package.json</small>")
+        backend_package_dependencies_cloudinary_fd191243("cloudinary<br/><small>Backend/package.json</small>")
+        backend_package_dependencies_cors_91963911("cors<br/><small>Backend/package.json</small>")
+        bcrypt_51684124("bcrypt<br/><small>Backend/package.json</small>")
+        cloudinary_a12ea095("cloudinary<br/><small>Backend/package.json</small>")
+    end
+    subgraph build_graph_src_schemas_auth_schema_js_10a81652["src/schemas/auth.schema.js"]
+        backend_src_schemas_auth_schema_0ea716c9("auth.schema.js")
+        backend_src_schemas_auth_schema_validateregister_880470b2("validateRegister()<br/><small>src/schemas/auth.schema.js</small>")
+        backend_src_schemas_auth_schema_validateupdate_0da765e9("validateUpdate()<br/><small>src/schemas/auth.schema.js</small>")
+        backend_src_schemas_auth_schema_validatelogin_98a7e5be("validateLogin()<br/><small>src/schemas/auth.schema.js</small>")
+        backend_src_schemas_auth_schema_validatechangepa_19f75d8a("validateChangePassword()<br/><small>src/schemas/auth.schema.js</small>")
+    end
+    backend_src_controllers_productcontroller_7a5ebdd0("productController.js")
+    backend_src_utils_extracterrordata_extractvalida_c0b7ce0e("extractValidationData()<br/><small>src/utils/extractErrorData.js</small>")
+    backend_src_schemas_auth_schema_validateregister_880470b2 -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_auth_schema_validateupdate_0da765e9 -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_auth_schema_validatelogin_98a7e5be -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_auth_schema_validatechangepa_19f75d8a -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_product_schema_validatecreat_a9840b68 -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_product_schema_validateupdat_bf65ef77 -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_product_schema_validateprodu_1afc7684 -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_product_schema_validatecreat_1ba910c8 -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_product_schema_validateupdat_da2eb857 -->|calls| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_package_dependencies_bcrypt_7783307b -->|imports| bcrypt_51684124
+    backend_package_dependencies_cloudinary_fd191243 -->|imports| cloudinary_a12ea095
+    backend_src_controllers_productcontroller_7a5ebdd0 -->|imports| backend_src_schemas_product_schema_ddf5a04a
+    backend_src_controllers_productcontroller_7a5ebdd0 -->|imports| backend_src_schemas_product_schema_validatecreat_a9840b68
+    backend_src_controllers_productcontroller_7a5ebdd0 -->|imports| backend_src_schemas_product_schema_validatecreat_1ba910c8
+    backend_src_controllers_productcontroller_7a5ebdd0 -->|imports| backend_src_schemas_product_schema_validateprodu_1afc7684
+    backend_src_controllers_productcontroller_7a5ebdd0 -->|imports| backend_src_schemas_product_schema_validateupdat_bf65ef77
+    backend_src_controllers_productcontroller_7a5ebdd0 -->|imports| backend_src_schemas_product_schema_validateupdat_da2eb857
+    backend_src_schemas_auth_schema_0ea716c9 -->|imports| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    backend_src_schemas_product_schema_ddf5a04a -->|imports| backend_src_utils_extracterrordata_extractvalida_c0b7ce0e
+    %% Omitted for readability: 126 nodes, 0 edges
+    class backend_src_schemas_product_schema_ddf5a04a module;
+    class backend_src_schemas_product_schema_validatecreat_a9840b68 function;
+    class backend_src_schemas_product_schema_validateupdat_bf65ef77 function;
+    class backend_src_schemas_product_schema_validateprodu_1afc7684 function;
+    class backend_src_schemas_product_schema_validatecreat_1ba910c8 function;
+    class backend_src_schemas_product_schema_validateupdat_da2eb857 function;
+    class backend_package_dependencies_bcrypt_7783307b function;
+    class backend_package_dependencies_cloudinary_fd191243 function;
+    class backend_package_dependencies_cors_91963911 function;
+    class bcrypt_51684124 function;
+    class cloudinary_a12ea095 function;
+    class backend_src_schemas_auth_schema_0ea716c9 module;
+    class backend_src_schemas_auth_schema_validateregister_880470b2 function;
+    class backend_src_schemas_auth_schema_validateupdate_0da765e9 function;
+    class backend_src_schemas_auth_schema_validatelogin_98a7e5be function;
+    class backend_src_schemas_auth_schema_validatechangepa_19f75d8a function;
+    class backend_src_controllers_productcontroller_7a5ebdd0 module;
+    class backend_src_utils_extracterrordata_extractvalida_c0b7ce0e function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>package.json</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>package.json node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>name</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>name node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>private</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>private node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>version</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>version node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>type</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>type node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>scripts</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>scripts node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>dev</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dev node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>build</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>lint</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>lint node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>preview</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>preview node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>dependencies</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dependencies node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>@fontsource-variable/inter</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@fontsource-variable/inter</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>@fontsource-variable/inter node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>@fontsource-variable/inter</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@fontsource-variable/inter</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@fontsource-variable/inter node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>@fontsource/barlow-condensed</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@fontsource/barlow-condensed</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>@fontsource/barlow-condensed node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>@fontsource/barlow-condensed</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@fontsource/barlow-condensed</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@fontsource/barlow-condensed node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>@tailwindcss/vite</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@tailwindcss/vite</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>@tailwindcss/vite node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>@tailwindcss/vite</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@tailwindcss/vite</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@tailwindcss/vite node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>axios</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>axios</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>axios node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>axios</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>axios</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>axios node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>framer-motion</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>framer-motion</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>framer-motion node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>framer-motion</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>framer-motion</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>framer-motion node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>lucide-react node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>lucide-react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>lucide-react node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>react node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>react</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>react node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>react-dom node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>react-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>react-dom node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>react-router-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>react-router-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>react-router-dom node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>react-router-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>react-router-dom</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>react-router-dom node in Frontend/package.json.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>tailwindcss</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>tailwindcss</code><br><small style="color:var(--muted)">Frontend/package.json</small></td>
+  <td>tailwindcss node in Frontend/package.json.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>Backend/package.json</code></td><td>65 nodes</td></tr>
+<tr><td><code>Frontend/package.json</code></td><td>42 nodes</td></tr>
+<tr><td><code>src/controllers/productController.js</code></td><td>13 nodes</td></tr>
+<tr><td><code>src/schemas/product.schema.js</code></td><td>11 nodes</td></tr>
+<tr><td><code>src/schemas/auth.schema.js</code></td><td>8 nodes</td></tr>
+<tr><td><code>src/utils/extractErrorData.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>Frontend/vercel.json</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/routes/productRoutes.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x98, imports x56, calls x9, imports x4. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 3. CLI & Skill Installers ====== -->
+<h2 id="cli-skills">3. CLI &amp; Skill Installers</h2>
+<p>CLI &amp; Skill Installers groups implementation around graphifyjs, opencode, plugins, graphifyplugin, mostly in .opencode/plugins/graphify.js. This section covers 3 nodes and 2 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: CLI &amp; Skill Installers (3 nodes, 2 edges)
+    opencode_plugins_graphify_9f97c30a("graphify.js")
+    opencode_plugins_graphify_graphifyplugin_69004865("GraphifyPlugin()<br/><small>.opencode/plugins/graphify.js</small>")
+    opencode_plugins_graphify_rationale_4_8dd2ffc7("IMPORTANT: keep the reminder string fre...<br/><small>.opencode/plugins/graphify.js</small>")
+    opencode_plugins_graphify_9f97c30a -->|contains| opencode_plugins_graphify_graphifyplugin_69004865
+    opencode_plugins_graphify_9f97c30a -->|explains| opencode_plugins_graphify_rationale_4_8dd2ffc7
+    class opencode_plugins_graphify_9f97c30a module;
+    class opencode_plugins_graphify_graphifyplugin_69004865 function;
+    class opencode_plugins_graphify_rationale_4_8dd2ffc7 concept;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>graphify.js</code><br><small style="color:var(--muted)">.opencode/plugins/graphify.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Builds dependency relationships and graph data.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>GraphifyPlugin()</code><br><small style="color:var(--muted)">.opencode/plugins/graphify.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Builds dependency relationships and graph data.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>IMPORTANT: keep the reminder string free of backticks and $(...) constructs.</code><br><small style="color:var(--muted)">.opencode/plugins/graphify.js</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Design note for IMPORTANT: keep the reminder string free of backticks and $(...) constructs..</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>.opencode/plugins/graphify.js</code></td><td>3 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x1, explains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 4. Serving API ====== -->
+<h2 id="serve-api">4. Serving API</h2>
+<p>Serving API groups implementation around frontend, backend, pages, controllers, mostly in src/pages/PaymentResultPage.jsx, src/controllers/adminController.js, src/controllers/authController.js. This section covers 120 nodes and 229 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Serving API (120 nodes, 229 edges)
+    subgraph serve_api_src_config_auth_js_1ccb23b4["src/config/auth.js"]
+        frontend_src_config_auth_loginrequest_6bf55246("loginRequest()<br/><small>src/config/auth.js</small>")
+        frontend_src_config_auth_registerrequest_cb2b773a("registerRequest()<br/><small>src/config/auth.js</small>")
+        frontend_src_config_auth_getprofilerequest_a1af5ef5("getProfileRequest()<br/><small>src/config/auth.js</small>")
+    end
+    subgraph serve_api_src_config_api_js_113a3e14["src/config/api.js"]
+        frontend_src_config_api_8ba12ae1("api.js")
+        frontend_src_config_api_api_5e355c05("api<br/><small>src/config/api.js</small>")
+    end
+    subgraph serve_api_src_context_AuthContext_jsx_3f1a5ecb["src/context/AuthContext.jsx"]
+        frontend_src_context_authcontext_useauth_f35f3cbe("useAuth()<br/><small>src/context/AuthContext.jsx</small>")
+        frontend_src_context_authcontext_authprovider_85d8128b("AuthProvider()<br/><small>src/context/AuthContext.jsx</small>")
+    end
+    subgraph serve_api_src_errors_appError_js_8ecfc583["src/errors/appError.js"]
+        backend_src_errors_apperror_apperror_f9879c68("AppError<br/><small>src/errors/appError.js</small>")
+        backend_src_errors_apperror_apperror_constructor_3c6331af("constructor()<br/><small>src/errors/appError.js</small>")
+    end
+    frontend_src_app_7da8908b("App.jsx")
+    frontend_src_pages_admin_adminlayout_adminlayout_5d122b84("AdminLayout()<br/><small>pages/admin/AdminLayout.jsx</small>")
+    frontend_src_components_minicart_minicart_9b07f448("MiniCart()<br/><small>src/components/MiniCart.jsx</small>")
+    frontend_src_components_navbar_navbar_38ba0933("Navbar()<br/><small>src/components/Navbar.jsx</small>")
+    frontend_src_context_cartcontext_usecart_6de49593("useCart()<br/><small>src/context/CartContext.jsx</small>")
+    backend_src_controllers_admincontroller_e89d8014("adminController.js")
+    backend_src_controllers_ordercontroller_c8f734a6("orderController.js")
+    frontend_src_pages_loginpage_loginpage_ca94a41d("LoginPage()<br/><small>src/pages/LoginPage.jsx</small>")
+    frontend_src_pages_registerpage_registerpage_4ef986ed("RegisterPage()<br/><small>src/pages/RegisterPage.jsx</small>")
+    backend_src_errors_apperror_apperror_f9879c68 -->|method| backend_src_errors_apperror_apperror_constructor_3c6331af
+    frontend_src_components_minicart_minicart_9b07f448 -->|calls| frontend_src_context_cartcontext_usecart_6de49593
+    frontend_src_components_navbar_navbar_38ba0933 -->|calls| frontend_src_context_authcontext_useauth_f35f3cbe
+    frontend_src_components_navbar_navbar_38ba0933 -->|calls| frontend_src_context_cartcontext_usecart_6de49593
+    frontend_src_config_auth_loginrequest_6bf55246 -->|calls| frontend_src_pages_loginpage_loginpage_ca94a41d
+    frontend_src_config_auth_registerrequest_cb2b773a -->|calls| frontend_src_pages_registerpage_registerpage_4ef986ed
+    frontend_src_config_auth_getprofilerequest_a1af5ef5 -->|calls| frontend_src_context_authcontext_authprovider_85d8128b
+    frontend_src_context_authcontext_useauth_f35f3cbe -->|calls| frontend_src_pages_admin_adminlayout_adminlayout_5d122b84
+    frontend_src_context_authcontext_useauth_f35f3cbe -->|calls| frontend_src_pages_loginpage_loginpage_ca94a41d
+    frontend_src_context_authcontext_useauth_f35f3cbe -->|calls| frontend_src_pages_registerpage_registerpage_4ef986ed
+    backend_src_controllers_admincontroller_e89d8014 -->|imports| backend_src_errors_apperror_apperror_f9879c68
+    backend_src_controllers_ordercontroller_c8f734a6 -->|imports| backend_src_errors_apperror_apperror_f9879c68
+    frontend_src_app_7da8908b -->|imports| frontend_src_components_navbar_navbar_38ba0933
+    frontend_src_app_7da8908b -->|imports| frontend_src_pages_admin_adminlayout_adminlayout_5d122b84
+    frontend_src_app_7da8908b -->|imports| frontend_src_pages_loginpage_loginpage_ca94a41d
+    frontend_src_app_7da8908b -->|imports| frontend_src_pages_registerpage_registerpage_4ef986ed
+    %% Omitted for readability: 102 nodes, 0 edges
+    class frontend_src_config_auth_loginrequest_6bf55246 function;
+    class frontend_src_config_auth_registerrequest_cb2b773a function;
+    class frontend_src_config_auth_getprofilerequest_a1af5ef5 function;
+    class frontend_src_config_api_8ba12ae1 api;
+    class frontend_src_config_api_api_5e355c05 api;
+    class frontend_src_context_authcontext_useauth_f35f3cbe ui;
+    class frontend_src_context_authcontext_authprovider_85d8128b ui;
+    class backend_src_errors_apperror_apperror_f9879c68 klass;
+    class backend_src_errors_apperror_apperror_constructor_3c6331af function;
+    class frontend_src_app_7da8908b ui;
+    class frontend_src_pages_admin_adminlayout_adminlayout_5d122b84 ui;
+    class frontend_src_components_minicart_minicart_9b07f448 ui;
+    class frontend_src_components_navbar_navbar_38ba0933 ui;
+    class frontend_src_context_cartcontext_usecart_6de49593 ui;
+    class backend_src_controllers_admincontroller_e89d8014 module;
+    class backend_src_controllers_ordercontroller_c8f734a6 module;
+    class frontend_src_pages_loginpage_loginpage_ca94a41d ui;
+    class frontend_src_pages_registerpage_registerpage_4ef986ed ui;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>App.jsx</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>AdminDashboard()</code><br><small style="color:var(--muted)">pages/admin/AdminDashboard.jsx</small><br><code>AdminDashboard.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminDashboard.jsx</small><br><code>AdminLayout()</code><br><small style="color:var(--muted)">pages/admin/AdminLayout.jsx</small><br>+30 more</td>
+  <td>App.jsx node in Frontend/src/App.jsx.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>App()</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>main.jsx</code><br><small style="color:var(--muted)">Frontend/src/main.jsx</small></td>
+  <td>App() node in Frontend/src/App.jsx.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>ConfirmModal.jsx</code><br><small style="color:var(--muted)">src/components/ConfirmModal.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>AdminProducts.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminProducts.jsx</small></td>
+  <td>ConfirmModal.jsx node in src/components/ConfirmModal.jsx.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>ConfirmModal()</code><br><small style="color:var(--muted)">src/components/ConfirmModal.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>AdminProducts.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminProducts.jsx</small></td>
+  <td>ConfirmModal() node in src/components/ConfirmModal.jsx.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>Footer.jsx</code><br><small style="color:var(--muted)">src/components/Footer.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>App.jsx</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>Footer.jsx node in src/components/Footer.jsx.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>Footer()</code><br><small style="color:var(--muted)">src/components/Footer.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>App.jsx</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>Footer() node in src/components/Footer.jsx.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>MiniCart.jsx</code><br><small style="color:var(--muted)">src/components/MiniCart.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>CartContext.jsx</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small><br><code>Navbar.jsx</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small><br><code>useCart()</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td>MiniCart.jsx node in src/components/MiniCart.jsx.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>MiniCart()</code><br><small style="color:var(--muted)">src/components/MiniCart.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>Navbar.jsx</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small><br><code>useCart()</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td>MiniCart() node in src/components/MiniCart.jsx.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>Navbar.jsx</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>App.jsx</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small><br><code>MiniCart()</code><br><small style="color:var(--muted)">src/components/MiniCart.jsx</small><br><code>MiniCart.jsx</code><br><small style="color:var(--muted)">src/components/MiniCart.jsx</small></td>
+  <td><code>AuthContext.jsx</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small><br><code>CartContext.jsx</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small><br><code>useAuth()</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small><br>+1 more</td>
+  <td>Navbar.jsx node in src/components/Navbar.jsx.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>Navbar()</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>App.jsx</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small></td>
+  <td><code>useAuth()</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small><br><code>useCart()</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td>Navbar() node in src/components/Navbar.jsx.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>PaymentSpinner.jsx</code><br><small style="color:var(--muted)">src/components/PaymentSpinner.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>PaymentResultPage.jsx</code><br><small style="color:var(--muted)">src/pages/PaymentResultPage.jsx</small></td>
+  <td>PaymentSpinner.jsx node in src/components/PaymentSpinner.jsx.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>messages</code><br><small style="color:var(--muted)">src/components/PaymentSpinner.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>messages node in src/components/PaymentSpinner.jsx.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>PaymentSpinner()</code><br><small style="color:var(--muted)">src/components/PaymentSpinner.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>PaymentResultPage.jsx</code><br><small style="color:var(--muted)">src/pages/PaymentResultPage.jsx</small></td>
+  <td>PaymentSpinner() node in src/components/PaymentSpinner.jsx.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>AnimateText()</code><br><small style="color:var(--muted)">src/components/PaymentSpinner.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>AnimateText() node in src/components/PaymentSpinner.jsx.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>api.js</code><br><small style="color:var(--muted)">src/config/api.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>AdminDashboard.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminDashboard.jsx</small><br><code>AdminOrders.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminOrders.jsx</small><br><code>AdminProductForm.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminProductForm.jsx</small><br>+5 more</td>
+  <td>api.js node in src/config/api.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>api</code><br><small style="color:var(--muted)">src/config/api.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>AdminDashboard.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminDashboard.jsx</small><br><code>AdminOrders.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminOrders.jsx</small><br><code>AdminProductForm.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminProductForm.jsx</small><br>+5 more</td>
+  <td>api node in src/config/api.js.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>auth.js</code><br><small style="color:var(--muted)">src/config/auth.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>api</code><br><small style="color:var(--muted)">src/config/api.js</small><br><code>api.js</code><br><small style="color:var(--muted)">src/config/api.js</small></td>
+  <td><code>AuthContext.jsx</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small><br><code>LoginPage.jsx</code><br><small style="color:var(--muted)">src/pages/LoginPage.jsx</small><br><code>RegisterPage.jsx</code><br><small style="color:var(--muted)">src/pages/RegisterPage.jsx</small></td>
+  <td>auth.js node in src/config/auth.js.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>loginRequest()</code><br><small style="color:var(--muted)">src/config/auth.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>LoginPage()</code><br><small style="color:var(--muted)">src/pages/LoginPage.jsx</small><br><code>LoginPage.jsx</code><br><small style="color:var(--muted)">src/pages/LoginPage.jsx</small></td>
+  <td>loginRequest() node in src/config/auth.js.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>registerRequest()</code><br><small style="color:var(--muted)">src/config/auth.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>RegisterPage()</code><br><small style="color:var(--muted)">src/pages/RegisterPage.jsx</small><br><code>RegisterPage.jsx</code><br><small style="color:var(--muted)">src/pages/RegisterPage.jsx</small></td>
+  <td>registerRequest() node in src/config/auth.js.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>getProfileRequest()</code><br><small style="color:var(--muted)">src/config/auth.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>AuthContext.jsx</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small><br><code>AuthProvider()</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small></td>
+  <td>getProfileRequest() node in src/config/auth.js.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>AuthContext.jsx</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>auth.js</code><br><small style="color:var(--muted)">src/config/auth.js</small><br><code>getProfileRequest()</code><br><small style="color:var(--muted)">src/config/auth.js</small><br><code>Navbar.jsx</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small></td>
+  <td><code>AdminLayout.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminLayout.jsx</small><br><code>LoginPage.jsx</code><br><small style="color:var(--muted)">src/pages/LoginPage.jsx</small><br><code>main.jsx</code><br><small style="color:var(--muted)">Frontend/src/main.jsx</small><br>+1 more</td>
+  <td>AuthContext.jsx node in src/context/AuthContext.jsx.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>AuthContext</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>AuthContext node in src/context/AuthContext.jsx.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>AuthProvider()</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>getProfileRequest()</code><br><small style="color:var(--muted)">src/config/auth.js</small></td>
+  <td><code>main.jsx</code><br><small style="color:var(--muted)">Frontend/src/main.jsx</small></td>
+  <td>AuthProvider() node in src/context/AuthContext.jsx.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>useAuth()</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>Navbar()</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small><br><code>Navbar.jsx</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small></td>
+  <td><code>AdminLayout()</code><br><small style="color:var(--muted)">pages/admin/AdminLayout.jsx</small><br><code>AdminLayout.jsx</code><br><small style="color:var(--muted)">pages/admin/AdminLayout.jsx</small><br><code>LoginPage()</code><br><small style="color:var(--muted)">src/pages/LoginPage.jsx</small><br>+3 more</td>
+  <td>useAuth() node in src/context/AuthContext.jsx.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>CartContext.jsx</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>MiniCart.jsx</code><br><small style="color:var(--muted)">src/components/MiniCart.jsx</small><br><code>Navbar.jsx</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small></td>
+  <td><code>CartPage.jsx</code><br><small style="color:var(--muted)">src/pages/CartPage.jsx</small><br><code>CheckoutPage.jsx</code><br><small style="color:var(--muted)">src/pages/CheckoutPage.jsx</small><br><code>main.jsx</code><br><small style="color:var(--muted)">Frontend/src/main.jsx</small></td>
+  <td>CartContext.jsx node in src/context/CartContext.jsx.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>CartContext</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>CartContext node in src/context/CartContext.jsx.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>loadCart()</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>loadCart() node in src/context/CartContext.jsx.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>CartProvider()</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>main.jsx</code><br><small style="color:var(--muted)">Frontend/src/main.jsx</small></td>
+  <td>CartProvider() node in src/context/CartContext.jsx.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>useCart()</code><br><small style="color:var(--muted)">src/context/CartContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>MiniCart()</code><br><small style="color:var(--muted)">src/components/MiniCart.jsx</small><br><code>MiniCart.jsx</code><br><small style="color:var(--muted)">src/components/MiniCart.jsx</small><br><code>Navbar()</code><br><small style="color:var(--muted)">src/components/Navbar.jsx</small><br>+1 more</td>
+  <td><code>CartPage()</code><br><small style="color:var(--muted)">src/pages/CartPage.jsx</small><br><code>CartPage.jsx</code><br><small style="color:var(--muted)">src/pages/CartPage.jsx</small><br><code>CheckoutPage()</code><br><small style="color:var(--muted)">src/pages/CheckoutPage.jsx</small><br>+1 more</td>
+  <td>useCart() node in src/context/CartContext.jsx.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>main.jsx</code><br><small style="color:var(--muted)">Frontend/src/main.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>App()</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small><br><code>App.jsx</code><br><small style="color:var(--muted)">Frontend/src/App.jsx</small><br><code>AuthContext.jsx</code><br><small style="color:var(--muted)">src/context/AuthContext.jsx</small><br>+3 more</td>
+  <td>No direct outbound edge</td>
+  <td>main.jsx node in Frontend/src/main.jsx.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/controllers/adminController.js</code></td><td>6 nodes</td></tr>
+<tr><td><code>src/controllers/authController.js</code></td><td>6 nodes</td></tr>
+<tr><td><code>src/controllers/orderController.js</code></td><td>6 nodes</td></tr>
+<tr><td><code>src/pages/PaymentResultPage.jsx</code></td><td>6 nodes</td></tr>
+<tr><td><code>src/context/CartContext.jsx</code></td><td>5 nodes</td></tr>
+<tr><td><code>src/pages/OrderSuccessPage.jsx</code></td><td>5 nodes</td></tr>
+<tr><td><code>src/middlewares/upload.js</code></td><td>4 nodes</td></tr>
+<tr><td><code>src/components/PaymentSpinner.jsx</code></td><td>4 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: imports x78, contains x74, imports x61, calls x11. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 5. Tests & Fixtures ====== -->
+<h2 id="tests-fixtures">5. Tests &amp; Fixtures</h2>
+<p>Tests &amp; Fixtures groups implementation around backend, test, services, models, mostly in src/services/order.service.js, Backend/src/test-utils.js, src/services/admin.service.js. This section covers 52 nodes and 201 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Tests &amp; Fixtures (52 nodes, 201 edges)
+    subgraph tests_fixtures_src_services_admin_service_js_f0fdd46c["src/services/admin.service.js"]
+        backend_src_services_admin_service_adminservice_167dc6c5("AdminService<br/><small>src/services/admin.service.js</small>")
+        backend_src_services_admin_service_adminservice_1325b91b("getOrderById()<br/><small>src/services/admin.service.js</small>")
+        backend_src_services_admin_service_adminservice_a175d748("getOrders()<br/><small>src/services/admin.service.js</small>")
+        backend_src_services_admin_service_adminservice_e96e3db6("getStats()<br/><small>src/services/admin.service.js</small>")
+        backend_src_services_admin_service_adminservice_bfa64b5c("uploadImage()<br/><small>src/services/admin.service.js</small>")
+    end
+    subgraph tests_fixtures_config_database_database_js_28eb02ed["config/database/database.js"]
+        backend_src_config_database_database_f8e0cee9("database.js")
+        backend_src_config_database_database_sequelize_18675d05("sequelize<br/><small>config/database/database.js</small>")
+        backend_src_config_database_database_authenticat_99b14def("authenticate()<br/><small>config/database/database.js</small>")
+        backend_src_config_database_database_syncup_3714062a("syncUp()<br/><small>config/database/database.js</small>")
+    end
+    subgraph tests_fixtures_src_services_order_service_js_0caa2ae2["src/services/order.service.js"]
+        backend_src_services_order_service_ensuresequenc_0c274286("ensureSequence()<br/><small>src/services/order.service.js</small>")
+        backend_src_services_order_service_getnextordern_804d6665("getNextOrderNumber()<br/><small>src/services/order.service.js</small>")
+        backend_src_services_order_service_orderservice_4d39c2ec("create()<br/><small>src/services/order.service.js</small>")
+        backend_src_services_order_service_orderservice_3e8c5716("OrderService<br/><small>src/services/order.service.js</small>")
+    end
+    backend_src_index_main_b9b7ba9a("main()<br/><small>Backend/src/index.js</small>")
+    backend_src_test_auth_runauthtests_6bfa54b1("runAuthTests()<br/><small>Backend/src/test-auth.js</small>")
+    backend_src_test_orders_runordertests_b833af1d("runOrderTests()<br/><small>Backend/src/test-orders.js</small>")
+    backend_src_test_products_runproducttests_b1d2d981("runProductTests()<br/><small>Backend/src/test-products.js</small>")
+    backend_src_models_associations_0928fcd9("associations.js")
+    backend_src_config_database_database_authenticat_99b14def -->|calls| backend_src_index_main_b9b7ba9a
+    backend_src_config_database_database_syncup_3714062a -->|calls| backend_src_index_main_b9b7ba9a
+    backend_src_index_main_b9b7ba9a -->|calls| backend_src_services_order_service_ensuresequenc_0c274286
+    backend_src_services_admin_service_adminservice_167dc6c5 -->|method| backend_src_services_admin_service_adminservice_1325b91b
+    backend_src_services_admin_service_adminservice_167dc6c5 -->|method| backend_src_services_admin_service_adminservice_a175d748
+    backend_src_services_admin_service_adminservice_167dc6c5 -->|method| backend_src_services_admin_service_adminservice_e96e3db6
+    backend_src_services_admin_service_adminservice_167dc6c5 -->|method| backend_src_services_admin_service_adminservice_bfa64b5c
+    backend_src_services_order_service_getnextordern_804d6665 -->|calls| backend_src_services_order_service_orderservice_4d39c2ec
+    backend_src_services_order_service_orderservice_3e8c5716 -->|method| backend_src_services_order_service_orderservice_4d39c2ec
+    backend_src_services_order_service_ensuresequenc_0c274286 -->|calls| backend_src_test_orders_runordertests_b833af1d
+    %% Omitted for readability: 34 nodes, 0 edges
+    class backend_src_services_admin_service_adminservice_167dc6c5 klass;
+    class backend_src_services_admin_service_adminservice_1325b91b function;
+    class backend_src_services_admin_service_adminservice_a175d748 function;
+    class backend_src_services_admin_service_adminservice_e96e3db6 function;
+    class backend_src_services_admin_service_adminservice_bfa64b5c function;
+    class backend_src_config_database_database_f8e0cee9 module;
+    class backend_src_config_database_database_sequelize_18675d05 function;
+    class backend_src_config_database_database_authenticat_99b14def function;
+    class backend_src_config_database_database_syncup_3714062a function;
+    class backend_src_services_order_service_ensuresequenc_0c274286 function;
+    class backend_src_services_order_service_getnextordern_804d6665 function;
+    class backend_src_services_order_service_orderservice_4d39c2ec function;
+    class backend_src_services_order_service_orderservice_3e8c5716 klass;
+    class backend_src_index_main_b9b7ba9a function;
+    class backend_src_test_auth_runauthtests_6bfa54b1 test;
+    class backend_src_test_orders_runordertests_b833af1d test;
+    class backend_src_test_products_runproducttests_b1d2d981 test;
+    class backend_src_models_associations_0928fcd9 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>productSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>Product</code><br><small style="color:var(--muted)">src/models/productModel.js</small><br>+4 more</td>
+  <td>productSeeder.js node in Backend/seeders/productSeeder.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>products</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>products node in Backend/seeders/productSeeder.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>main()</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main() node in Backend/seeders/productSeeder.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>productSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><code>authModel.js</code><br><small style="color:var(--muted)">src/models/authModel.js</small><br><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br>+8 more</td>
+  <td>database.js node in config/database/database.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>sequelize</code><br><small style="color:var(--muted)">config/database/database.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>productSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><code>authModel.js</code><br><small style="color:var(--muted)">src/models/authModel.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>orderItemModel.js</code><br><small style="color:var(--muted)">src/models/orderItemModel.js</small><br>+7 more</td>
+  <td>sequelize node in config/database/database.js.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>authenticate()</code><br><small style="color:var(--muted)">config/database/database.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br><code>main()</code><br><small style="color:var(--muted)">Backend/src/index.js</small></td>
+  <td>authenticate() node in config/database/database.js.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>syncUp()</code><br><small style="color:var(--muted)">config/database/database.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br><code>main()</code><br><small style="color:var(--muted)">Backend/src/index.js</small></td>
+  <td>syncUp() node in config/database/database.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>authenticate()</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>syncUp()</code><br><small style="color:var(--muted)">config/database/database.js</small></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>authModel.js</code><br><small style="color:var(--muted)">src/models/authModel.js</small><br><code>ensureSequence()</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br>+5 more</td>
+  <td>index.js node in Backend/src/index.js.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>main()</code><br><small style="color:var(--muted)">Backend/src/index.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>authenticate()</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>syncUp()</code><br><small style="color:var(--muted)">config/database/database.js</small></td>
+  <td><code>ensureSequence()</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td>main() node in Backend/src/index.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br><code>productSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><code>authModel.js</code><br><small style="color:var(--muted)">src/models/authModel.js</small><br><code>Order</code><br><small style="color:var(--muted)">src/models/orderModel.js</small><br><code>OrderItem</code><br><small style="color:var(--muted)">src/models/orderItemModel.js</small><br>+9 more</td>
+  <td>associations.js node in src/models/associations.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>authModel.js</code><br><small style="color:var(--muted)">src/models/authModel.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br>+1 more</td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>test-auth.js</code><br><small style="color:var(--muted)">Backend/src/test-auth.js</small><br><code>test-runner.js</code><br><small style="color:var(--muted)">Backend/src/test-runner.js</small></td>
+  <td>authModel.js node in src/models/authModel.js.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>orderItemModel.js</code><br><small style="color:var(--muted)">src/models/orderItemModel.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br>+1 more</td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>permanentDelete()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br>+2 more</td>
+  <td>orderItemModel.js node in src/models/orderItemModel.js.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>OrderItem</code><br><small style="color:var(--muted)">src/models/orderItemModel.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small></td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>test-orders.js</code><br><small style="color:var(--muted)">Backend/src/test-orders.js</small></td>
+  <td>OrderItem node in src/models/orderItemModel.js.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>orderModel.js</code><br><small style="color:var(--muted)">src/models/orderModel.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br>+1 more</td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>test-orders.js</code><br><small style="color:var(--muted)">Backend/src/test-orders.js</small><br>+1 more</td>
+  <td>orderModel.js node in src/models/orderModel.js.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>Order</code><br><small style="color:var(--muted)">src/models/orderModel.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small></td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>test-orders.js</code><br><small style="color:var(--muted)">Backend/src/test-orders.js</small></td>
+  <td>Order node in src/models/orderModel.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>productModel.js</code><br><small style="color:var(--muted)">src/models/productModel.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br>+2 more</td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>product.services.js</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br>+3 more</td>
+  <td>productModel.js node in src/models/productModel.js.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>Product</code><br><small style="color:var(--muted)">src/models/productModel.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>productSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>product.services.js</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br>+2 more</td>
+  <td>Product node in src/models/productModel.js.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>productVariantModel.js</code><br><small style="color:var(--muted)">src/models/productVariantModel.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br>+2 more</td>
+  <td><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>permanentDelete()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>product.services.js</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br>+3 more</td>
+  <td>productVariantModel.js node in src/models/productVariantModel.js.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>ProductVariant</code><br><small style="color:var(--muted)">src/models/productVariantModel.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>associations.js</code><br><small style="color:var(--muted)">src/models/associations.js</small><br><code>productSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/productSeeder.js</small></td>
+  <td><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>product.services.js</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>test-orders.js</code><br><small style="color:var(--muted)">Backend/src/test-orders.js</small></td>
+  <td>ProductVariant node in src/models/productVariantModel.js.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>admin.service.js</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>authModel.js</code><br><small style="color:var(--muted)">src/models/authModel.js</small><br><code>Order</code><br><small style="color:var(--muted)">src/models/orderModel.js</small><br><code>OrderItem</code><br><small style="color:var(--muted)">src/models/orderItemModel.js</small><br>+4 more</td>
+  <td>No direct outbound edge</td>
+  <td>admin.service.js node in src/services/admin.service.js.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>AdminService</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>getOrderById()</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>getOrders()</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br><code>getStats()</code><br><small style="color:var(--muted)">src/services/admin.service.js</small><br>+1 more</td>
+  <td>AdminService node in src/services/admin.service.js.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>.uploadImage()</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AdminService</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.uploadImage() node in src/services/admin.service.js.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>.getStats()</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AdminService</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.getStats() node in src/services/admin.service.js.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>.getOrders()</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AdminService</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.getOrders() node in src/services/admin.service.js.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>.getOrderById()</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AdminService</code><br><small style="color:var(--muted)">src/services/admin.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.getOrderById() node in src/services/admin.service.js.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>order.service.js</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>database.js</code><br><small style="color:var(--muted)">config/database/database.js</small><br><code>index.js</code><br><small style="color:var(--muted)">Backend/src/index.js</small><br><code>Order</code><br><small style="color:var(--muted)">src/models/orderModel.js</small><br>+8 more</td>
+  <td><code>test-orders.js</code><br><small style="color:var(--muted)">Backend/src/test-orders.js</small><br><code>test-runner.js</code><br><small style="color:var(--muted)">Backend/src/test-runner.js</small></td>
+  <td>order.service.js node in src/services/order.service.js.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>getNextOrderNumber()</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>create()</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td>getNextOrderNumber() node in src/services/order.service.js.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>OrderService</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>create()</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>findById()</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>findByOrderNumber()</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br>+2 more</td>
+  <td>OrderService node in src/services/order.service.js.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>.create()</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getNextOrderNumber()</code><br><small style="color:var(--muted)">src/services/order.service.js</small><br><code>OrderService</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.create() node in src/services/order.service.js.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>.findById()</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>OrderService</code><br><small style="color:var(--muted)">src/services/order.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findById() node in src/services/order.service.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/services/order.service.js</code></td><td>9 nodes</td></tr>
+<tr><td><code>Backend/src/test-utils.js</code></td><td>7 nodes</td></tr>
+<tr><td><code>src/services/admin.service.js</code></td><td>6 nodes</td></tr>
+<tr><td><code>config/database/database.js</code></td><td>4 nodes</td></tr>
+<tr><td><code>Backend/seeders/productSeeder.js</code></td><td>3 nodes</td></tr>
+<tr><td><code>Backend/src/test-products.js</code></td><td>3 nodes</td></tr>
+<tr><td><code>Backend/src/index.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/models/orderItemModel.js</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: imports x62, imports x57, calls x28, contains x25. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 6. Backend Services Paymentservicejs ====== -->
+<h2 id="backend-services-paymentservicejs">6. Backend Services Paymentservicejs</h2>
+<p>Backend Services Paymentservicejs groups implementation around backend, services, paymentservicejs, config, mostly in src/services/payment.service.js, src/controllers/paymentController.js, src/services/mail.service.js. This section covers 34 nodes and 61 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Backend Services Paymentservicejs (34 nodes, 61 edges)
+    subgraph backend_services_paymentservicejs_src_services_p_e1fd652f["src/services/payment.service.js"]
+        backend_src_services_payment_service_paymentserv_755cfb8a("PaymentService<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_handleorder_fb369b8b("handleOrderPaid()<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_fetchpaymen_9192e585("fetchPaymentById()<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_paymentserv_2a013cc8("processWebhook()<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_paymentserv_88b88174("verifyAndProcessOrder()<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_fetchmercha_6b622b4d("fetchMerchantOrders()<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_findapprove_b6492c41("findApprovedPayment()<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_paymentserv_bf0c4465("simulateOrderPaid()<br/><small>src/services/payment.service.js</small>")
+        backend_src_services_payment_service_paymentserv_72535663("createPreference()<br/><small>src/services/payment.service.js</small>")
+    end
+    subgraph backend_services_paymentservicejs_src_services_m_8bc276a7["src/services/mail.service.js"]
+        backend_src_services_mail_service_mailservice_19b9980e("MailService<br/><small>src/services/mail.service.js</small>")
+        backend_src_services_mail_service_mailservice_se_db9cc73c("sendOwnerAlert()<br/><small>src/services/mail.service.js</small>")
+        backend_src_services_mail_service_mailservice_se_c8019e1e("sendReceipt()<br/><small>src/services/mail.service.js</small>")
+    end
+    subgraph backend_services_paymentservicejs_config_envirom_78f3b90b["config/enviroments/enviroments.js"]
+        backend_src_config_enviroments_enviroments_06d24e8e("enviroments.js")
+        backend_src_config_enviroments_enviroments_envs_a70a8ecf("envs<br/><small>config/enviroments/enviroments.js</small>")
+    end
+    subgraph backend_services_paymentservicejs_src_services_p_9f9e2225["src/services/pdf.service.js"]
+        backend_src_services_pdf_service_pdfservice_gene_5427d763("generateReceipt()<br/><small>src/services/pdf.service.js</small>")
+        backend_src_services_pdf_service_pdfservice_f551c544("PdfService<br/><small>src/services/pdf.service.js</small>")
+    end
+    backend_src_config_logger_logger_cd1c3e82("logger.js")
+    backend_src_config_cloudinary_27c50736("cloudinary.js")
+    backend_src_services_mail_service_mailservice_19b9980e -->|method| backend_src_services_mail_service_mailservice_se_db9cc73c
+    backend_src_services_mail_service_mailservice_19b9980e -->|method| backend_src_services_mail_service_mailservice_se_c8019e1e
+    backend_src_services_mail_service_mailservice_se_db9cc73c -->|calls| backend_src_services_payment_service_handleorder_fb369b8b
+    backend_src_services_mail_service_mailservice_se_c8019e1e -->|calls| backend_src_services_payment_service_handleorder_fb369b8b
+    backend_src_services_payment_service_fetchpaymen_9192e585 -->|calls| backend_src_services_payment_service_paymentserv_2a013cc8
+    backend_src_services_payment_service_fetchpaymen_9192e585 -->|calls| backend_src_services_payment_service_paymentserv_88b88174
+    backend_src_services_payment_service_fetchmercha_6b622b4d -->|calls| backend_src_services_payment_service_findapprove_b6492c41
+    backend_src_services_payment_service_findapprove_b6492c41 -->|calls| backend_src_services_payment_service_paymentserv_88b88174
+    backend_src_services_payment_service_handleorder_fb369b8b -->|calls| backend_src_services_pdf_service_pdfservice_gene_5427d763
+    backend_src_services_payment_service_handleorder_fb369b8b -->|calls| backend_src_services_payment_service_paymentserv_2a013cc8
+    backend_src_services_payment_service_handleorder_fb369b8b -->|calls| backend_src_services_payment_service_paymentserv_bf0c4465
+    backend_src_services_payment_service_handleorder_fb369b8b -->|calls| backend_src_services_payment_service_paymentserv_88b88174
+    backend_src_services_payment_service_paymentserv_755cfb8a -->|method| backend_src_services_payment_service_paymentserv_72535663
+    backend_src_services_payment_service_paymentserv_755cfb8a -->|method| backend_src_services_payment_service_paymentserv_2a013cc8
+    backend_src_services_payment_service_paymentserv_755cfb8a -->|method| backend_src_services_payment_service_paymentserv_bf0c4465
+    backend_src_services_payment_service_paymentserv_755cfb8a -->|method| backend_src_services_payment_service_paymentserv_88b88174
+    backend_src_services_pdf_service_pdfservice_f551c544 -->|method| backend_src_services_pdf_service_pdfservice_gene_5427d763
+    backend_src_config_cloudinary_27c50736 -->|imports| backend_src_config_enviroments_enviroments_06d24e8e
+    backend_src_config_cloudinary_27c50736 -->|imports| backend_src_config_enviroments_enviroments_envs_a70a8ecf
+    backend_src_config_enviroments_enviroments_06d24e8e -->|imports| backend_src_config_logger_logger_cd1c3e82
+    backend_src_config_enviroments_enviroments_envs_a70a8ecf -->|imports| backend_src_config_logger_logger_cd1c3e82
+    %% Omitted for readability: 16 nodes, 0 edges
+    class backend_src_services_payment_service_paymentserv_755cfb8a klass;
+    class backend_src_services_payment_service_handleorder_fb369b8b function;
+    class backend_src_services_payment_service_fetchpaymen_9192e585 function;
+    class backend_src_services_payment_service_paymentserv_2a013cc8 ui;
+    class backend_src_services_payment_service_paymentserv_88b88174 function;
+    class backend_src_services_payment_service_fetchmercha_6b622b4d function;
+    class backend_src_services_payment_service_findapprove_b6492c41 function;
+    class backend_src_services_payment_service_paymentserv_bf0c4465 function;
+    class backend_src_services_payment_service_paymentserv_72535663 function;
+    class backend_src_services_mail_service_mailservice_19b9980e klass;
+    class backend_src_services_mail_service_mailservice_se_db9cc73c function;
+    class backend_src_services_mail_service_mailservice_se_c8019e1e function;
+    class backend_src_config_enviroments_enviroments_06d24e8e module;
+    class backend_src_config_enviroments_enviroments_envs_a70a8ecf function;
+    class backend_src_services_pdf_service_pdfservice_gene_5427d763 function;
+    class backend_src_services_pdf_service_pdfservice_f551c544 klass;
+    class backend_src_config_logger_logger_cd1c3e82 module;
+    class backend_src_config_cloudinary_27c50736 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>cloudinary.js</code><br><small style="color:var(--muted)">src/config/cloudinary.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td>cloudinary.js node in src/config/cloudinary.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>cloudinary.js</code><br><small style="color:var(--muted)">src/config/cloudinary.js</small></td>
+  <td><code>logger.js</code><br><small style="color:var(--muted)">config/logger/logger.js</small><br><code>mail.service.js</code><br><small style="color:var(--muted)">src/services/mail.service.js</small><br><code>mailer.js</code><br><small style="color:var(--muted)">src/config/mailer.js</small><br>+3 more</td>
+  <td>enviroments.js node in config/enviroments/enviroments.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>envSchema</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>envSchema node in config/enviroments/enviroments.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>cloudinary.js</code><br><small style="color:var(--muted)">src/config/cloudinary.js</small></td>
+  <td><code>logger.js</code><br><small style="color:var(--muted)">config/logger/logger.js</small><br><code>mail.service.js</code><br><small style="color:var(--muted)">src/services/mail.service.js</small><br><code>mailer.js</code><br><small style="color:var(--muted)">src/config/mailer.js</small><br>+3 more</td>
+  <td>envs node in config/enviroments/enviroments.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>logger.js</code><br><small style="color:var(--muted)">config/logger/logger.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>logger.js node in config/logger/logger.js.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>mailer.js</code><br><small style="color:var(--muted)">src/config/mailer.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td><code>mail.service.js</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td>mailer.js node in src/config/mailer.js.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>transporter</code><br><small style="color:var(--muted)">src/config/mailer.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>mail.service.js</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td>transporter node in src/config/mailer.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>mercadopago.js</code><br><small style="color:var(--muted)">src/config/mercadopago.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td><code>payment.service.js</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>mercadopago.js node in src/config/mercadopago.js.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>client</code><br><small style="color:var(--muted)">src/config/mercadopago.js</small></td>
+  <td><span class="tag tag-cmd">Entry</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>payment.service.js</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>client node in src/config/mercadopago.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>paymentController.js</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small></td>
+  <td><code>payment.service.js</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>paymentRoutes.js</code><br><small style="color:var(--muted)">src/routes/paymentRoutes.js</small><br><code>PaymentService</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>paymentController.js node in src/controllers/paymentController.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>orderService</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>orderService node in src/controllers/paymentController.js.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>paymentService</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>paymentService node in src/controllers/paymentController.js.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>createPreference</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>paymentRoutes.js</code><br><small style="color:var(--muted)">src/routes/paymentRoutes.js</small></td>
+  <td>createPreference node in src/controllers/paymentController.js.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>webhookHandler</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>paymentRoutes.js</code><br><small style="color:var(--muted)">src/routes/paymentRoutes.js</small></td>
+  <td>webhookHandler node in src/controllers/paymentController.js.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>verifyPayment</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>paymentRoutes.js</code><br><small style="color:var(--muted)">src/routes/paymentRoutes.js</small></td>
+  <td>verifyPayment node in src/controllers/paymentController.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>simulatePayment</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>paymentRoutes.js</code><br><small style="color:var(--muted)">src/routes/paymentRoutes.js</small></td>
+  <td>simulatePayment node in src/controllers/paymentController.js.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>paymentRoutes.js</code><br><small style="color:var(--muted)">src/routes/paymentRoutes.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>createPreference</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small><br><code>paymentController.js</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small><br><code>simulatePayment</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small><br>+2 more</td>
+  <td>No direct outbound edge</td>
+  <td>paymentRoutes.js node in src/routes/paymentRoutes.js.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>mail.service.js</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>mailer.js</code><br><small style="color:var(--muted)">src/config/mailer.js</small><br>+1 more</td>
+  <td><code>handleOrderPaid()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>mail.service.js node in src/services/mail.service.js.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>MailService</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>sendOwnerAlert()</code><br><small style="color:var(--muted)">src/services/mail.service.js</small><br><code>sendReceipt()</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td>MailService node in src/services/mail.service.js.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>.sendOwnerAlert()</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>MailService</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td><code>handleOrderPaid()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>.sendOwnerAlert() node in src/services/mail.service.js.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>.sendReceipt()</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>MailService</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td><code>handleOrderPaid()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>.sendReceipt() node in src/services/mail.service.js.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>payment.service.js</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>client</code><br><small style="color:var(--muted)">src/config/mercadopago.js</small><br><code>enviroments.js</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br><code>envs</code><br><small style="color:var(--muted)">config/enviroments/enviroments.js</small><br>+2 more</td>
+  <td>No direct outbound edge</td>
+  <td>payment.service.js node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>fetchPaymentById()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>processWebhook()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>verifyAndProcessOrder()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>fetchPaymentById() node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>fetchMerchantOrders()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>findApprovedPayment()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>fetchMerchantOrders() node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>findApprovedPayment()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>fetchMerchantOrders()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><code>verifyAndProcessOrder()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>findApprovedPayment() node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>handleOrderPaid()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>mail.service.js</code><br><small style="color:var(--muted)">src/services/mail.service.js</small><br><code>sendOwnerAlert()</code><br><small style="color:var(--muted)">src/services/mail.service.js</small><br><code>sendReceipt()</code><br><small style="color:var(--muted)">src/services/mail.service.js</small></td>
+  <td><code>generateReceipt()</code><br><small style="color:var(--muted)">src/services/pdf.service.js</small><br><code>pdf.service.js</code><br><small style="color:var(--muted)">src/services/pdf.service.js</small><br><code>processWebhook()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br>+2 more</td>
+  <td>handleOrderPaid() node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>PaymentService</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>paymentController.js</code><br><small style="color:var(--muted)">src/controllers/paymentController.js</small></td>
+  <td><code>createPreference()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>processWebhook()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>simulateOrderPaid()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br>+1 more</td>
+  <td>PaymentService node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>.createPreference()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>PaymentService</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.createPreference() node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>.processWebhook()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>fetchPaymentById()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>handleOrderPaid()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>PaymentService</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.processWebhook() node in src/services/payment.service.js.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>.verifyAndProcessOrder()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>fetchPaymentById()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>findApprovedPayment()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br><code>handleOrderPaid()</code><br><small style="color:var(--muted)">src/services/payment.service.js</small><br>+1 more</td>
+  <td>No direct outbound edge</td>
+  <td>.verifyAndProcessOrder() node in src/services/payment.service.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/services/payment.service.js</code></td><td>10 nodes</td></tr>
+<tr><td><code>src/controllers/paymentController.js</code></td><td>7 nodes</td></tr>
+<tr><td><code>src/services/mail.service.js</code></td><td>4 nodes</td></tr>
+<tr><td><code>config/enviroments/enviroments.js</code></td><td>3 nodes</td></tr>
+<tr><td><code>src/services/pdf.service.js</code></td><td>3 nodes</td></tr>
+<tr><td><code>src/config/mailer.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/config/mercadopago.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/config/cloudinary.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x17, imports x14, imports x13, calls x10. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 7. Frontend Components Pages ====== -->
+<h2 id="frontend-components-pages">7. Frontend Components Pages</h2>
+<p>Frontend Components Pages groups implementation around frontend, components, pages, productservicejs, mostly in src/services/product.service.js, src/context/ToastContext.jsx, src/pages/HomePage.jsx. This section covers 28 nodes and 45 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Frontend Components Pages (28 nodes, 45 edges)
+    subgraph frontend_components_pages_src_services_product_s_ec194d53["src/services/product.service.js"]
+        frontend_src_services_product_service_getproduct_4c02d428("getProducts()<br/><small>src/services/product.service.js</small>")
+        frontend_src_services_product_service_getfeature_0f7c1bae("getFeaturedProducts()<br/><small>src/services/product.service.js</small>")
+        frontend_src_services_product_service_getproduct_d28a5146("getProduct()<br/><small>src/services/product.service.js</small>")
+        frontend_src_services_product_service_getproduct_956d56b1("getProductVariants()<br/><small>src/services/product.service.js</small>")
+    end
+    subgraph frontend_components_pages_src_components_ColorSe_b70ed37b["src/components/ColorSelector.jsx"]
+        frontend_src_components_colorselector_20219508("ColorSelector.jsx")
+        frontend_src_components_colorselector_colorselec_737e172e("ColorSelector()<br/><small>src/components/ColorSelector.jsx</small>")
+    end
+    subgraph frontend_components_pages_src_components_Feature_68df207d["src/components/FeaturedCard.jsx"]
+        frontend_src_components_featuredcard_3d943536("FeaturedCard.jsx")
+        frontend_src_components_featuredcard_featuredcar_f162178d("FeaturedCard()<br/><small>src/components/FeaturedCard.jsx</small>")
+    end
+    subgraph frontend_components_pages_src_components_Variant_82a5ec89["src/components/VariantDots.jsx"]
+        frontend_src_components_variantdots_e7a350ca("VariantDots.jsx")
+        frontend_src_components_variantdots_variantdots_20175736("VariantDots()<br/><small>src/components/VariantDots.jsx</small>")
+    end
+    subgraph frontend_components_pages_src_pages_HomePage_jsx_24c85cb2["src/pages/HomePage.jsx"]
+        frontend_src_pages_homepage_homepage_5a5e39e5("HomePage()<br/><small>src/pages/HomePage.jsx</small>")
+        frontend_src_pages_homepage_2c1f009a("HomePage.jsx")
+    end
+    subgraph frontend_components_pages_src_pages_ProductDetai_296f6844["src/pages/ProductDetailPage.jsx"]
+        frontend_src_pages_productdetailpage_productdeta_4a290daa("ProductDetailPage()<br/><small>src/pages/ProductDetailPage.jsx</small>")
+        frontend_src_pages_productdetailpage_cebc8de2("ProductDetailPage.jsx")
+    end
+    frontend_src_components_featuredcarousel_3b07e0b9("FeaturedCarousel.jsx")
+    frontend_src_components_productcard_967ec0df("ProductCard.jsx")
+    frontend_src_context_toastcontext_usetoast_8799f197("useToast()<br/><small>src/context/ToastContext.jsx</small>")
+    frontend_src_pages_catalogpage_catalogpage_4c232edd("CatalogPage()<br/><small>src/pages/CatalogPage.jsx</small>")
+    frontend_src_context_toastcontext_usetoast_8799f197 -->|calls| frontend_src_pages_productdetailpage_productdeta_4a290daa
+    frontend_src_pages_catalogpage_catalogpage_4c232edd -->|calls| frontend_src_services_product_service_getproduct_4c02d428
+    frontend_src_pages_homepage_homepage_5a5e39e5 -->|calls| frontend_src_services_product_service_getfeature_0f7c1bae
+    frontend_src_pages_productdetailpage_productdeta_4a290daa -->|calls| frontend_src_services_product_service_getproduct_d28a5146
+    frontend_src_pages_productdetailpage_productdeta_4a290daa -->|calls| frontend_src_services_product_service_getproduct_956d56b1
+    frontend_src_components_colorselector_20219508 -->|imports| frontend_src_pages_productdetailpage_cebc8de2
+    frontend_src_components_colorselector_colorselec_737e172e -->|imports| frontend_src_pages_productdetailpage_cebc8de2
+    frontend_src_components_featuredcard_3d943536 -->|imports| frontend_src_components_variantdots_e7a350ca
+    frontend_src_components_featuredcard_3d943536 -->|imports| frontend_src_components_variantdots_variantdots_20175736
+    frontend_src_components_featuredcard_3d943536 -->|imports| frontend_src_components_featuredcarousel_3b07e0b9
+    frontend_src_components_featuredcard_featuredcar_f162178d -->|imports| frontend_src_components_featuredcarousel_3b07e0b9
+    frontend_src_components_featuredcarousel_3b07e0b9 -->|imports| frontend_src_pages_homepage_2c1f009a
+    frontend_src_components_productcard_967ec0df -->|imports| frontend_src_components_variantdots_e7a350ca
+    frontend_src_components_productcard_967ec0df -->|imports| frontend_src_components_variantdots_variantdots_20175736
+    frontend_src_context_toastcontext_usetoast_8799f197 -->|imports| frontend_src_pages_productdetailpage_cebc8de2
+    frontend_src_pages_homepage_2c1f009a -->|imports| frontend_src_services_product_service_getfeature_0f7c1bae
+    frontend_src_pages_productdetailpage_cebc8de2 -->|imports| frontend_src_services_product_service_getproduct_d28a5146
+    frontend_src_pages_productdetailpage_cebc8de2 -->|imports| frontend_src_services_product_service_getproduct_956d56b1
+    %% Omitted for readability: 10 nodes, 0 edges
+    class frontend_src_services_product_service_getproduct_4c02d428 function;
+    class frontend_src_services_product_service_getfeature_0f7c1bae function;
+    class frontend_src_services_product_service_getproduct_d28a5146 function;
+    class frontend_src_services_product_service_getproduct_956d56b1 function;
+    class frontend_src_components_colorselector_20219508 ui;
+    class frontend_src_components_colorselector_colorselec_737e172e ui;
+    class frontend_src_components_featuredcard_3d943536 ui;
+    class frontend_src_components_featuredcard_featuredcar_f162178d ui;
+    class frontend_src_components_variantdots_e7a350ca ui;
+    class frontend_src_components_variantdots_variantdots_20175736 ui;
+    class frontend_src_pages_homepage_homepage_5a5e39e5 ui;
+    class frontend_src_pages_homepage_2c1f009a ui;
+    class frontend_src_pages_productdetailpage_productdeta_4a290daa ui;
+    class frontend_src_pages_productdetailpage_cebc8de2 ui;
+    class frontend_src_components_featuredcarousel_3b07e0b9 ui;
+    class frontend_src_components_productcard_967ec0df ui;
+    class frontend_src_context_toastcontext_usetoast_8799f197 ui;
+    class frontend_src_pages_catalogpage_catalogpage_4c232edd ui;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>ColorSelector.jsx</code><br><small style="color:var(--muted)">src/components/ColorSelector.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td>ColorSelector.jsx node in src/components/ColorSelector.jsx.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>ColorSelector()</code><br><small style="color:var(--muted)">src/components/ColorSelector.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td>ColorSelector() node in src/components/ColorSelector.jsx.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>FeaturedCard.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCard.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>FeaturedCarousel.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCarousel.jsx</small><br><code>VariantDots()</code><br><small style="color:var(--muted)">src/components/VariantDots.jsx</small><br><code>VariantDots.jsx</code><br><small style="color:var(--muted)">src/components/VariantDots.jsx</small></td>
+  <td>FeaturedCard.jsx node in src/components/FeaturedCard.jsx.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>FeaturedCard()</code><br><small style="color:var(--muted)">src/components/FeaturedCard.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>FeaturedCarousel.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCarousel.jsx</small></td>
+  <td>FeaturedCard() node in src/components/FeaturedCard.jsx.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>FeaturedCarousel.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCarousel.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>FeaturedCard()</code><br><small style="color:var(--muted)">src/components/FeaturedCard.jsx</small><br><code>FeaturedCard.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCard.jsx</small></td>
+  <td><code>HomePage.jsx</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small></td>
+  <td>FeaturedCarousel.jsx node in src/components/FeaturedCarousel.jsx.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>FeaturedCarousel()</code><br><small style="color:var(--muted)">src/components/FeaturedCarousel.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>HomePage.jsx</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small></td>
+  <td>FeaturedCarousel() node in src/components/FeaturedCarousel.jsx.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>ProductCard.jsx</code><br><small style="color:var(--muted)">src/components/ProductCard.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>CatalogPage.jsx</code><br><small style="color:var(--muted)">src/pages/CatalogPage.jsx</small><br><code>VariantDots()</code><br><small style="color:var(--muted)">src/components/VariantDots.jsx</small><br><code>VariantDots.jsx</code><br><small style="color:var(--muted)">src/components/VariantDots.jsx</small></td>
+  <td>ProductCard.jsx node in src/components/ProductCard.jsx.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>ProductCard()</code><br><small style="color:var(--muted)">src/components/ProductCard.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>CatalogPage.jsx</code><br><small style="color:var(--muted)">src/pages/CatalogPage.jsx</small></td>
+  <td>ProductCard() node in src/components/ProductCard.jsx.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>Toast.jsx</code><br><small style="color:var(--muted)">src/components/Toast.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>ToastContext.jsx</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small></td>
+  <td>Toast.jsx node in src/components/Toast.jsx.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>Toast()</code><br><small style="color:var(--muted)">src/components/Toast.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>ToastContext.jsx</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small></td>
+  <td>Toast() node in src/components/Toast.jsx.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>VariantDots.jsx</code><br><small style="color:var(--muted)">src/components/VariantDots.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>FeaturedCard.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCard.jsx</small><br><code>ProductCard.jsx</code><br><small style="color:var(--muted)">src/components/ProductCard.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>VariantDots.jsx node in src/components/VariantDots.jsx.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>VariantDots()</code><br><small style="color:var(--muted)">src/components/VariantDots.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>FeaturedCard.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCard.jsx</small><br><code>ProductCard.jsx</code><br><small style="color:var(--muted)">src/components/ProductCard.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>VariantDots() node in src/components/VariantDots.jsx.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>ToastContext.jsx</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>Toast()</code><br><small style="color:var(--muted)">src/components/Toast.jsx</small><br><code>Toast.jsx</code><br><small style="color:var(--muted)">src/components/Toast.jsx</small></td>
+  <td><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td>ToastContext.jsx node in src/context/ToastContext.jsx.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>ToastContext</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ToastContext node in src/context/ToastContext.jsx.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>ToastProvider()</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ToastProvider() node in src/context/ToastContext.jsx.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>useToast()</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>ProductDetailPage()</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small><br><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td>useToast() node in src/context/ToastContext.jsx.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>CatalogPage.jsx</code><br><small style="color:var(--muted)">src/pages/CatalogPage.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>ProductCard()</code><br><small style="color:var(--muted)">src/components/ProductCard.jsx</small><br><code>ProductCard.jsx</code><br><small style="color:var(--muted)">src/components/ProductCard.jsx</small></td>
+  <td><code>getProducts()</code><br><small style="color:var(--muted)">src/services/product.service.js</small><br><code>product.service.js</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>CatalogPage()</code><br><small style="color:var(--muted)">src/pages/CatalogPage.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>getProducts()</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>HomePage.jsx</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>FeaturedCarousel()</code><br><small style="color:var(--muted)">src/components/FeaturedCarousel.jsx</small><br><code>FeaturedCarousel.jsx</code><br><small style="color:var(--muted)">src/components/FeaturedCarousel.jsx</small></td>
+  <td><code>getFeaturedProducts()</code><br><small style="color:var(--muted)">src/services/product.service.js</small><br><code>product.service.js</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>featured</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>featured node in src/pages/HomePage.jsx.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>HomePage()</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>getFeaturedProducts()</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>ColorSelector()</code><br><small style="color:var(--muted)">src/components/ColorSelector.jsx</small><br><code>ColorSelector.jsx</code><br><small style="color:var(--muted)">src/components/ColorSelector.jsx</small><br><code>ToastContext.jsx</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small><br>+1 more</td>
+  <td><code>getProduct()</code><br><small style="color:var(--muted)">src/services/product.service.js</small><br><code>getProductVariants()</code><br><small style="color:var(--muted)">src/services/product.service.js</small><br><code>product.service.js</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>ProductDetailPage()</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>useToast()</code><br><small style="color:var(--muted)">src/context/ToastContext.jsx</small></td>
+  <td><code>getProduct()</code><br><small style="color:var(--muted)">src/services/product.service.js</small><br><code>getProductVariants()</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td>Organizes documentation pages, navigation, or content lookup.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>product.service.js</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>CatalogPage.jsx</code><br><small style="color:var(--muted)">src/pages/CatalogPage.jsx</small><br><code>HomePage.jsx</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small><br><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>product.service.js node in src/services/product.service.js.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>getProducts()</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>CatalogPage()</code><br><small style="color:var(--muted)">src/pages/CatalogPage.jsx</small><br><code>CatalogPage.jsx</code><br><small style="color:var(--muted)">src/pages/CatalogPage.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>getProducts() node in src/services/product.service.js.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>getProduct()</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductDetailPage()</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small><br><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>getProduct() node in src/services/product.service.js.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>getProductVariants()</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductDetailPage()</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small><br><code>ProductDetailPage.jsx</code><br><small style="color:var(--muted)">src/pages/ProductDetailPage.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>getProductVariants() node in src/services/product.service.js.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>getFeaturedProducts()</code><br><small style="color:var(--muted)">src/services/product.service.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>HomePage()</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small><br><code>HomePage.jsx</code><br><small style="color:var(--muted)">src/pages/HomePage.jsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>getFeaturedProducts() node in src/services/product.service.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/services/product.service.js</code></td><td>5 nodes</td></tr>
+<tr><td><code>src/context/ToastContext.jsx</code></td><td>4 nodes</td></tr>
+<tr><td><code>src/pages/HomePage.jsx</code></td><td>3 nodes</td></tr>
+<tr><td><code>src/components/ColorSelector.jsx</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/components/FeaturedCard.jsx</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/components/FeaturedCarousel.jsx</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/components/ProductCard.jsx</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/components/Toast.jsx</code></td><td>2 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x17, imports x12, imports x11, calls x5. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 8. Backend Errors Errormatchersjs ====== -->
+<h2 id="backend-errors-errormatchersjs">8. Backend Errors Errormatchersjs</h2>
+<p>Backend Errors Errormatchersjs groups implementation around backend, errors, errormatchersjs, appjs, mostly in src/errors/errorMatchers.js, Backend/src/app.js, src/errors/error.controller.js. This section covers 23 nodes and 27 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Backend Errors Errormatchersjs (23 nodes, 27 edges)
+    subgraph backend_errors_errormatchersjs_src_errors_errorM_67cf2828["src/errors/errorMatchers.js"]
+        backend_src_errors_errormatchers_cf0abc5c("errorMatchers.js")
+        backend_src_errors_errormatchers_errormatchers_98525aeb("errorMatchers<br/><small>src/errors/errorMatchers.js</small>")
+        backend_src_errors_errormatchers_handlecasterror_2fd9989a("handleCastError22001()<br/><small>src/errors/errorMatchers.js</small>")
+        backend_src_errors_errormatchers_handlecasterror_dd205ea8("handleCastError22P02()<br/><small>src/errors/errorMatchers.js</small>")
+        backend_src_errors_errormatchers_handlecasterror_03e20cc0("handleCastError23503()<br/><small>src/errors/errorMatchers.js</small>")
+        backend_src_errors_errormatchers_handlecasterror_63223fc9("handleCastError23505()<br/><small>src/errors/errorMatchers.js</small>")
+        backend_src_errors_errormatchers_handlejwterror_129a96a7("handleJWTError()<br/><small>src/errors/errorMatchers.js</small>")
+    end
+    subgraph backend_errors_errormatchersjs_Backend_src_app_j_c86e7fe7["Backend/src/app.js"]
+        backend_src_app_8bc6e428("app.js")
+        backend_src_app_app_67c54931("app<br/><small>Backend/src/app.js</small>")
+        backend_src_app_authlimiter_fd467305("authLimiter<br/><small>Backend/src/app.js</small>")
+        backend_src_app_globallimiter_0aa750fc("globalLimiter<br/><small>Backend/src/app.js</small>")
+    end
+    subgraph backend_errors_errormatchersjs_src_errors_error_a70151d0["src/errors/error.controller.js"]
+        backend_src_errors_error_controller_0e2c912c("error.controller.js")
+        backend_src_errors_error_controller_senderrordev_d080e7f9("sendErrorDev()<br/><small>src/errors/error.controller.js</small>")
+        backend_src_errors_error_controller_senderrorpro_46e523c8("sendErrorProd()<br/><small>src/errors/error.controller.js</small>")
+        backend_src_errors_error_controller_globalerrorh_85d0d32f("globalErrorHandler()<br/><small>src/errors/error.controller.js</small>")
+    end
+    subgraph backend_errors_errormatchersjs_src_errors_error_8da81d22["src/errors/error.model.js"]
+        backend_src_errors_error_model_6fa01aa0("error.model.js")
+        backend_src_errors_error_model_error_f0171ba2("Error<br/><small>src/errors/error.model.js</small>")
+    end
+    backend_src_routes_routes_router_19f463f4("router<br/><small>src/routes/routes.js</small>")
+    backend_src_errors_error_controller_senderrordev_d080e7f9 -->|calls| backend_src_errors_error_controller_globalerrorh_85d0d32f
+    backend_src_errors_error_controller_senderrorpro_46e523c8 -->|calls| backend_src_errors_error_controller_globalerrorh_85d0d32f
+    backend_src_app_8bc6e428 -->|imports| backend_src_errors_error_controller_0e2c912c
+    backend_src_app_8bc6e428 -->|imports| backend_src_errors_error_controller_globalerrorh_85d0d32f
+    backend_src_app_8bc6e428 -->|imports| backend_src_routes_routes_router_19f463f4
+    backend_src_errors_error_controller_0e2c912c -->|imports| backend_src_errors_error_model_6fa01aa0
+    backend_src_errors_error_controller_0e2c912c -->|imports| backend_src_errors_error_model_error_f0171ba2
+    backend_src_errors_error_controller_0e2c912c -->|imports| backend_src_errors_errormatchers_cf0abc5c
+    backend_src_errors_error_controller_0e2c912c -->|imports| backend_src_errors_errormatchers_errormatchers_98525aeb
+    %% Omitted for readability: 5 nodes, 0 edges
+    class backend_src_errors_errormatchers_cf0abc5c module;
+    class backend_src_errors_errormatchers_errormatchers_98525aeb function;
+    class backend_src_errors_errormatchers_handlecasterror_2fd9989a function;
+    class backend_src_errors_errormatchers_handlecasterror_dd205ea8 function;
+    class backend_src_errors_errormatchers_handlecasterror_03e20cc0 function;
+    class backend_src_errors_errormatchers_handlecasterror_63223fc9 function;
+    class backend_src_errors_errormatchers_handlejwterror_129a96a7 function;
+    class backend_src_app_8bc6e428 module;
+    class backend_src_app_app_67c54931 function;
+    class backend_src_app_authlimiter_fd467305 function;
+    class backend_src_app_globallimiter_0aa750fc function;
+    class backend_src_errors_error_controller_0e2c912c module;
+    class backend_src_errors_error_controller_senderrordev_d080e7f9 function;
+    class backend_src_errors_error_controller_senderrorpro_46e523c8 function;
+    class backend_src_errors_error_controller_globalerrorh_85d0d32f function;
+    class backend_src_errors_error_model_6fa01aa0 module;
+    class backend_src_errors_error_model_error_f0171ba2 klass;
+    class backend_src_routes_routes_router_19f463f4 api;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">Backend/src/app.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>error.controller.js</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small><br><code>globalErrorHandler()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small><br><code>router</code><br><small style="color:var(--muted)">src/routes/routes.js</small></td>
+  <td>app.js node in Backend/src/app.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>app</code><br><small style="color:var(--muted)">Backend/src/app.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>app node in Backend/src/app.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>globalLimiter</code><br><small style="color:var(--muted)">Backend/src/app.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>globalLimiter node in Backend/src/app.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>authLimiter</code><br><small style="color:var(--muted)">Backend/src/app.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>authLimiter node in Backend/src/app.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>error.controller.js</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">Backend/src/app.js</small></td>
+  <td><code>Error</code><br><small style="color:var(--muted)">src/errors/error.model.js</small><br><code>error.model.js</code><br><small style="color:var(--muted)">src/errors/error.model.js</small><br><code>errorMatchers</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small><br>+1 more</td>
+  <td>error.controller.js node in src/errors/error.controller.js.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>sendErrorDev()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>globalErrorHandler()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td>sendErrorDev() node in src/errors/error.controller.js.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>sendErrorProd()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>globalErrorHandler()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td>sendErrorProd() node in src/errors/error.controller.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>globalErrorHandler()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">Backend/src/app.js</small><br><code>sendErrorDev()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small><br><code>sendErrorProd()</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>globalErrorHandler() node in src/errors/error.controller.js.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>error.model.js</code><br><small style="color:var(--muted)">src/errors/error.model.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>error.controller.js</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>error.model.js node in src/errors/error.model.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>Error</code><br><small style="color:var(--muted)">src/errors/error.model.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>error.controller.js</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>Error node in src/errors/error.model.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>errorMatchers.js</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>error.controller.js</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>errorMatchers.js node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>handleCastError22001()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleCastError22001() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>handleCastError23505()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleCastError23505() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>handleCastError22P02()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleCastError22P02() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>handleCastError23503()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleCastError23503() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>handleSequelizeUniqueConstraintError()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleSequelizeUniqueConstraintError() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>handleSequelizeValidationError()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleSequelizeValidationError() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>handleJWTExpiredError()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleJWTExpiredError() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>handleJWTError()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleJWTError() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>handleMulterError()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleMulterError() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>handleZodError()</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>handleZodError() node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>errorMatchers</code><br><small style="color:var(--muted)">src/errors/errorMatchers.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>error.controller.js</code><br><small style="color:var(--muted)">src/errors/error.controller.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>errorMatchers node in src/errors/errorMatchers.js.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>router</code><br><small style="color:var(--muted)">src/routes/routes.js</small></td>
+  <td><span class="tag tag-endpoint">API</span></td>
+  <td><code>app.js</code><br><small style="color:var(--muted)">Backend/src/app.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>router node in src/routes/routes.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/errors/errorMatchers.js</code></td><td>12 nodes</td></tr>
+<tr><td><code>Backend/src/app.js</code></td><td>4 nodes</td></tr>
+<tr><td><code>src/errors/error.controller.js</code></td><td>4 nodes</td></tr>
+<tr><td><code>src/errors/error.model.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/routes/routes.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x14, imports x4, imports x3, calls x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 9. Backend Services Productservicesjs ====== -->
+<h2 id="backend-services-productservicesjs">9. Backend Services Productservicesjs</h2>
+<p>Backend Services Productservicesjs groups implementation around backend, services, productservicesjs, generateslug, mostly in src/services/product.services.js. This section covers 16 nodes and 19 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Backend Services Productservicesjs (16 nodes, 19 edges)
+    backend_src_services_product_services_productser_80cdd14b("ProductService<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_generatesl_60a375b2("generateSlug()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_d026b690("update()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_169f0591("getVariant()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_c4d24686("create()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_9d7cdfd1("createVariant()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_44643253("decrementVariantStock()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_68e2c016("deleteVariant()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_581c2621("disable()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_3a722838("findAll()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_1edbcced("findById()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_fc389a22("findByIdWithVariants()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_a7ad026d("findBySlug()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_e59d51c1("findFeatured()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_8dc6c02c("getVariants()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_productser_86c9d87c("updateVariant()<br/><small>src/services/product.services.js</small>")
+    backend_src_services_product_services_generatesl_60a375b2 -->|calls| backend_src_services_product_services_productser_c4d24686
+    backend_src_services_product_services_generatesl_60a375b2 -->|calls| backend_src_services_product_services_productser_d026b690
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_c4d24686
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_9d7cdfd1
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_44643253
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_68e2c016
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_581c2621
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_3a722838
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_1edbcced
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_fc389a22
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_a7ad026d
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_e59d51c1
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_169f0591
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_8dc6c02c
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_d026b690
+    backend_src_services_product_services_productser_80cdd14b -->|method| backend_src_services_product_services_productser_86c9d87c
+    backend_src_services_product_services_productser_d026b690 -->|calls| backend_src_services_product_services_productser_581c2621
+    backend_src_services_product_services_productser_d026b690 -->|calls| backend_src_services_product_services_productser_86c9d87c
+    backend_src_services_product_services_productser_169f0591 -->|calls| backend_src_services_product_services_productser_44643253
+    class backend_src_services_product_services_productser_80cdd14b klass;
+    class backend_src_services_product_services_generatesl_60a375b2 function;
+    class backend_src_services_product_services_productser_d026b690 function;
+    class backend_src_services_product_services_productser_169f0591 function;
+    class backend_src_services_product_services_productser_c4d24686 function;
+    class backend_src_services_product_services_productser_9d7cdfd1 function;
+    class backend_src_services_product_services_productser_44643253 function;
+    class backend_src_services_product_services_productser_68e2c016 function;
+    class backend_src_services_product_services_productser_581c2621 function;
+    class backend_src_services_product_services_productser_3a722838 function;
+    class backend_src_services_product_services_productser_1edbcced function;
+    class backend_src_services_product_services_productser_fc389a22 function;
+    class backend_src_services_product_services_productser_a7ad026d function;
+    class backend_src_services_product_services_productser_e59d51c1 function;
+    class backend_src_services_product_services_productser_8dc6c02c function;
+    class backend_src_services_product_services_productser_86c9d87c function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>generateSlug()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>create()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>update()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>generateSlug() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>create()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>createVariant()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>decrementVariantStock()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br>+11 more</td>
+  <td>ProductService node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>.findAll()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findAll() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>.findById()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findById() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>.findByIdWithVariants()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findByIdWithVariants() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>.findBySlug()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findBySlug() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>.findFeatured()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findFeatured() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>.create()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>generateSlug()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.create() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>.update()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>generateSlug()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><code>disable()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>updateVariant()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>.update() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>.disable()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>update()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.disable() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>.getVariants()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.getVariants() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>.getVariant()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><code>decrementVariantStock()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>.getVariant() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>.createVariant()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.createVariant() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>.updateVariant()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>update()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.updateVariant() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>.deleteVariant()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.deleteVariant() node in src/services/product.services.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>.decrementVariantStock()</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getVariant()</code><br><small style="color:var(--muted)">src/services/product.services.js</small><br><code>ProductService</code><br><small style="color:var(--muted)">src/services/product.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.decrementVariantStock() node in src/services/product.services.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/services/product.services.js</code></td><td>16 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: method x14, calls x5. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 10. Backend Authservicesjs Services ====== -->
+<h2 id="backend-authservicesjs-services">10. Backend Authservicesjs Services</h2>
+<p>Backend Authservicesjs Services groups implementation around backend, authservicesjs, services, adminseederjs, mostly in src/services/auth.services.js, Backend/seeders/adminSeeder.js, src/models/authModel.js. This section covers 11 nodes and 15 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Backend Authservicesjs Services (11 nodes, 15 edges)
+    subgraph backend_authservicesjs_services_src_services_aut_decb468e["src/services/auth.services.js"]
+        backend_src_services_auth_services_authservice_76a0bdb4("AuthService<br/><small>src/services/auth.services.js</small>")
+        backend_src_services_auth_services_authservice_c_8bf74ac9("createUser()<br/><small>src/services/auth.services.js</small>")
+        backend_src_services_auth_services_authservice_d_90fc49c5("deleteUser()<br/><small>src/services/auth.services.js</small>")
+        backend_src_services_auth_services_authservice_f_7672acf7("findAllUser()<br/><small>src/services/auth.services.js</small>")
+        backend_src_services_auth_services_authservice_f_dc079caf("findOneUserByEmail()<br/><small>src/services/auth.services.js</small>")
+        backend_src_services_auth_services_authservice_f_501b807b("findOneUserById()<br/><small>src/services/auth.services.js</small>")
+        backend_src_services_auth_services_authservice_u_fcbfc47f("updateUser()<br/><small>src/services/auth.services.js</small>")
+        backend_src_services_auth_services_5c0eecc5("auth.services.js")
+    end
+    subgraph backend_authservicesjs_services_Backend_seeders_e36bbd22["Backend/seeders/adminSeeder.js"]
+        backend_seeders_adminseeder_dd111323("adminSeeder.js")
+        backend_seeders_adminseeder_main_03d85d93("main()<br/><small>Backend/seeders/adminSeeder.js</small>")
+    end
+    backend_src_models_authmodel_user_4196e5f4("User<br/><small>src/models/authModel.js</small>")
+    backend_src_services_auth_services_authservice_76a0bdb4 -->|method| backend_src_services_auth_services_authservice_c_8bf74ac9
+    backend_src_services_auth_services_authservice_76a0bdb4 -->|method| backend_src_services_auth_services_authservice_d_90fc49c5
+    backend_src_services_auth_services_authservice_76a0bdb4 -->|method| backend_src_services_auth_services_authservice_f_7672acf7
+    backend_src_services_auth_services_authservice_76a0bdb4 -->|method| backend_src_services_auth_services_authservice_f_dc079caf
+    backend_src_services_auth_services_authservice_76a0bdb4 -->|method| backend_src_services_auth_services_authservice_f_501b807b
+    backend_src_services_auth_services_authservice_76a0bdb4 -->|method| backend_src_services_auth_services_authservice_u_fcbfc47f
+    backend_seeders_adminseeder_dd111323 -->|imports| backend_src_models_authmodel_user_4196e5f4
+    backend_src_models_authmodel_user_4196e5f4 -->|imports| backend_src_services_auth_services_5c0eecc5
+    class backend_src_services_auth_services_authservice_76a0bdb4 klass;
+    class backend_src_services_auth_services_authservice_c_8bf74ac9 function;
+    class backend_src_services_auth_services_authservice_d_90fc49c5 function;
+    class backend_src_services_auth_services_authservice_f_7672acf7 function;
+    class backend_src_services_auth_services_authservice_f_dc079caf function;
+    class backend_src_services_auth_services_authservice_f_501b807b function;
+    class backend_src_services_auth_services_authservice_u_fcbfc47f function;
+    class backend_src_services_auth_services_5c0eecc5 module;
+    class backend_seeders_adminseeder_dd111323 module;
+    class backend_seeders_adminseeder_main_03d85d93 function;
+    class backend_src_models_authmodel_user_4196e5f4 klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>adminSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/adminSeeder.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>User</code><br><small style="color:var(--muted)">src/models/authModel.js</small></td>
+  <td>adminSeeder.js node in Backend/seeders/adminSeeder.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>main()</code><br><small style="color:var(--muted)">Backend/seeders/adminSeeder.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main() node in Backend/seeders/adminSeeder.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>User</code><br><small style="color:var(--muted)">src/models/authModel.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>adminSeeder.js</code><br><small style="color:var(--muted)">Backend/seeders/adminSeeder.js</small></td>
+  <td><code>auth.services.js</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td>User node in src/models/authModel.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>auth.services.js</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>User</code><br><small style="color:var(--muted)">src/models/authModel.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>auth.services.js node in src/services/auth.services.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>AuthService</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>createUser()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small><br><code>deleteUser()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small><br><code>findAllUser()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small><br>+3 more</td>
+  <td>AuthService node in src/services/auth.services.js.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>.findAllUser()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AuthService</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findAllUser() node in src/services/auth.services.js.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>.findOneUserByEmail()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AuthService</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findOneUserByEmail() node in src/services/auth.services.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>.findOneUserById()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AuthService</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.findOneUserById() node in src/services/auth.services.js.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>.updateUser()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AuthService</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.updateUser() node in src/services/auth.services.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>.deleteUser()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AuthService</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.deleteUser() node in src/services/auth.services.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>.createUser()</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>AuthService</code><br><small style="color:var(--muted)">src/services/auth.services.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>.createUser() node in src/services/auth.services.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>src/services/auth.services.js</code></td><td>8 nodes</td></tr>
+<tr><td><code>Backend/seeders/adminSeeder.js</code></td><td>2 nodes</td></tr>
+<tr><td><code>src/models/authModel.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: method x6, references x5, contains x2, imports x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 11. Eslintconfigjs Backend ====== -->
+<h2 id="eslintconfigjs-backend">11. Eslintconfigjs Backend</h2>
+<p>Eslintconfigjs Backend groups implementation around eslintconfigjs, backend, mostly in Backend/eslint.config.js. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Eslintconfigjs Backend (1 nodes, 0 edges)
+    backend_eslint_config_de580ce9("eslint.config.js")
+    class backend_eslint_config_de580ce9 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>eslint.config.js</code><br><small style="color:var(--muted)">Backend/eslint.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>Backend/eslint.config.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 12. Viteconfigjs Frontend ====== -->
+<h2 id="viteconfigjs-frontend">12. Viteconfigjs Frontend</h2>
+<p>Viteconfigjs Frontend groups implementation around viteconfigjs, frontend, mostly in Frontend/vite.config.js. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Viteconfigjs Frontend (1 nodes, 0 edges)
+    frontend_vite_config_3ac59d22("vite.config.js")
+    class frontend_vite_config_3ac59d22 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>vite.config.js</code><br><small style="color:var(--muted)">Frontend/vite.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>Frontend/vite.config.js</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<h2 id="stats">Project Statistics</h2>
+
+<div class="grid">
+  <div class="card">
+    <h4>Graph</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>Nodes</td><td>433</td></tr>
+      <tr><td>Edges</td><td>882</td></tr>
+      <tr><td>Hyperedges</td><td>0</td></tr>
+      <tr><td>Communities</td><td>16</td></tr>
+      <tr><td>Documented Sections</td><td>11</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Edge Confidence</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>EXTRACTED</td><td>876</td></tr>
+      <tr><td>INFERRED</td><td>6</td></tr>
+      <tr><td>AMBIGUOUS</td><td>0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
+  <p>e-commerce Neo Tech — Architecture Documentation</p>
+  <p>Generated: 2026-07-16 19:19 UTC · graphify callflow-html</p>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const mermaidConfig = {
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, useMaxWidth: true },
+    themeVariables: {
+      primaryColor: '#1e293b',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#38bdf8',
+      secondaryColor: '#0f172a',
+      tertiaryColor: '#334155',
+      lineColor: '#64748b',
+      textColor: '#e2e8f0',
+    }
+  };
+
+  mermaid.initialize(mermaidConfig);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function enhanceMermaidDiagrams() {
+    document.querySelectorAll('.mermaid').forEach((container) => {
+      if (container.dataset.zoomReady === 'true') return;
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      container.dataset.zoomReady = 'true';
+      container.classList.add('is-enhanced');
+
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      svg.parentNode.insertBefore(viewport, svg);
+      viewport.appendChild(svg);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      toolbar.innerHTML = [
+        '<button type="button" data-action="zoom-out" title="Zoom out">-</button>',
+        '<span class="zoom-level" data-role="level">100%</span>',
+        '<button type="button" data-action="zoom-in" title="Zoom in">+</button>',
+        '<button type="button" data-action="fit" title="Fit width">Fit</button>',
+        '<button type="button" data-action="reset" title="Reset view">Reset</button>'
+      ].join('');
+      container.insertBefore(toolbar, viewport);
+
+      const state = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 };
+      const level = toolbar.querySelector('[data-role="level"]');
+
+      function applyTransform() {
+        svg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        level.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function zoomBy(delta) {
+        state.scale = clamp(state.scale + delta, 0.25, 3);
+        applyTransform();
+      }
+
+      function reset() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      function fitWidth() {
+        const rawWidth = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
+          ? svg.viewBox.baseVal.width
+          : svg.getBoundingClientRect().width / state.scale;
+        if (!rawWidth) {
+          reset();
+          return;
+        }
+        state.scale = clamp((viewport.clientWidth - 48) / rawWidth, 0.25, 1.4);
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      toolbar.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'zoom-in') zoomBy(0.15);
+        if (action === 'zoom-out') zoomBy(-0.15);
+        if (action === 'fit') fitWidth();
+        if (action === 'reset') reset();
+      });
+
+      viewport.addEventListener('wheel', (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        state.dragging = true;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.originX = state.x;
+        state.originY = state.y;
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!state.dragging) return;
+        state.x = state.originX + event.clientX - state.startX;
+        state.y = state.originY + event.clientY - state.startY;
+        applyTransform();
+      });
+
+      function endDrag(event) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        viewport.classList.remove('is-dragging');
+        if (viewport.hasPointerCapture(event.pointerId)) {
+          viewport.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      applyTransform();
+    });
+  }
+
+  function renderMermaid() {
+    const result = mermaid.run
+      ? mermaid.run({ querySelector: '.mermaid' })
+      : Promise.resolve();
+    Promise.resolve(result)
+      .then(enhanceMermaidDiagrams)
+      .catch((error) => {
+        console.error('Mermaid render failed:', error);
+        enhanceMermaidDiagrams();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
+</script>
+
+</body>
+</html>
