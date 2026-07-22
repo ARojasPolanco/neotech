@@ -36,6 +36,9 @@ export default function PaymentResultPage() {
   const [error, setError] = useState(null);
 
   const paymentId = searchParams.get("payment_id") || searchParams.get("collection_id") || "";
+  const urlOrderNumber = searchParams.get("external_reference") || "";
+  const urlPreferenceId = searchParams.get("preference_id") || "";
+  const urlStatus = searchParams.get("status") || searchParams.get("collection_status") || "";
 
   useEffect(() => {
     api.get("/config/whatsapp").then((res) => {
@@ -44,8 +47,9 @@ export default function PaymentResultPage() {
   }, []);
 
   useEffect(() => {
-    const storedOrderNumber = sessionStorage.getItem("lastOrderNumber");
-    const storedPreferenceId = sessionStorage.getItem("lastPreferenceId") || "";
+    const storedOrderNumber = sessionStorage.getItem("lastOrderNumber") || urlOrderNumber;
+    const storedPreferenceId = sessionStorage.getItem("lastPreferenceId") || urlPreferenceId;
+
     if (!storedOrderNumber) {
       setStatus("no-order");
       return;
@@ -74,6 +78,19 @@ export default function PaymentResultPage() {
           sessionStorage.removeItem("lastPreferenceId");
           return;
         }
+
+        if (urlStatus === "approved" && attempts >= 3) {
+          try {
+            await api.post(`/admin/orders/${storedOrderNumber}/notify`);
+            const orderRes = await api.get(`/orders/number/${storedOrderNumber}`);
+            setOrder(orderRes.data);
+            setStatus("found");
+            sessionStorage.removeItem("lastOrderNumber");
+            sessionStorage.removeItem("lastPreferenceId");
+            return;
+          } catch (notifyErr) {
+          }
+        }
       } catch (err) {
         if (!cancelled) {
           setError("No pudimos contactar al servidor. Intentando de nuevo...");
@@ -101,12 +118,22 @@ export default function PaymentResultPage() {
       clearTimeout(timer);
       clearTimeout(maxAttemptsTimer);
     };
-  }, [paymentId]);
+  }, [paymentId, urlOrderNumber, urlPreferenceId, urlStatus]);
 
   if (status === "no-order") {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
         <p className="text-lg text-muted">No hay una compra reciente para mostrar.</p>
+        {whatsappNumber && (
+          <a
+            href={`https://wa.me/${whatsappNumber}?text=Hola,%20quiero%20informar%20mi%20compra.%20N%C3%BAmero%20de%20pedido:%20${orderNumber || urlOrderNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1ebe57]"
+          >
+            💬 Informar mi compra por WhatsApp
+          </a>
+        )}
         <Link
           to="/products"
           className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg"
@@ -127,6 +154,9 @@ export default function PaymentResultPage() {
             Número de pedido: {orderNumber}
           </p>
         )}
+        <p className="text-sm text-muted">
+          Esto puede tomar unos segundos. No cierres esta ventana.
+        </p>
         {error && (
           <p className="text-xs text-warning">{error}</p>
         )}
