@@ -22,6 +22,8 @@ export default function CheckoutPage() {
     setError("");
     setLoading(true);
 
+    const paymentWindow = window.open("", "_blank");
+
     try {
       const payload = {
         ...form,
@@ -38,7 +40,12 @@ export default function CheckoutPage() {
       const res = await api.post("/payments/create-preference", payload);
       sessionStorage.setItem("lastOrderNumber", res.data.orderNumber);
       clearCart();
-      window.open(res.data.initPoint, "_blank");
+
+      if (paymentWindow) {
+        paymentWindow.location.href = res.data.initPoint;
+      } else {
+        window.location.href = res.data.initPoint;
+      }
       navigate("/payment-result");
     } catch (err) {
       setError(err.response?.data?.message || "Error al procesar el pago");
