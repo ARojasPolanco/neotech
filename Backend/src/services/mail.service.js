@@ -1,5 +1,9 @@
-import transporter from "../config/mailer.js";
+import { Resend } from "resend";
 import { envs } from "../config/enviroments/enviroments.js";
+
+const resend = new Resend(envs.RESEND_API_KEY);
+
+const FROM_EMAIL = "Neo Tech <onboarding@resend.dev>";
 
 export class MailService {
   async sendOwnerAlert(order) {
@@ -10,7 +14,7 @@ export class MailService {
     ).join("\n");
 
     const text = [
-      `🛒 Nuevo pedido: ${order.orderNumber}`,
+      `Nuevo pedido: ${order.orderNumber}`,
       `Cliente: ${order.customerName}`,
       ``,
       `Productos:`,
@@ -21,14 +25,14 @@ export class MailService {
       `Contacto: ${order.customerEmail} / ${order.customerPhone}`,
     ].join("\n");
 
-    const result = await transporter.sendMail({
-      from: `"Neo Tech" <${envs.MAIL_FROM}>`,
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
       to: envs.OWNER_EMAIL,
-      subject: `🛒 Nuevo pedido ${order.orderNumber} - ${order.customerName}`,
+      subject: `Nuevo pedido ${order.orderNumber} - ${order.customerName}`,
       text,
     });
 
-    console.log(`[MailService] owner alert sent for ${order.orderNumber}: ${result.messageId}`);
+    console.log(`[MailService] owner alert sent for ${order.orderNumber}: ${result.data?.id || "unknown"}`);
     return result;
   }
 
@@ -40,7 +44,7 @@ export class MailService {
     ).join("\n");
 
     const text = [
-      `¡Gracias por tu compra en Neo Tech!`,
+      `Gracias por tu compra en Neo Tech!`,
       ``,
       `Pedido: ${order.orderNumber}`,
       `Fecha: ${new Date(order.createdAt).toLocaleDateString("es-AR")}`,
@@ -51,11 +55,11 @@ export class MailService {
       `Total: $${Number(order.total).toLocaleString("es-AR")}`,
       ``,
       `Adjuntamos el recibo en PDF.`,
-      `Si tenés dudas, respondé este mail.`,
+      `Si tenes dudas, respondi este mail.`,
     ].join("\n");
 
-    const result = await transporter.sendMail({
-      from: `"Neo Tech" <${envs.MAIL_FROM}>`,
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
       to: order.customerEmail,
       subject: `Tu pedido Neo Tech ${order.orderNumber} fue confirmado`,
       text,
@@ -63,12 +67,11 @@ export class MailService {
         {
           filename: `recibo-${order.orderNumber}.pdf`,
           content: pdfBuffer,
-          contentType: "application/pdf",
         },
       ],
     });
 
-    console.log(`[MailService] receipt sent for ${order.orderNumber}: ${result.messageId}`);
+    console.log(`[MailService] receipt sent for ${order.orderNumber}: ${result.data?.id || "unknown"}`);
     return result;
   }
 }
