@@ -114,13 +114,11 @@ async function handleOrderPaid(order) {
     console.log(`[handleOrderPaid] order ${order.orderNumber} already paid, sending notifications only`);
   }
 
-  setImmediate(async () => {
-    try {
-      await sendOrderNotifications(order);
-    } catch (err) {
-      console.error("[handleOrderPaid] notification error:", err);
-    }
-  });
+  try {
+    await sendOrderNotifications(order);
+  } catch (err) {
+    console.error("[handleOrderPaid] notification error:", err);
+  }
 }
 
 export class PaymentService {

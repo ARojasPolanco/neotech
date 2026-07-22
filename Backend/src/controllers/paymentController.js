@@ -67,13 +67,11 @@ export const webhookHandler = catchAsync(async (req, res) => {
       }
     }
 
-    setImmediate(async () => {
-      try {
-        await paymentService.processWebhook(notification);
-      } catch (err) {
-        console.error("Webhook processing error:", err);
-      }
-    });
+    try {
+      await paymentService.processWebhook(notification);
+    } catch (err) {
+      console.error("Webhook processing error:", err);
+    }
   }
 
   return res.status(200).send("OK");
