@@ -147,6 +147,7 @@ export class PaymentService {
       },
     });
 
+    await order.update({ preferenceId: preference.id });
     return preference;
   }
 
@@ -165,8 +166,8 @@ export class PaymentService {
     }
   }
 
-  async verifyAndProcessOrder(orderNumber, paymentId) {
-    console.log(`[verifyAndProcessOrder] checking order ${orderNumber}, paymentId: ${paymentId || "none"}`);
+  async verifyAndProcessOrder(orderNumber, paymentId, preferenceId = null) {
+    console.log(`[verifyAndProcessOrder] checking order ${orderNumber}, paymentId: ${paymentId || "none"}, preferenceId: ${preferenceId || "none"}`);
     const { OrderService } = await import("./order.service.js");
     const orderService = new OrderService();
     const order = await orderService.findByOrderNumber(orderNumber);
@@ -192,6 +193,29 @@ export class PaymentService {
           return { found: true, status: "paid" };
         }
         console.warn(`[verifyAndProcessOrder] payment ${paymentId} external_reference mismatch: ${payment.external_reference} !== ${orderNumber}`);
+      }
+    }
+
+    if (order.preferenceId || preferenceId) {
+      const prefId = order.preferenceId || preferenceId;
+      const prefSearchUrl = `https://api.mercadopago.com/v1/payments/search?preference_id=${encodeURIComponent(prefId)}&sort=date_created&criteria=desc`;
+      console.log(`[verifyAndProcessOrder] querying MP by preference: ${prefSearchUrl}`);
+      const prefResponse = await fetch(prefSearchUrl, {
+        headers: { Authorization: `Bearer ${client.accessToken}` },
+      });
+
+      if (prefResponse.ok) {
+        const prefData = await prefResponse.json();
+        console.log(`[verifyAndProcessOrder] preference search returned ${prefData.results?.length || 0} payments`);
+        const approvedPayment = prefData.results?.find((p) => p.status === "approved");
+        if (approvedPayment) {
+          console.log(`[verifyAndProcessOrder] approved payment found via preference_id for ${orderNumber}: ${approvedPayment.id}`);
+          await handleOrderPaid(order);
+          return { found: true, status: "paid" };
+        }
+      } else {
+        const errorText = await prefResponse.text().catch(() => "unknown");
+        console.error(`[verifyAndProcessOrder] preference search failed: ${prefResponse.status} ${errorText}`);
       }
     }
 

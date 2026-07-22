@@ -33,6 +33,7 @@ export const createPreference = catchAsync(async (req, res, next) => {
     initPoint: preference.init_point,
     orderNumber: order.orderNumber,
     orderId: order.id,
+    preferenceId: preference.id,
   });
 });
 
@@ -80,9 +81,9 @@ export const webhookHandler = catchAsync(async (req, res) => {
 
 export const verifyPayment = catchAsync(async (req, res, next) => {
   const { orderNumber } = req.params;
-  const { paymentId } = req.query;
-  console.log(`[verifyPayment] received request for ${orderNumber}, paymentId: ${paymentId || "none"}`);
-  const result = await paymentService.verifyAndProcessOrder(orderNumber, paymentId);
+  const { paymentId, preferenceId } = req.query;
+  console.log(`[verifyPayment] received request for ${orderNumber}, paymentId: ${paymentId || "none"}, preferenceId: ${preferenceId || "none"}`);
+  const result = await paymentService.verifyAndProcessOrder(orderNumber, paymentId, preferenceId);
 
   if (!result.found) {
     console.log(`[verifyPayment] order ${orderNumber} not found`);

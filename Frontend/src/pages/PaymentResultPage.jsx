@@ -45,6 +45,7 @@ export default function PaymentResultPage() {
 
   useEffect(() => {
     const storedOrderNumber = sessionStorage.getItem("lastOrderNumber");
+    const storedPreferenceId = sessionStorage.getItem("lastPreferenceId") || "";
     if (!storedOrderNumber) {
       setStatus("no-order");
       return;
@@ -59,13 +60,18 @@ export default function PaymentResultPage() {
     async function poll() {
       if (cancelled || timedOut) return;
       try {
-        const url = `/payments/verify/${storedOrderNumber}${paymentId ? `?paymentId=${paymentId}` : ""}`;
+        const params = new URLSearchParams();
+        if (paymentId) params.append("paymentId", paymentId);
+        if (storedPreferenceId) params.append("preferenceId", storedPreferenceId);
+        const qs = params.toString();
+        const url = `/payments/verify/${storedOrderNumber}${qs ? `?${qs}` : ""}`;
         const res = await api.get(url);
         if (res.data.status === "paid" && !cancelled) {
           const orderRes = await api.get(`/orders/number/${storedOrderNumber}`);
           setOrder(orderRes.data);
           setStatus("found");
           sessionStorage.removeItem("lastOrderNumber");
+          sessionStorage.removeItem("lastPreferenceId");
           return;
         }
       } catch (err) {
