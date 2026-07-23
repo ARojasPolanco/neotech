@@ -5,6 +5,14 @@ const resend = new Resend(envs.RESEND_API_KEY);
 
 const FROM_EMAIL = "Neo Tech <onboarding@resend.dev>";
 
+function checkResult(result, context) {
+  if (result.error) {
+    console.error(`[MailService] ${context} failed:`, JSON.stringify(result.error));
+    throw new Error(`Mail failed: ${result.error.message}`);
+  }
+  return result;
+}
+
 export class MailService {
   async sendOwnerAlert(order) {
     console.log(`[MailService] preparing owner alert for ${order.orderNumber} to ${envs.OWNER_EMAIL}`);
@@ -32,7 +40,8 @@ export class MailService {
       text,
     });
 
-    console.log(`[MailService] owner alert response for ${order.orderNumber}:`, JSON.stringify(result));
+    checkResult(result, `owner alert ${order.orderNumber}`);
+    console.log(`[MailService] owner alert sent for ${order.orderNumber}: ${result.data?.id}`);
     return result;
   }
 
@@ -66,12 +75,13 @@ export class MailService {
       attachments: [
         {
           filename: `recibo-${order.orderNumber}.pdf`,
-          content: pdfBuffer,
+          content: pdfBuffer.toString("base64"),
         },
       ],
     });
 
-    console.log(`[MailService] receipt response for ${order.orderNumber}:`, JSON.stringify(result));
+    checkResult(result, `receipt ${order.orderNumber}`);
+    console.log(`[MailService] receipt sent for ${order.orderNumber}: ${result.data?.id}`);
     return result;
   }
 }
