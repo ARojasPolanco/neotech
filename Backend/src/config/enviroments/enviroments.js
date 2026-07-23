@@ -26,7 +26,7 @@ const envSchema = z.object({
   MP_WEBHOOK_SECRET: z.string().min(1),
   BASE_URL: z.string().url().optional(),
   WHATSAPP_OWNER_NUMBER: z.string().min(1),
-  RESEND_API_KEY: z.string().min(1).optional(),
+  RESEND_API_KEY: z.string().min(1),
 });
 
 export const envs = envSchema.parse(process.env);
