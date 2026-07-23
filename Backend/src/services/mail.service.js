@@ -32,7 +32,7 @@ export class MailService {
       text,
     });
 
-    console.log(`[MailService] owner alert sent for ${order.orderNumber}: ${result.data?.id || "unknown"}`);
+    console.log(`[MailService] owner alert response for ${order.orderNumber}:`, JSON.stringify(result));
     return result;
   }
 
@@ -71,7 +71,7 @@ export class MailService {
       ],
     });
 
-    console.log(`[MailService] receipt sent for ${order.orderNumber}: ${result.data?.id || "unknown"}`);
+    console.log(`[MailService] receipt response for ${order.orderNumber}:`, JSON.stringify(result));
     return result;
   }
 }
