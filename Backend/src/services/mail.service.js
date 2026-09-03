@@ -3,7 +3,7 @@ import { envs } from "../config/enviroments/enviroments.js";
 
 const resend = new Resend(envs.RESEND_API_KEY);
 
-const FROM_EMAIL = "Neo Tech <onboarding@resend.dev>";
+const FROM_EMAIL = "Neo Tech <ventas@neotechbb.shop>";
 
 function checkResult(result, context) {
   if (result.error) {

@@ -9,7 +9,6 @@ import "./models/orderModel.js";
 import "./models/orderItemModel.js";
 import "./models/associations.js";
 import { ensureSequence } from "./services/order.service.js";
-import transporter from "./config/mailer.js";
 
 const categoryKeywords = [
   { pattern: /auricular|headphone|earphone|audifono/i, category: "Auriculares" },
@@ -63,14 +62,6 @@ async function main() {
     if (envs.NODE_ENV !== "test") {
       await migrateCategories();
     }
-
-    transporter.verify((error, success) => {
-      if (error) {
-        console.error("[SMTP] Transporter verification failed:", error);
-      } else {
-        console.log("[SMTP] Transporter ready:", success);
-      }
-    });
 
     app.listen(envs.PORT, () => {
       console.log(`Server running on ${envs.PORT}`);
