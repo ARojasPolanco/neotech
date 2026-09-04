@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Instagram, MessageCircle } from "lucide-react";
+import { Camera, MessageCircle } from "lucide-react";
 
 const LINKS = {
   instagram: "https://www.instagram.com/neo.tech.bb?igsi=MWR4YzE2YnZhNDBvMg%3D%3D&utm_source=qr",
@@ -39,7 +39,7 @@ export default function SlideSocialMedia() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
           >
-            <Instagram size={20} />
+            <Camera size={20} />
             Instagram
           </a>
           <a
