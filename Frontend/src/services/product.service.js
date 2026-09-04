@@ -19,3 +19,8 @@ export async function getFeaturedProducts() {
   const res = await api.get("/products/featured");
   return res.data;
 }
+
+export async function getFeaturedHighlight() {
+  const res = await api.get("/products/featured-highlight");
+  return res.data;
+}

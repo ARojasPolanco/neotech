@@ -4,26 +4,48 @@ import ProductCard from "../components/ProductCard.jsx";
 import { getProducts } from "../services/product.service.js";
 
 export default function CatalogPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const category = searchParams.get("category");
+  const subcategory = searchParams.get("subcategory");
 
   useEffect(() => {
     const filters = { isActive: "true", includeVariants: "true" };
     const search = searchParams.get("search");
-    const category = searchParams.get("category");
     if (search) filters.search = search;
     if (category) filters.category = category;
+    if (subcategory) filters.subcategory = subcategory;
 
     setLoading(true);
     getProducts(filters)
-      .then(setProducts)
+      .then((data) => {
+        setProducts(data);
+        if (category === "Fundas" && !subcategory) {
+          const subs = [...new Set(data.map((p) => p.subcategory).filter(Boolean))];
+          setSubcategories(subs);
+        } else {
+          setSubcategories([]);
+        }
+      })
       .catch(() => setError("Error al cargar productos"))
       .finally(() => setLoading(false));
-  }, [searchParams]);
+  }, [searchParams, category, subcategory]);
 
-  const categoryTitle = searchParams.get("category");
+  const categoryTitle = category;
+
+  const handleSubcategoryClick = (sub) => {
+    const params = new URLSearchParams(searchParams);
+    if (sub === subcategory) {
+      params.delete("subcategory");
+    } else {
+      params.set("subcategory", sub);
+    }
+    setSearchParams(params);
+  };
 
   if (loading) {
     return (
@@ -67,6 +89,25 @@ export default function CatalogPage() {
       <h1 className="mb-6 font-heading text-3xl font-bold">
         {categoryTitle || "Productos"}
       </h1>
+
+      {subcategories.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {subcategories.map((sub) => (
+            <button
+              key={sub}
+              onClick={() => handleSubcategoryClick(sub)}
+              className={`cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                subcategory === sub
+                  ? "bg-accent text-fg"
+                  : "border border-border bg-white text-muted hover:bg-surface"
+              }`}
+            >
+              {sub}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {products.map((p) => (
           <ProductCard key={p.id} product={p} />

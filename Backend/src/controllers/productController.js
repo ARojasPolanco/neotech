@@ -6,6 +6,7 @@ import {
   validateProductQuery,
   validateCreateVariant,
   validateUpdateVariant,
+  validateSetFeatured,
 } from "../schemas/product.schema.js";
 
 const productService = new ProductService();
@@ -40,6 +41,35 @@ export const findProductById = catchAsync(async (req, res, next) => {
 export const findFeaturedProducts = catchAsync(async (req, res) => {
   const products = await productService.findFeatured(6);
   return res.status(200).json(products);
+});
+
+export const getFeaturedHighlight = catchAsync(async (req, res) => {
+  const product = await productService.getFeaturedHighlight();
+  if (!product) {
+    return res.status(200).json({ empty: true });
+  }
+  return res.status(200).json(product);
+});
+
+export const setFeaturedProduct = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await productService.findById(id);
+
+  if (!product) {
+    return next(new AppError("Product not found", 404));
+  }
+
+  const { hasError, errorMessages, featuredData } = validateSetFeatured(req.body);
+
+  if (hasError) {
+    return res.status(422).json({
+      status: "error",
+      message: errorMessages,
+    });
+  }
+
+  const updated = await productService.setFeatured(id, featuredData);
+  return res.status(200).json(updated);
 });
 
 export const createProduct = catchAsync(async (req, res) => {

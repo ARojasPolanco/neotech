@@ -13,6 +13,26 @@ function generateSlug(name) {
   return `${base}-${suffix}`;
 }
 
+function buildDiscountInfo(product) {
+  const plain = product.toJSON ? product.toJSON() : { ...product };
+  const price = Number(plain.price);
+
+  if (
+    plain.discountPercent &&
+    Number(plain.discountPercent) > 0 &&
+    (!plain.discountExpiresAt || new Date(plain.discountExpiresAt) > new Date())
+  ) {
+    const pct = Number(plain.discountPercent);
+    plain.discountedPrice = Math.round(price * (1 - pct / 100));
+    plain.discountActive = true;
+  } else {
+    plain.discountedPrice = null;
+    plain.discountActive = false;
+  }
+
+  return plain;
+}
+
 export class ProductService {
   async findAll(filters = {}) {
     const where = {};
@@ -27,6 +47,10 @@ export class ProductService {
 
     if (filters.category) {
       where.category = filters.category;
+    }
+
+    if (filters.subcategory) {
+      where.subcategory = filters.subcategory;
     }
 
     if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
@@ -45,18 +69,21 @@ export class ProductService {
       options.include = [{ model: ProductVariant }];
     }
 
-    return await Product.findAll(options);
+    const products = await Product.findAll(options);
+    return products.map(buildDiscountInfo);
   }
 
   async findById(id) {
-    return await Product.findOne({ where: { id } });
+    const product = await Product.findOne({ where: { id } });
+    return product ? buildDiscountInfo(product) : null;
   }
 
   async findByIdWithVariants(id) {
-    return await Product.findOne({
+    const product = await Product.findOne({
       where: { id },
       include: [{ model: ProductVariant }],
     });
+    return product ? buildDiscountInfo(product) : null;
   }
 
   async findBySlug(slug) {
@@ -64,12 +91,41 @@ export class ProductService {
   }
 
   async findFeatured(limit = 6) {
-    return await Product.findAll({
+    const products = await Product.findAll({
       where: { isActive: true },
       include: [{ model: ProductVariant }],
       order: Sequelize.literal("RANDOM()"),
       limit,
     });
+    return products.map(buildDiscountInfo);
+  }
+
+  async setFeatured(productId, data) {
+    if (data.isFeatured === true) {
+      await Product.update({ isFeatured: false }, { where: { isFeatured: true } });
+    }
+
+    const product = await Product.findByPk(productId);
+    if (!product) throw new Error("Product not found");
+
+    const payload = {};
+    if (data.isFeatured !== undefined) payload.isFeatured = data.isFeatured;
+    if (data.discountPercent !== undefined) payload.discountPercent = data.discountPercent;
+    if (data.discountExpiresAt !== undefined) payload.discountExpiresAt = data.discountExpiresAt;
+    if (data.subcategory !== undefined) payload.subcategory = data.subcategory;
+
+    await product.update(payload);
+    return buildDiscountInfo(product);
+  }
+
+  async getFeaturedHighlight() {
+    const product = await Product.findOne({
+      where: { isFeatured: true, isActive: true },
+      include: [{ model: ProductVariant }],
+    });
+
+    if (!product) return null;
+    return buildDiscountInfo(product);
   }
 
   async create(data) {

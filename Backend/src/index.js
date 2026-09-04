@@ -16,6 +16,7 @@ const categoryKeywords = [
   { pattern: /microfono|micrófono|mic|condenser/i, category: "Micrófonos" },
   { pattern: /parlante|speaker|boomcast|altavoz/i, category: "Parlantes" },
   { pattern: /cargador|cargador|gan|qi/i, category: "Cargadores" },
+  { pattern: /funda|case|cover|carcasa/i, category: "Fundas" },
 ];
 
 async function migrateCategories() {

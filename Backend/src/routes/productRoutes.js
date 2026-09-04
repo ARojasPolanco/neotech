@@ -4,6 +4,8 @@ import {
   findAllProducts,
   findProductById,
   findFeaturedProducts,
+  getFeaturedHighlight,
+  setFeaturedProduct,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -18,11 +20,13 @@ export const router = Router();
 
 router.get("/", findAllProducts);
 router.get("/featured", findFeaturedProducts);
+router.get("/featured-highlight", getFeaturedHighlight);
 router.get("/:id", findProductById);
 router.get("/:id/variants", getProductVariants);
 router.post("/", protect, restrictTo("ADMIN"), createProduct);
 router.post("/:id/variants", protect, restrictTo("ADMIN"), createVariant);
 router.patch("/:id", protect, restrictTo("ADMIN"), updateProduct);
+router.patch("/:id/featured", protect, restrictTo("ADMIN"), setFeaturedProduct);
 router.patch("/variants/:id", protect, restrictTo("ADMIN"), updateVariant);
 router.delete("/:id", protect, restrictTo("ADMIN"), deleteProduct);
 router.delete("/:id/permanent", protect, restrictTo("ADMIN"), permanentDeleteProduct);

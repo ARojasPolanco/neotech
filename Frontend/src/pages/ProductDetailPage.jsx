@@ -129,9 +129,24 @@ export default function ProductDetailPage() {
           {product.description && (
             <p className="text-muted">{product.description}</p>
           )}
-          <p className="text-3xl font-bold">
-            ${Number(product.price).toLocaleString("es-AR")}
-          </p>
+
+          {product.discountActive ? (
+            <div className="flex items-center gap-3">
+              <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-fg">
+                {Number(product.discountPercent)}% OFF
+              </span>
+              <span className="text-lg text-muted line-through">
+                ${Number(product.price).toLocaleString("es-AR")}
+              </span>
+              <span className="text-3xl font-bold text-accent-dark">
+                ${Number(product.discountedPrice).toLocaleString("es-AR")}
+              </span>
+            </div>
+          ) : (
+            <p className="text-3xl font-bold">
+              ${Number(product.price).toLocaleString("es-AR")}
+            </p>
+          )}
 
           {stock !== null && (
             <p className={`text-sm ${stock > 0 ? "text-success" : "text-error"}`}>

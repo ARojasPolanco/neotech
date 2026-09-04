@@ -38,6 +38,12 @@ export default function ProductCard({ product }) {
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
 
+        {product.discountActive && (
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-fg">
+            {Number(product.discountPercent)}% OFF
+          </span>
+        )}
+
         {hasMultiple && (
           <>
             <button
@@ -64,9 +70,20 @@ export default function ProductCard({ product }) {
           <p className="line-clamp-2 text-sm text-muted">{product.description}</p>
         )}
         <div className="mt-auto flex items-center justify-between pt-2">
-          <p className="text-xl font-bold">
-            ${Number(product.price).toLocaleString("es-AR")}
-          </p>
+          {product.discountActive ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted line-through">
+                ${Number(product.price).toLocaleString("es-AR")}
+              </span>
+              <span className="text-xl font-bold text-accent-dark">
+                ${Number(product.discountedPrice).toLocaleString("es-AR")}
+              </span>
+            </div>
+          ) : (
+            <p className="text-xl font-bold">
+              ${Number(product.price).toLocaleString("es-AR")}
+            </p>
+          )}
           {variants.length > 0 && (
             <VariantDots
               variants={variants}

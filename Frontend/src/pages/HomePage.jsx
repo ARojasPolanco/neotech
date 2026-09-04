@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Headphones, Keyboard, Mic, Speaker, Zap, Cable } from "lucide-react";
+import { Headphones, Keyboard, Mic, Speaker, Zap, Cable, Smartphone } from "lucide-react";
 import FeaturedCarousel from "../components/FeaturedCarousel.jsx";
-import { getFeaturedProducts } from "../services/product.service.js";
+import HeroSlider from "../components/HeroSlider.jsx";
+import { getFeaturedProducts, getFeaturedHighlight } from "../services/product.service.js";
 
 const categories = [
   { name: "Auriculares", desc: "Sumergite en el sonido", icon: Headphones },
@@ -11,55 +12,30 @@ const categories = [
   { name: "Micrófonos", desc: "Sonido profesional", icon: Mic },
   { name: "Parlantes", desc: "Potencia y claridad", icon: Speaker },
   { name: "Cargadores", desc: "Carga rápida y segura", icon: Zap },
+  { name: "Fundas", desc: "Protegé tu celular", icon: Smartphone },
   { name: "Accesorios", desc: "Todo lo que necesitás", icon: Cable },
 ];
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [highlight, setHighlight] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getFeaturedProducts()
-      .then(setFeaturedProducts)
-      .catch(() => setFeaturedProducts([]))
+    Promise.all([
+      getFeaturedProducts().catch(() => []),
+      getFeaturedHighlight().catch(() => null),
+    ])
+      .then(([products, hl]) => {
+        setFeaturedProducts(products);
+        setHighlight(hl);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   return (
     <div>
-      <section className="relative mb-12 mt-2 overflow-hidden rounded-2xl bg-gradient-to-br from-fg to-neutral-900 px-6 py-16 text-center text-white sm:py-20">
-        <div className="relative z-10">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="font-heading text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl"
-          >
-            Tecnología para{" "}
-            <span className="text-accent">todo</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mx-auto mt-4 max-w-lg text-base text-white/80 sm:text-lg"
-          >
-            Descubrí nuestra selección de audio, gaming, carga y accesorios. Calidad y precio justo.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Link
-              to="/products"
-              className="mt-8 inline-block rounded-lg bg-accent px-8 py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
-            >
-              Ver Productos
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      <HeroSlider featuredProduct={highlight} />
 
       {featuredProducts.length > 0 && (
         <section className="mb-12">

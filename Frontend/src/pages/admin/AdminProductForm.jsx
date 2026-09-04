@@ -18,6 +18,7 @@ export default function AdminProductForm() {
     imageUrl: "",
     isActive: true,
     category: "",
+    subcategory: "",
   });
   const [variants, setVariants] = useState([]);
   const [imageFile, setImageFile] = useState(null);
@@ -52,6 +53,7 @@ export default function AdminProductForm() {
           imageUrl: p.imageUrl || "",
           isActive: p.isActive,
           category: p.category || "",
+          subcategory: p.subcategory || "",
         });
         if (p.imageUrl) setImagePreview(p.imageUrl);
         setVariants(varRes.data);
@@ -158,6 +160,7 @@ export default function AdminProductForm() {
         price: Number(priceStr),
         isActive: form.isActive,
         category: form.category,
+        subcategory: form.subcategory || null,
       };
       if (imageUrl) payload.imageUrl = imageUrl;
 
@@ -255,10 +258,22 @@ export default function AdminProductForm() {
               <option value="Micrófonos">Micrófonos</option>
               <option value="Parlantes">Parlantes</option>
               <option value="Cargadores">Cargadores</option>
+              <option value="Fundas">Fundas</option>
               <option value="Accesorios">Accesorios</option>
             </select>
           </div>
-          <div></div>
+          {form.category === "Fundas" && (
+            <div>
+              <label className="mb-1 block text-sm font-medium">Subcategoría (modelo)</label>
+              <input
+                type="text"
+                value={form.subcategory}
+                onChange={update("subcategory")}
+                placeholder="Ej: iPhone 13, Samsung Galaxy S24"
+                className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">

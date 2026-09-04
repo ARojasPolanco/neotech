@@ -11,6 +11,7 @@ const createProductSchema = z.object({
   imageUrl: z.string().url({ message: "Invalid image URL" }).optional().or(z.literal("")),
   isActive: z.boolean().optional(),
   category: z.string().optional(),
+  subcategory: z.string().max(100).optional().nullable(),
 });
 
 const updateProductSchema = createProductSchema.partial();
@@ -24,6 +25,7 @@ const productQuerySchema = z.object({
   priceMax: z.coerce.number().positive().optional(),
   search: z.string().optional(),
   category: z.string().optional().transform((val) => val || undefined),
+  subcategory: z.string().optional().transform((val) => val || undefined),
   includeVariants: z
     .enum(["true", "false"])
     .optional()
@@ -43,6 +45,18 @@ const createVariantSchema = z.object({
 });
 
 const updateVariantSchema = createVariantSchema.partial();
+
+const setFeaturedSchema = z.object({
+  isFeatured: z.boolean().optional(),
+  discountPercent: z.number().min(1).max(100).optional().nullable(),
+  discountExpiresAt: z
+    .string()
+    .datetime()
+    .optional()
+    .nullable()
+    .transform((val) => (val ? new Date(val) : null)),
+  subcategory: z.string().max(100).optional().nullable(),
+});
 
 export const validateCreateProduct = (data) => {
   const result = createProductSchema.safeParse(data);
@@ -77,4 +91,11 @@ export const validateUpdateVariant = (data) => {
   const { hasError, errorMessages, data: variantData } =
     extractValidationData(result);
   return { hasError, errorMessages, variantData };
+};
+
+export const validateSetFeatured = (data) => {
+  const result = setFeaturedSchema.safeParse(data);
+  const { hasError, errorMessages, data: featuredData } =
+    extractValidationData(result);
+  return { hasError, errorMessages, featuredData };
 };

@@ -37,6 +37,24 @@ const Product = sequelize.define("Product", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  subcategory: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  discountPercent: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    defaultValue: null,
+  },
+  discountExpiresAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null,
+  },
+  isFeatured: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 export default Product;
