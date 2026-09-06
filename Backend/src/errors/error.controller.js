@@ -41,8 +41,8 @@ const sendErrorProd = async (err, req, res) => {
       status: "fail",
       message: "Something went very wrong!",
     });
-    logger.fatal({
-      message: err.message,
+    logger.error({
+      message: `[FATAL] ${err.message}`,
       status: err.status,
       stack: err.stack,
     });

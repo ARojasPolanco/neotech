@@ -74,8 +74,7 @@ export class ProductService {
   }
 
   async findById(id) {
-    const product = await Product.findOne({ where: { id } });
-    return product ? buildDiscountInfo(product) : null;
+    return await Product.findOne({ where: { id } });
   }
 
   async findByIdWithVariants(id) {
