@@ -5,6 +5,7 @@ import {
   findProductById,
   findFeaturedProducts,
   getFeaturedHighlight,
+  getSubcategories,
   setFeaturedProduct,
   createProduct,
   updateProduct,
@@ -21,6 +22,7 @@ export const router = Router();
 router.get("/", findAllProducts);
 router.get("/featured", findFeaturedProducts);
 router.get("/featured-highlight", getFeaturedHighlight);
+router.get("/subcategories", getSubcategories);
 router.get("/:id", findProductById);
 router.get("/:id/variants", getProductVariants);
 router.post("/", protect, restrictTo("ADMIN"), createProduct);

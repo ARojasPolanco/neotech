@@ -204,4 +204,13 @@ export class ProductService {
     if (variant.stock < quantity) throw new Error("Insufficient stock");
     return await variant.decrement("stock", { by: quantity });
   }
+
+  async getSubcategories(category) {
+    const results = await Product.findAll({
+      where: { category, subcategory: { [Op.ne]: null }, isActive: true },
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("subcategory")), "subcategory"]],
+      raw: true,
+    });
+    return results.map((r) => r.subcategory).filter(Boolean).sort();
+  }
 }

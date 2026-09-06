@@ -36,6 +36,20 @@ export default function AdminProductForm() {
   });
   const [variantImageFile, setVariantImageFile] = useState(null);
   const [variantImagePreview, setVariantImagePreview] = useState("");
+  const [subcategories, setSubcategories] = useState([]);
+  const [isNewSubcategory, setIsNewSubcategory] = useState(false);
+
+  useEffect(() => {
+    if (form.category !== "Fundas") {
+      setSubcategories([]);
+      setIsNewSubcategory(false);
+      return;
+    }
+    api
+      .get("/products/subcategories", { params: { category: "Fundas" } })
+      .then((res) => setSubcategories(res.data))
+      .catch(() => setSubcategories([]));
+  }, [form.category]);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -265,13 +279,46 @@ export default function AdminProductForm() {
           {form.category === "Fundas" && (
             <div>
               <label className="mb-1 block text-sm font-medium">Subcategoría (modelo)</label>
-              <input
-                type="text"
-                value={form.subcategory}
-                onChange={update("subcategory")}
-                placeholder="Ej: iPhone 13, Samsung Galaxy S24"
-                className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
-              />
+              {!isNewSubcategory ? (
+                <div className="flex gap-2">
+                  <select
+                    value={form.subcategory}
+                    onChange={(e) => {
+                      if (e.target.value === "__new__") {
+                        setIsNewSubcategory(true);
+                        setForm((f) => ({ ...f, subcategory: "" }));
+                      } else {
+                        setForm((f) => ({ ...f, subcategory: e.target.value }));
+                      }
+                    }}
+                    className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+                  >
+                    <option value="">Sin subcategoría</option>
+                    {subcategories.map((sub) => (
+                      <option key={sub} value={sub}>{sub}</option>
+                    ))}
+                    <option value="__new__">＋ Agregar nueva...</option>
+                  </select>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={form.subcategory}
+                    onChange={(e) => setForm((f) => ({ ...f, subcategory: e.target.value }))}
+                    placeholder="Ej: iPhone 13, Samsung Galaxy S24"
+                    autoFocus
+                    className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsNewSubcategory(false)}
+                    className="shrink-0 rounded-lg border border-border px-3 py-2 text-xs text-muted transition-colors hover:bg-surface"
+                  >
+                    Elegir
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

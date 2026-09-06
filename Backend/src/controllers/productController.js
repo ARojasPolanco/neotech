@@ -43,6 +43,15 @@ export const findFeaturedProducts = catchAsync(async (req, res) => {
   return res.status(200).json(products);
 });
 
+export const getSubcategories = catchAsync(async (req, res) => {
+  const { category } = req.query;
+  if (!category) {
+    return res.status(400).json({ message: "category is required" });
+  }
+  const subcategories = await productService.getSubcategories(category);
+  return res.status(200).json(subcategories);
+});
+
 export const getFeaturedHighlight = catchAsync(async (req, res) => {
   const product = await productService.getFeaturedHighlight();
   if (!product) {
