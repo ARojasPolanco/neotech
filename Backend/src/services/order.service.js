@@ -31,14 +31,23 @@ export class OrderService {
         }
       }
 
+      let unitPrice = Number(product.price);
+      if (
+        product.discountPercent &&
+        Number(product.discountPercent) > 0 &&
+        (!product.discountExpiresAt || new Date(product.discountExpiresAt) > new Date())
+      ) {
+        unitPrice = Math.round(unitPrice * (1 - Number(product.discountPercent) / 100));
+      }
+
       verifiedItems.push({
         productId: product.id,
         productVariantId: variant?.id || null,
         productName: product.name,
         color: variant?.color || item.color || null,
-        unitPrice: Number(product.price),
+        unitPrice,
         quantity: Number(item.quantity),
-        subtotal: Number(product.price) * Number(item.quantity),
+        subtotal: unitPrice * Number(item.quantity),
       });
     }
 

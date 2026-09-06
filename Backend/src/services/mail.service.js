@@ -75,7 +75,7 @@ export class MailService {
       attachments: [
         {
           filename: `recibo-${order.orderNumber}.pdf`,
-          content: pdfBuffer.toString("base64"),
+          content: Buffer.from(pdfBuffer).toString("base64"),
         },
       ],
     });
