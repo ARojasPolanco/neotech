@@ -77,6 +77,11 @@ export class ProductService {
     return await Product.findOne({ where: { id } });
   }
 
+  async findByIdForClient(id) {
+    const product = await Product.findOne({ where: { id } });
+    return product ? buildDiscountInfo(product) : null;
+  }
+
   async findByIdWithVariants(id) {
     const product = await Product.findOne({
       where: { id },

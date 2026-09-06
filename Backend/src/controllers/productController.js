@@ -29,7 +29,7 @@ export const findAllProducts = catchAsync(async (req, res) => {
 
 export const findProductById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const product = await productService.findById(id);
+  const product = await productService.findByIdForClient(id);
 
   if (!product) {
     return next(new AppError("Product not found", 404));
