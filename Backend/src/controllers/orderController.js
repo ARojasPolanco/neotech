@@ -65,6 +65,7 @@ export const getOrderByNumber = catchAsync(async (req, res, next) => {
       orderNumber: order.orderNumber,
       status: order.status,
       total: order.total,
+      customerEmail: order.customerEmail,
       createdAt: order.createdAt,
       OrderItems: order.OrderItems?.map((item) => ({
         id: item.id,

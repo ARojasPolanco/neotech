@@ -28,7 +28,7 @@ export function CartProvider({ children }) {
         productId: product.id,
         variantId: variant?.id || null,
         name: product.name,
-        price: Number(product.price),
+        price: product.discountActive ? Number(product.discountedPrice) : Number(product.price),
         color: variant?.color || null,
         image: variant?.imageUrl || product.imageUrl || "",
         quantity,

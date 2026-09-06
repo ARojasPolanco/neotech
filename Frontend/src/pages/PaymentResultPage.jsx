@@ -240,6 +240,7 @@ export default function PaymentResultPage() {
 
       <motion.p variants={itemVariants} className="mt-4 text-sm text-muted">
         Te enviamos el recibo a <strong>{order.customerEmail}</strong>.
+        Si no lo ves, revisá tu carpeta de <strong>SPAM</strong> o correo no deseado.
       </motion.p>
 
       <motion.p variants={itemVariants} className="mt-1 text-sm text-muted">
