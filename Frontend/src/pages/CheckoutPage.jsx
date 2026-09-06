@@ -38,6 +38,8 @@ export default function CheckoutPage() {
       };
 
       const res = await api.post("/payments/create-preference", payload);
+      sessionStorage.removeItem("lastOrderNumber");
+      sessionStorage.removeItem("lastPreferenceId");
       sessionStorage.setItem("lastOrderNumber", res.data.orderNumber);
       sessionStorage.setItem("lastPreferenceId", res.data.preferenceId || "");
       clearCart();

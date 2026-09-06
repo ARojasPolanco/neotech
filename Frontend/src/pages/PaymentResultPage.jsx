@@ -47,8 +47,8 @@ export default function PaymentResultPage() {
   }, []);
 
   useEffect(() => {
-    const storedOrderNumber = sessionStorage.getItem("lastOrderNumber") || urlOrderNumber;
-    const storedPreferenceId = sessionStorage.getItem("lastPreferenceId") || urlPreferenceId;
+    const storedOrderNumber = urlOrderNumber || sessionStorage.getItem("lastOrderNumber");
+    const storedPreferenceId = urlPreferenceId || sessionStorage.getItem("lastPreferenceId");
 
     if (!storedOrderNumber) {
       setStatus("no-order");
