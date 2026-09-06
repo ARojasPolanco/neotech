@@ -136,7 +136,8 @@ export class PaymentService {
       body: {
         items,
         external_reference: order.orderNumber,
-        notification_url: `${envs.BASE_URL || "https://api.neotech.com"}/api/v1/payments/webhook`,
+        auto_return: "approved",
+        notification_url: `${envs.BASE_URL}/api/v1/payments/webhook`,
         back_urls: {
           success: `${frontendUrl}/payment-result`,
           failure: `${frontendUrl}/cart`,
@@ -191,29 +192,6 @@ export class PaymentService {
           return { found: true, status: "paid" };
         }
         console.warn(`[verifyAndProcessOrder] payment ${paymentId} external_reference mismatch: ${payment.external_reference} !== ${orderNumber}`);
-      }
-    }
-
-    if (order.preferenceId || preferenceId) {
-      const prefId = order.preferenceId || preferenceId;
-      const prefSearchUrl = `https://api.mercadopago.com/v1/payments/search?preference_id=${encodeURIComponent(prefId)}&sort=date_created&criteria=desc`;
-      console.log(`[verifyAndProcessOrder] querying MP by preference: ${prefSearchUrl}`);
-      const prefResponse = await fetch(prefSearchUrl, {
-        headers: { Authorization: `Bearer ${client.accessToken}` },
-      });
-
-      if (prefResponse.ok) {
-        const prefData = await prefResponse.json();
-        console.log(`[verifyAndProcessOrder] preference search returned ${prefData.results?.length || 0} payments`);
-        const approvedPayment = prefData.results?.find((p) => p.status === "approved");
-        if (approvedPayment) {
-          console.log(`[verifyAndProcessOrder] approved payment found via preference_id for ${orderNumber}: ${approvedPayment.id}`);
-          await handleOrderPaid(order);
-          return { found: true, status: "paid" };
-        }
-      } else {
-        const errorText = await prefResponse.text().catch(() => "unknown");
-        console.error(`[verifyAndProcessOrder] preference search failed: ${prefResponse.status} ${errorText}`);
       }
     }
 
