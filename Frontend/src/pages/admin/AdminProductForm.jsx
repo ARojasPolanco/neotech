@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Pencil } from "lucide-react";
 import api from "../../config/api.js";
+import { compressImage } from "../../utils/compressImage.js";
 
 export default function AdminProductForm() {
   const { id } = useParams();
@@ -81,11 +82,12 @@ export default function AdminProductForm() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+    const compressed = await compressImage(file);
+    setImageFile(compressed);
   };
 
   const uploadImage = async (file) => {
@@ -97,11 +99,12 @@ export default function AdminProductForm() {
     return res.data.url;
   };
 
-  const handleVariantImageChange = (e) => {
+  const handleVariantImageChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setVariantImageFile(file);
     setVariantImagePreview(URL.createObjectURL(file));
+    const compressed = await compressImage(file);
+    setVariantImageFile(compressed);
   };
 
   const handleSaveVariant = async () => {

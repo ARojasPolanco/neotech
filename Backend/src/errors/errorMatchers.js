@@ -35,7 +35,15 @@ const handleJWTExpiredError = () => new AppError("Your token has expired. Please
 
 const handleJWTError = () => new AppError("Invalid token. Please login again", 401);
 
-const handleMulterError = (err) => new AppError(`File upload error: ${err.message}`, 400);
+const handleMulterError = (err) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return new AppError("La imagen es demasiado grande. Intentá con una imagen más pequeña.", 400);
+  }
+  if (err.code === "LIMIT_UNEXPECTED_FILE") {
+    return new AppError("Tipo de archivo no válido. Solo se permiten imágenes (JPEG, PNG, WebP, GIF).", 400);
+  }
+  return new AppError("Error al subir la imagen. Intentá con otra imagen.", 400);
+};
 
 // eslint-disable-next-line no-unused-vars
 const handleZodError = (err, req) => {
