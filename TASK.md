@@ -450,7 +450,7 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 - **Marca:** "LIER" en el copyright del footer es correcta y NO se toca. El `NEO TECH` del navbar/footer es la marca de la tienda.
 - **Buscador:** en mobile (lupa) y desktop (input), solo por nombre, navega a `/products?search=`.
-- **Dark mode:** incluye storefront y admin; default según sistema operativo con toggle persistido.
+- **Dark mode:** incluye storefront y admin; default según sistema operativo con toggle persistido. Paleta: `#192734` fondo, `#043f51` superficies/tarjetas, `#bcff7b` acento.
 - **Tests frontend:** se agrega Vitest + React Testing Library como devDependencies.
 - **Stock:** se agrega `stock` al producto base. `ProductVariant.stock` sigue existiendo. "Última unidad" cuando el stock disponible es 1.
 - **Color base:** `color` y `colorHex` opcionales en `Product`; la imagen del color base es `product.imageUrl`.

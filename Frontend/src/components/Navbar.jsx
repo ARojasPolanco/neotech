@@ -50,7 +50,18 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm">
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-5">
-        <BrandLogo size="md" />
+        <div className="flex items-center gap-3">
+          <BrandLogo size="md" />
+          <button
+            onClick={toggleTheme}
+            aria-label={
+              theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"
+            }
+            className="hidden h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-border text-muted transition-colors hover:bg-surface hover:text-fg md:flex"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
 
         {/* Desktop search */}
         <form
@@ -89,16 +100,6 @@ export default function Navbar() {
               Admin
             </Link>
           )}
-
-          <button
-            onClick={toggleTheme}
-            aria-label={
-              theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"
-            }
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-border text-muted transition-colors hover:bg-surface hover:text-fg"
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
 
           <div
             className="relative"
