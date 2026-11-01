@@ -29,6 +29,11 @@ describe("Navbar", () => {
     const user = userEvent.setup();
     renderNavbar();
 
+    expect(screen.getByAltText("Neo Tech")).toHaveAttribute(
+      "src",
+      "/logo_light_cropped.png",
+    );
+
     await user.click(screen.getByRole("button", { name: "Buscar" }));
 
     const inputs = screen.getAllByLabelText("Buscar productos");

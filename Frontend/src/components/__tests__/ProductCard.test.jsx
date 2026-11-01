@@ -47,6 +47,11 @@ describe("ProductCard", () => {
   it("usa el logo local como placeholder cuando no hay imagen", () => {
     renderCard(baseProduct);
 
-    expect(screen.getByTestId("product-placeholder")).toBeInTheDocument();
+    const placeholder = screen.getByTestId("product-placeholder");
+    expect(placeholder).toBeInTheDocument();
+    expect(placeholder.querySelector("img")).toHaveAttribute(
+      "src",
+      "/logo_light_cropped.png",
+    );
   });
 });

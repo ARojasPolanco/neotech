@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 
 const sizes = {
-  sm: "h-8",
-  md: "h-10",
-  lg: "h-14",
+  sm: "h-9",
+  md: "h-12",
+  lg: "h-16",
 };
 
 export default function BrandLogo({ size = "md", to = "/", className = "" }) {
@@ -11,7 +11,11 @@ export default function BrandLogo({ size = "md", to = "/", className = "" }) {
     <span
       className={`inline-flex ${sizes[size] || sizes.md} items-center overflow-hidden rounded-lg ${className}`}
     >
-      <img src="/logo.png" alt="Neo Tech" className="h-full w-auto object-contain" />
+      <img
+        src="/logo_light_cropped.png"
+        alt="Neo Tech"
+        className="h-full w-auto object-contain"
+      />
     </span>
   );
 
