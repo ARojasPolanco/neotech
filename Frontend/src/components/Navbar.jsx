@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Search, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import BrandLogo from "./BrandLogo.jsx";
 import MiniCart from "./MiniCart.jsx";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { totalItems, lastAdded, clearLastAdded } = useCart();
+  const navigate = useNavigate();
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const [bump, setBump] = useState(false);
 
   useEffect(() => {
@@ -28,15 +33,40 @@ export default function Navbar() {
     { to: "/cart", label: "Carrito" },
   ];
 
+  const closeMenus = () => {
+    setSearchOpen(false);
+    setMobileOpen(false);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const term = query.trim();
+    navigate(term ? `/products?search=${encodeURIComponent(term)}` : "/products");
+    closeMenus();
+  };
+
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
-        <Link to="/" className="font-heading text-2xl font-bold tracking-tight">
-          NEO <span className="text-accent">TECH</span>
-        </Link>
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-5">
+        <BrandLogo size="md" />
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-6 md:flex">
+          <form onSubmit={handleSearch} role="search" className="relative">
+            <Search
+              size={16}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar productos..."
+              aria-label="Buscar productos"
+              className="w-52 rounded-full border border-border bg-surface py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+          </form>
+
           <Link
             to="/products"
             className="text-sm font-medium text-muted transition-colors hover:text-fg"
@@ -104,32 +134,80 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile menu button */}
-        <button
-          onClick={() => setMobileOpen((prev) => !prev)}
-          className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
-          aria-label="Menú"
-        >
-          <motion.span
-            animate={{
-              rotate: mobileOpen ? 45 : 0,
-              y: mobileOpen ? 7 : 0,
+        {/* Mobile actions */}
+        <div className="flex items-center gap-1 md:hidden">
+          <button
+            onClick={() => {
+              setSearchOpen((prev) => !prev);
+              setMobileOpen(false);
             }}
-            className="block h-0.5 w-6 bg-fg"
-          />
-          <motion.span
-            animate={{ opacity: mobileOpen ? 0 : 1 }}
-            className="block h-0.5 w-6 bg-fg"
-          />
-          <motion.span
-            animate={{
-              rotate: mobileOpen ? -45 : 0,
-              y: mobileOpen ? -7 : 0,
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-fg"
+            aria-label={searchOpen ? "Cerrar búsqueda" : "Buscar"}
+            aria-expanded={searchOpen}
+          >
+            {searchOpen ? <X size={22} /> : <Search size={22} />}
+          </button>
+
+          <button
+            onClick={() => {
+              setMobileOpen((prev) => !prev);
+              setSearchOpen(false);
             }}
-            className="block h-0.5 w-6 bg-fg"
-          />
-        </button>
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5"
+            aria-label="Menú"
+            aria-expanded={mobileOpen}
+          >
+            <motion.span
+              animate={{
+                rotate: mobileOpen ? 45 : 0,
+                y: mobileOpen ? 7 : 0,
+              }}
+              className="block h-0.5 w-6 bg-fg"
+            />
+            <motion.span
+              animate={{ opacity: mobileOpen ? 0 : 1 }}
+              className="block h-0.5 w-6 bg-fg"
+            />
+            <motion.span
+              animate={{
+                rotate: mobileOpen ? -45 : 0,
+                y: mobileOpen ? -7 : 0,
+              }}
+              className="block h-0.5 w-6 bg-fg"
+            />
+          </button>
+        </div>
       </div>
+
+      {/* Mobile search */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden border-t border-border bg-white md:hidden"
+          >
+            <form onSubmit={handleSearch} role="search" className="px-5 py-3">
+              <div className="relative">
+                <Search
+                  size={16}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar productos..."
+                  aria-label="Buscar productos"
+                  autoFocus
+                  className="w-full rounded-full border border-border bg-surface py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+                />
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile menu */}
       <AnimatePresence>
@@ -145,7 +223,7 @@ export default function Navbar() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMenus}
                   className="rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-fg"
                 >
                   {link.label}
@@ -163,7 +241,7 @@ export default function Navbar() {
                   {user.role === "ADMIN" && (
                     <Link
                       to="/admin"
-                      onClick={() => setMobileOpen(false)}
+                      onClick={closeMenus}
                       className="rounded-lg px-3 py-2 text-sm font-medium text-accent-dark transition-colors hover:bg-surface hover:text-fg"
                     >
                       Panel Admin
@@ -172,7 +250,7 @@ export default function Navbar() {
                   <button
                     onClick={() => {
                       logout();
-                      setMobileOpen(false);
+                      closeMenus();
                     }}
                     className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-fg"
                   >
@@ -182,7 +260,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMenus}
                   className="mt-2 rounded-lg bg-accent px-3 py-2 text-center text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
                 >
                   Ingresar

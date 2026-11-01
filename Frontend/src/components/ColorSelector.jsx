@@ -1,7 +1,7 @@
+import ProductImage from "./ProductImage.jsx";
+
 export default function ColorSelector({ product, variants, selected, onSelect, onDeselect }) {
   if (!variants || variants.length === 0) return null;
-
-  const placeholder = "https://placehold.co/48x48/e0e0e0/666?text=Img";
 
   return (
     <div>
@@ -18,10 +18,11 @@ export default function ColorSelector({ product, variants, selected, onSelect, o
           }`}
           title="Producto original"
         >
-          <img
-            src={product.imageUrl || placeholder}
-            alt="Producto"
-            className="h-12 w-12 object-cover"
+          <ProductImage
+            src={product.imageUrl}
+            alt="Producto original"
+            className="h-12 w-12"
+            logoClassName="h-9 w-9"
           />
           {!selected && (
             <span className="absolute inset-0 border-2 border-fg rounded-lg" />

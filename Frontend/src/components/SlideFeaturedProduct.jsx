@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Tag } from "lucide-react";
+import ProductImage from "./ProductImage.jsx";
 
 export default function SlideFeaturedProduct({ product }) {
   if (!product || product.empty) {
@@ -28,18 +29,17 @@ export default function SlideFeaturedProduct({ product }) {
     );
   }
 
-  const placeholder = "https://placehold.co/800x400/1a1a1a/666?text=Neo+Tech";
-  const imgSrc = product.imageUrl || placeholder;
-
   return (
     <Link
       to={`/products/${product.id}`}
       className="relative block h-full min-h-[280px] overflow-hidden rounded-2xl sm:min-h-[340px]"
     >
-      <img
-        src={imgSrc}
+      <ProductImage
+        src={product.imageUrl}
         alt={product.name}
-        className="absolute inset-0 h-full w-full object-cover blur-sm brightness-50"
+        className="absolute inset-0 h-full w-full"
+        imgClassName="h-full w-full object-cover blur-sm brightness-50"
+        logoClassName="h-1/3 w-1/3 opacity-40"
       />
 
       <div className="relative z-10 flex h-full min-h-[280px] items-center justify-center px-6 py-16 sm:min-h-[340px]">

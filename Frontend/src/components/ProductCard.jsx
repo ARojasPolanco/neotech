@@ -1,20 +1,30 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ProductImage from "./ProductImage.jsx";
 import VariantDots from "./VariantDots.jsx";
 
 export default function ProductCard({ product }) {
   const [imageIndex, setImageIndex] = useState(-1);
   const variants = product.ProductVariants || [];
-  const placeholder = "https://placehold.co/400x400/e0e0e0/666?text=Neo+Tech";
 
   const images = [
-    product.imageUrl || placeholder,
+    product.imageUrl,
     ...variants.filter((v) => v.imageUrl).map((v) => v.imageUrl),
-  ];
+  ].filter(Boolean);
 
-  const currentImg = images[Math.max(0, imageIndex)] || placeholder;
+  const currentImg =
+    images.length > 0
+      ? images[Math.min(Math.max(imageIndex, 0), images.length - 1)]
+      : null;
   const hasMultiple = images.length > 1;
+
+  const totalStock = variants.length
+    ? variants.reduce((sum, v) => sum + Number(v.stock || 0), 0)
+    : product.stock !== undefined && product.stock !== null
+      ? Number(product.stock)
+      : null;
+  const isLastUnit = totalStock === 1;
 
   const nextImage = (e) => {
     e.preventDefault();
@@ -32,15 +42,22 @@ export default function ProductCard({ product }) {
       className="group flex flex-col overflow-hidden rounded-card border border-border bg-white transition-shadow hover:shadow-lg"
     >
       <div className="relative aspect-square overflow-hidden bg-surface">
-        <img
+        <ProductImage
           src={currentImg}
           alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full"
+          imgClassName="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
 
         {product.discountActive && (
           <span className="absolute left-2 top-2 z-10 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-fg">
             {Number(product.discountPercent)}% OFF
+          </span>
+        )}
+
+        {isLastUnit && (
+          <span className="absolute bottom-2 left-2 z-10 rounded-full bg-warning px-2 py-0.5 text-[11px] font-bold text-fg">
+            Última unidad
           </span>
         )}
 

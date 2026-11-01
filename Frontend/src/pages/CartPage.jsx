@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import ProductImage from "../components/ProductImage.jsx";
 import { useCart } from "../context/CartContext.jsx";
 
 export default function CartPage() {
@@ -42,7 +44,12 @@ export default function CartPage() {
               className="flex flex-col gap-4 rounded-card border border-border bg-white p-4 sm:flex-row sm:items-center"
             >
               <div className="h-24 w-full flex-shrink-0 overflow-hidden rounded-lg bg-surface sm:h-20 sm:w-20">
-                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                <ProductImage
+                  src={item.image || null}
+                  alt={item.name}
+                  className="h-full w-full"
+                  imgClassName="h-full w-full object-cover"
+                />
               </div>
 
               <div className="flex-1">
@@ -50,9 +57,21 @@ export default function CartPage() {
                 {item.color && (
                   <p className="text-sm text-muted">Color: {item.color}</p>
                 )}
-                <p className="text-sm font-semibold">
-                  ${Number(item.price).toLocaleString("es-AR")}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold">
+                    ${Number(item.price).toLocaleString("es-AR")}
+                  </p>
+                  {item.discountActive && (
+                    <>
+                      <span className="text-xs text-muted line-through">
+                        ${Number(item.originalPrice).toLocaleString("es-AR")}
+                      </span>
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-fg">
+                        {item.discountPercent}% OFF
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center justify-between gap-4 sm:justify-start">
@@ -81,9 +100,10 @@ export default function CartPage() {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={() => removeItem(item.key)}
-                  className="cursor-pointer text-sm text-muted hover:text-error transition-colors"
+                  className="cursor-pointer text-muted transition-colors hover:text-error"
+                  aria-label={`Quitar ${item.name}`}
                 >
-                  ✕
+                  <X size={16} />
                 </motion.button>
               </div>
             </motion.div>
