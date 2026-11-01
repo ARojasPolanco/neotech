@@ -32,9 +32,9 @@
 
 .dark {
   color-scheme: dark;
-  --color-bg: #192734;
-  --color-surface: #0a4a5e;
-  --color-card: #043f51;
+  --color-bg: #043f51;
+  --color-surface: #223646;
+  --color-card: #192734;
   --color-fg: #f4f7f8;
   --color-muted: #a9c0c9;
   --color-border: #2b5266;
