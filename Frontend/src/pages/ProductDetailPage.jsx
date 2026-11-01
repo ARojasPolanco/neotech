@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ColorSelector from "../components/ColorSelector.jsx";
+import ProductImage from "../components/ProductImage.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { getProduct, getProductVariants } from "../services/product.service.js";
@@ -43,37 +44,43 @@ export default function ProductDetailPage() {
     setSelected(null);
   };
 
-  const placeholder = "https://placehold.co/600x600/e0e0e0/666?text=Neo+Tech";
-  const displayImg = selected?.imageUrl || product?.imageUrl || placeholder;
+  const displayImg = selected?.imageUrl || product?.imageUrl || null;
 
+  const variantImages = variants.filter((v) => v.imageUrl);
+  const baseOffset = product?.imageUrl ? 1 : 0;
   const imageList = [
-    product?.imageUrl || placeholder,
-    ...variants.filter((v) => v.imageUrl).map((v) => v.imageUrl),
+    ...(product?.imageUrl ? [product.imageUrl] : []),
+    ...variantImages.map((v) => v.imageUrl),
   ];
 
   const currentImageIndex = selected
-    ? variants.filter((v) => v.imageUrl).indexOf(selected) + 1
+    ? variantImages.indexOf(selected) + baseOffset
     : 0;
 
+  const selectionFromIndex = (index) => {
+    const variantIndex = index - baseOffset;
+    return variantIndex >= 0 ? variantImages[variantIndex] : null;
+  };
+
   const nextImage = () => {
-    const nextIdx = (currentImageIndex + 1) % imageList.length;
-    if (nextIdx === 0) {
-      setSelected(null);
-    } else {
-      setSelected(variants.filter((v) => v.imageUrl)[nextIdx - 1]);
-    }
+    if (imageList.length === 0) return;
+    setSelected(selectionFromIndex((currentImageIndex + 1) % imageList.length));
   };
 
   const prevImage = () => {
-    const prevIdx = (currentImageIndex - 1 + imageList.length) % imageList.length;
-    if (prevIdx === 0) {
-      setSelected(null);
-    } else {
-      setSelected(variants.filter((v) => v.imageUrl)[prevIdx - 1]);
-    }
+    if (imageList.length === 0) return;
+    setSelected(
+      selectionFromIndex(
+        (currentImageIndex - 1 + imageList.length) % imageList.length,
+      ),
+    );
   };
 
-  const stock = selected ? selected.stock : null;
+  const stock = selected
+    ? selected.stock
+    : product?.stock !== undefined && product?.stock !== null
+      ? Number(product.stock)
+      : null;
 
   if (loading) {
     return (
@@ -104,7 +111,12 @@ export default function ProductDetailPage() {
 
       <div className="flex flex-col gap-8 md:flex-row">
         <div className="relative aspect-square overflow-hidden rounded-card bg-surface md:w-1/2">
-          <img src={displayImg} alt={product.name} className="h-full w-full object-cover" />
+          <ProductImage
+            src={displayImg}
+            alt={product.name}
+            className="h-full w-full"
+            imgClassName="h-full w-full object-cover"
+          />
 
           {imageList.length > 1 && (
             <>
@@ -121,6 +133,12 @@ export default function ProductDetailPage() {
                 <ChevronRight size={20} />
               </button>
             </>
+          )}
+
+          {stock === 1 && (
+            <span className="absolute bottom-3 left-3 rounded-full bg-warning px-3 py-1 text-xs font-bold text-fg">
+              Última unidad
+            </span>
           )}
         </div>
 

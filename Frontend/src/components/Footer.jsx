@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
+import BrandLogo from "./BrandLogo.jsx";
 
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface py-8">
       <div className="mx-auto max-w-7xl px-5">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div className="text-center md:text-left">
-            <p className="font-heading text-lg font-semibold">
-              NEO <span className="text-accent">TECH</span>
-            </p>
-            <p className="mt-1 text-sm text-muted">
+          <div className="flex flex-col items-center text-center md:items-start md:text-left">
+            <BrandLogo size="md" />
+            <p className="mt-2 text-sm text-muted">
               Tecnología al alcance de todos
             </p>
           </div>

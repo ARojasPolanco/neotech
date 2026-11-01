@@ -115,6 +115,11 @@ export default function CheckoutPage() {
             <div key={item.key} className="flex justify-between text-sm">
               <span>
                 {item.name}{item.color ? ` (${item.color})` : ""} x{item.quantity}
+                {item.discountActive && (
+                  <span className="ml-2 rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold text-fg">
+                    {item.discountPercent}% OFF
+                  </span>
+                )}
               </span>
               <span className="font-medium">
                 ${(Number(item.price) * item.quantity).toLocaleString("es-AR")}
