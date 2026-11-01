@@ -47,26 +47,31 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-5">
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-5">
         <BrandLogo size="md" />
+
+        {/* Desktop search */}
+        <form
+          onSubmit={handleSearch}
+          role="search"
+          className="absolute left-1/2 top-1/2 hidden w-64 -translate-x-1/2 -translate-y-1/2 md:block"
+        >
+          <Search
+            size={16}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar productos..."
+            aria-label="Buscar productos"
+            className="w-full rounded-full border border-border bg-surface py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+          />
+        </form>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-6 md:flex">
-          <form onSubmit={handleSearch} role="search" className="relative">
-            <Search
-              size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar productos..."
-              aria-label="Buscar productos"
-              className="w-52 rounded-full border border-border bg-surface py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
-            />
-          </form>
-
           <Link
             to="/products"
             className="text-sm font-medium text-muted transition-colors hover:text-fg"
