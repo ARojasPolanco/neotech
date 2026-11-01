@@ -4,19 +4,22 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { ToastProvider } from "./context/ToastContext.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   </StrictMode>,
 );

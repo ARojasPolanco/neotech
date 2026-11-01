@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <p className="text-lg text-muted">{error || "Producto no encontrado"}</p>
-        <Link to="/products" className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg">
+        <Link to="/products" className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg">
           Volver al catálogo
         </Link>
       </div>
@@ -122,13 +122,13 @@ export default function ProductDetailPage() {
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 shadow transition-colors hover:bg-white"
+                className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 shadow transition-colors hover:bg-card"
               >
                 <ChevronLeft size={20} />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 shadow transition-colors hover:bg-white"
+                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 shadow transition-colors hover:bg-card"
               >
                 <ChevronRight size={20} />
               </button>
@@ -136,7 +136,7 @@ export default function ProductDetailPage() {
           )}
 
           {stock === 1 && (
-            <span className="absolute bottom-3 left-3 rounded-full bg-warning px-3 py-1 text-xs font-bold text-fg">
+            <span className="absolute bottom-3 left-3 rounded-full bg-warning px-3 py-1 text-xs font-bold text-accent-fg">
               Última unidad
             </span>
           )}
@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
 
           {product.discountActive ? (
             <div className="flex items-center gap-3">
-              <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-fg">
+              <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-fg">
                 {Number(product.discountPercent)}% OFF
               </span>
               <span className="text-lg text-muted line-through">
@@ -183,7 +183,7 @@ export default function ProductDetailPage() {
           <button
             onClick={handleAdd}
             disabled={stock !== null && stock <= 0}
-            className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
             Agregar al carrito
           </button>

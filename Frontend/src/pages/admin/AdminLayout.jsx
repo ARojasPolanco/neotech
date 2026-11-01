@@ -17,7 +17,7 @@ export default function AdminLayout() {
 
   return (
     <div>
-      <nav className="mb-6 flex gap-1 overflow-x-auto rounded-card border border-border bg-white p-1">
+      <nav className="mb-6 flex gap-1 overflow-x-auto rounded-card border border-border bg-card p-1">
         {tabs.map((tab) => (
           <NavLink
             key={tab.to}
@@ -26,7 +26,7 @@ export default function AdminLayout() {
             className={({ isActive }) =>
               `rounded-lg px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
                 isActive
-                  ? "bg-accent text-fg"
+                  ? "bg-accent text-accent-fg"
                   : "text-muted hover:bg-surface hover:text-fg"
               }`
             }

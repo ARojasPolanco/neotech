@@ -64,7 +64,7 @@ export default function AdminOrders() {
               }}
               className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                 filter === opt.value
-                  ? "bg-accent text-fg"
+                  ? "bg-accent text-accent-fg"
                   : "border border-border text-muted hover:bg-surface"
               }`}
             >
@@ -85,7 +85,7 @@ export default function AdminOrders() {
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="animate-pulse rounded-card border border-border bg-white p-4"
+              className="animate-pulse rounded-card border border-border bg-card p-4"
             >
               <div className="h-5 w-32 rounded bg-surface" />
               <div className="mt-2 h-4 w-48 rounded bg-surface" />
@@ -94,7 +94,7 @@ export default function AdminOrders() {
         </div>
       ) : (
         <>
-          <div className="overflow-hidden rounded-card border border-border bg-white">
+          <div className="overflow-hidden rounded-card border border-border bg-card">
             <div className="hidden grid-cols-12 gap-4 border-b border-border bg-surface px-4 py-3 text-xs font-semibold text-muted md:grid">
               <div className="col-span-2">Pedido</div>
               <div className="col-span-3">Cliente</div>
@@ -206,7 +206,7 @@ function OrderDetail({ order, onClose }) {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 300 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="fixed right-0 top-0 z-50 h-full w-full max-w-md overflow-y-auto border-l border-border bg-white p-6 shadow-xl"
+        className="fixed right-0 top-0 z-50 h-full w-full max-w-md overflow-y-auto border-l border-border bg-card p-6 shadow-xl"
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-heading text-xl font-bold">
@@ -256,7 +256,7 @@ function OrderDetail({ order, onClose }) {
             {order.OrderItems?.map((item) => (
               <div
                 key={item.id}
-                className="rounded-lg border border-border bg-white p-3"
+                className="rounded-lg border border-border bg-card p-3"
               >
                 <p className="text-sm font-medium">{item.productName}</p>
                 {item.color && (

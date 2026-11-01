@@ -14,7 +14,13 @@ export default function BrandLogo({ size = "md", to = "/", className = "" }) {
       <img
         src="/logo_light_cropped.png"
         alt="Neo Tech"
-        className="h-full w-auto object-contain"
+        className="h-full w-auto object-contain dark:hidden"
+      />
+      <img
+        src="/logo_dark.png"
+        alt=""
+        aria-hidden="true"
+        className="hidden h-full w-auto object-contain dark:block"
       />
     </span>
   );

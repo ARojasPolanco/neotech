@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function SlideBranding() {
   return (
-    <div className="relative flex h-full min-h-[280px] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-fg to-neutral-900 px-6 py-16 text-center text-white sm:min-h-[340px]">
+    <div className="relative flex h-full min-h-[280px] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f0f12] to-neutral-900 px-6 py-16 text-center text-white sm:min-h-[340px]">
       <div className="relative z-10">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -29,7 +29,7 @@ export default function SlideBranding() {
         >
           <Link
             to="/products"
-            className="mt-8 inline-block rounded-lg bg-accent px-8 py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+            className="mt-8 inline-block rounded-lg bg-accent px-8 py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
           >
             Ver Productos
           </Link>

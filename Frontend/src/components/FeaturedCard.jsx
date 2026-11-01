@@ -39,7 +39,7 @@ export default function FeaturedCard({ product }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="group block w-64 overflow-hidden rounded-card border border-border bg-white shadow-sm transition-shadow hover:shadow-lg"
+      className="group block w-64 overflow-hidden rounded-card border border-border bg-card shadow-sm transition-shadow hover:shadow-lg"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-surface">
         <ProductImage
@@ -50,13 +50,13 @@ export default function FeaturedCard({ product }) {
         />
 
         {product.discountActive && (
-          <span className="absolute left-2 top-2 z-10 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-fg">
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-accent-fg">
             {Number(product.discountPercent)}% OFF
           </span>
         )}
 
         {isLastUnit && (
-          <span className="absolute bottom-2 left-2 z-10 rounded-full bg-warning px-2 py-0.5 text-[11px] font-bold text-fg">
+          <span className="absolute bottom-2 left-2 z-10 rounded-full bg-warning px-2 py-0.5 text-[11px] font-bold text-accent-fg">
             Última unidad
           </span>
         )}
@@ -65,13 +65,13 @@ export default function FeaturedCard({ product }) {
           <>
             <button
               onClick={prevImage}
-              className="absolute left-1 top-1/2 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute left-1 top-1/2 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 opacity-0 transition-opacity group-hover:opacity-100"
             >
               <ChevronLeft size={14} />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 opacity-0 transition-opacity group-hover:opacity-100"
             >
               <ChevronRight size={14} />
             </button>

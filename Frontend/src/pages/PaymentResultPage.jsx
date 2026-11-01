@@ -136,7 +136,7 @@ export default function PaymentResultPage() {
         )}
         <Link
           to="/products"
-          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg"
+          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg"
         >
           Ver productos
         </Link>
@@ -204,7 +204,7 @@ export default function PaymentResultPage() {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+            className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
           >
             Refrescar estado
           </button>
@@ -265,7 +265,7 @@ export default function PaymentResultPage() {
           </Link>
           <Link
             to="/products"
-            className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+            className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
           >
             Seguir comprando
           </Link>
@@ -289,7 +289,7 @@ function SuccessCheckmark() {
         cx="40"
         cy="40"
         r="36"
-        stroke="#a8e05f"
+        stroke="var(--color-accent)"
         strokeWidth="4"
         variants={{
           hidden: { pathLength: 0, opacity: 0 },
@@ -302,7 +302,7 @@ function SuccessCheckmark() {
       />
       <motion.path
         d="M26 42L36 52L54 32"
-        stroke="#0a0a0a"
+        stroke="var(--color-fg)"
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -331,14 +331,14 @@ function DelayedPaymentIcon() {
         cx="40"
         cy="40"
         r="36"
-        stroke="#d5d5d5"
+        stroke="var(--color-border)"
         strokeWidth="4"
       />
       <motion.circle
         cx="40"
         cy="40"
         r="36"
-        stroke="#a8e05f"
+        stroke="var(--color-accent)"
         strokeWidth="4"
         strokeLinecap="round"
         initial={{ pathLength: 0, rotate: -90 }}
@@ -348,7 +348,7 @@ function DelayedPaymentIcon() {
       />
       <motion.path
         d="M40 22V40L52 52"
-        stroke="#0a0a0a"
+        stroke="var(--color-fg)"
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"

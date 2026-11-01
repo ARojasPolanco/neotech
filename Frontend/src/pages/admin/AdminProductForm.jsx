@@ -247,7 +247,7 @@ export default function AdminProductForm() {
             value={form.name}
             onChange={update("name")}
             required
-            className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
         </div>
 
@@ -257,7 +257,7 @@ export default function AdminProductForm() {
             value={form.description}
             onChange={update("description")}
             rows={3}
-            className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
         </div>
 
@@ -267,7 +267,7 @@ export default function AdminProductForm() {
             <select
               value={form.category}
               onChange={update("category")}
-              className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+              className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
             >
               <option value="">Sin categoría</option>
               <option value="Auriculares">Auriculares</option>
@@ -294,7 +294,7 @@ export default function AdminProductForm() {
                         setForm((f) => ({ ...f, subcategory: e.target.value }));
                       }
                     }}
-                    className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+                    className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
                   >
                     <option value="">Sin subcategoría</option>
                     {subcategories.map((sub) => (
@@ -311,7 +311,7 @@ export default function AdminProductForm() {
                     onChange={(e) => setForm((f) => ({ ...f, subcategory: e.target.value }))}
                     placeholder="Ej: iPhone 13, Samsung Galaxy S24"
                     autoFocus
-                    className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+                    className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
                   />
                   <button
                     type="button"
@@ -336,7 +336,7 @@ export default function AdminProductForm() {
               required
               min="0"
               step="0.01"
-              className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+              className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
             />
           </div>
           <div className="flex items-end">
@@ -413,7 +413,7 @@ export default function AdminProductForm() {
               {variants.map((v) => (
                 <div
                   key={v.id}
-                  className="flex items-center gap-3 rounded-lg border border-border bg-white p-3"
+                  className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
                 >
                   <div
                     className="h-8 w-8 flex-shrink-0 rounded-full border border-border"
@@ -479,7 +479,7 @@ export default function AdminProductForm() {
                           }))
                         }
                         placeholder="Ej: Negro"
-                        className="w-full rounded-input border border-border bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+                        className="w-full rounded-input border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
                       />
                     </div>
                     <div>
@@ -507,7 +507,7 @@ export default function AdminProductForm() {
                               colorHex: e.target.value,
                             }))
                           }
-                          className="w-full rounded-input border border-border bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+                          className="w-full rounded-input border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
                         />
                       </div>
                     </div>
@@ -525,7 +525,7 @@ export default function AdminProductForm() {
                           }))
                         }
                         min="0"
-                        className="w-full rounded-input border border-border bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+                        className="w-full rounded-input border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
                       />
                     </div>
                     <div>
@@ -567,7 +567,7 @@ export default function AdminProductForm() {
                     <button
                       type="button"
                       onClick={handleSaveVariant}
-                      className="rounded-lg bg-accent px-4 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-accent-dark"
+                      className="rounded-lg bg-accent px-4 py-1.5 text-xs font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
                     >
                       {editingVariant ? "Guardar" : "Agregar"}
                     </button>
@@ -591,7 +591,7 @@ export default function AdminProductForm() {
         <button
           type="submit"
           disabled={uploading}
-          className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           {uploading
             ? "Guardando..."

@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X } from "lucide-react";
+import { Moon, Search, Sun, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import { useTheme } from "../context/ThemeContext.jsx";
 import BrandLogo from "./BrandLogo.jsx";
 import MiniCart from "./MiniCart.jsx";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { totalItems, lastAdded, clearLastAdded } = useCart();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -46,7 +48,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-white/95 backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm">
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-5">
         <BrandLogo size="md" />
 
@@ -88,6 +90,16 @@ export default function Navbar() {
             </Link>
           )}
 
+          <button
+            onClick={toggleTheme}
+            aria-label={
+              theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"
+            }
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-border text-muted transition-colors hover:bg-surface hover:text-fg"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
           <div
             className="relative"
             onMouseEnter={() => setCartOpen(true)}
@@ -109,7 +121,7 @@ export default function Navbar() {
                     }}
                     exit={{ scale: 0.5, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                    className="absolute -right-3 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-fg"
+                    className="absolute -right-3 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-fg"
                   >
                     {totalItems}
                   </motion.span>
@@ -132,7 +144,7 @@ export default function Navbar() {
           ) : (
             <Link
               to="/login"
-              className="rounded-lg bg-accent px-4 py-1.5 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+              className="rounded-lg bg-accent px-4 py-1.5 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
             >
               Ingresar
             </Link>
@@ -141,6 +153,16 @@ export default function Navbar() {
 
         {/* Mobile actions */}
         <div className="flex items-center gap-1 md:hidden">
+          <button
+            onClick={toggleTheme}
+            aria-label={
+              theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"
+            }
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-fg"
+          >
+            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
           <button
             onClick={() => {
               setSearchOpen((prev) => !prev);
@@ -191,7 +213,7 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-border bg-white md:hidden"
+            className="overflow-hidden border-t border-border bg-card md:hidden"
           >
             <form onSubmit={handleSearch} role="search" className="px-5 py-3">
               <div className="relative">
@@ -221,7 +243,7 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-border bg-white md:hidden"
+            className="overflow-hidden border-t border-border bg-card md:hidden"
           >
             <div className="flex flex-col gap-2 px-5 py-4">
               {navLinks.map((link) => (
@@ -233,7 +255,7 @@ export default function Navbar() {
                 >
                   {link.label}
                   {link.to === "/cart" && totalItems > 0 && (
-                    <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-fg">
+                    <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-fg">
                       {totalItems}
                     </span>
                   )}
@@ -266,7 +288,7 @@ export default function Navbar() {
                 <Link
                   to="/login"
                   onClick={closeMenus}
-                  className="mt-2 rounded-lg bg-accent px-3 py-2 text-center text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+                  className="mt-2 rounded-lg bg-accent px-3 py-2 text-center text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
                 >
                   Ingresar
                 </Link>

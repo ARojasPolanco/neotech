@@ -79,7 +79,7 @@ export default function AdminProducts() {
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="animate-pulse rounded-card border border-border bg-white p-4"
+            className="animate-pulse rounded-card border border-border bg-card p-4"
           >
             <div className="h-5 w-48 rounded bg-surface" />
             <div className="mt-2 h-4 w-24 rounded bg-surface" />
@@ -105,12 +105,12 @@ export default function AdminProducts() {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por nombre..."
               aria-label="Buscar productos por nombre"
-              className="w-full rounded-input border border-border bg-white py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent sm:w-64"
+              className="w-full rounded-input border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent sm:w-64"
             />
           </div>
           <Link
             to="/admin/products/new"
-            className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+            className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
           >
             Nuevo producto
           </Link>
@@ -127,7 +127,7 @@ export default function AdminProducts() {
         <p className="mb-2 text-xs text-muted">Buscando...</p>
       )}
 
-      <div className="overflow-hidden rounded-card border border-border bg-white">
+      <div className="overflow-hidden rounded-card border border-border bg-card">
         <div className="hidden grid-cols-12 gap-4 border-b border-border bg-surface px-4 py-3 text-xs font-semibold text-muted md:grid">
           <div className="col-span-4">Nombre</div>
           <div className="col-span-2">Precio</div>

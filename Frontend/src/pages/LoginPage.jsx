@@ -44,7 +44,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+          className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
         />
         <div className="relative">
           <input
@@ -53,7 +53,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-input border border-border bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
           <button
             type="button"
@@ -66,7 +66,7 @@ export default function LoginPage() {
         </div>
         <button
           type="submit"
-          className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
         >
           Ingresar
         </button>

@@ -78,7 +78,7 @@ export default function HomePage() {
             >
               <motion.div
                 whileHover={{ y: -4 }}
-                className="flex flex-col items-center rounded-card border border-border bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+                className="flex flex-col items-center rounded-card border border-border bg-card p-6 text-center shadow-sm transition-shadow hover:shadow-md"
               >
                 <cat.icon size={28} className="text-accent" />
                 <h3 className="mt-3 font-heading text-lg font-semibold">{cat.name}</h3>

@@ -54,12 +54,12 @@ export default function RegisterPage() {
         <input
           type="text" placeholder="Nombre completo" value={form.fullname}
           onChange={update("fullname")} required
-          className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+          className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
         />
         <input
           type="email" placeholder="Email" value={form.email}
           onChange={update("email")} required
-          className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+          className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
         />
         <div className="relative">
           <input
@@ -68,7 +68,7 @@ export default function RegisterPage() {
             value={form.password}
             onChange={update("password")}
             required minLength={8}
-            className="w-full rounded-input border border-border bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
           <button
             type="button"
@@ -107,7 +107,7 @@ export default function RegisterPage() {
 
         <button
           type="submit" disabled={!form.acceptedTerms}
-          className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           Crear Cuenta
         </button>

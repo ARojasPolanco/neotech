@@ -28,7 +28,7 @@ export default function AdminDashboard() {
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="animate-pulse rounded-card border border-border bg-white p-5">
+          <div key={i} className="animate-pulse rounded-card border border-border bg-card p-5">
             <div className="h-4 w-24 rounded bg-surface" />
             <div className="mt-3 h-8 w-16 rounded bg-surface" />
           </div>
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
             variants={cardVariants}
             initial="hidden"
             animate="visible"
-            className="rounded-card border border-border bg-white p-5"
+            className="rounded-card border border-border bg-card p-5"
           >
             <p className="text-xs font-medium text-muted">{card.label}</p>
             <p className={`mt-1 text-2xl font-bold ${card.color}`}>{card.value}</p>
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
       <div className="mt-8 flex flex-wrap gap-4">
         <Link
           to="/admin/products"
-          className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
         >
           Gestionar productos
         </Link>

@@ -61,7 +61,7 @@ export default function CheckoutPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <p className="text-lg font-semibold">Tu carrito está vacío</p>
-        <Link to="/products" className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg">
+        <Link to="/products" className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg">
           Ver productos
         </Link>
       </div>
@@ -81,23 +81,23 @@ export default function CheckoutPage() {
           <input
             type="text" placeholder="Nombre completo" value={form.customerName}
             onChange={update("customerName")} required
-            className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
           <input
             type="email" placeholder="Email" value={form.customerEmail}
             onChange={update("customerEmail")} required
-            className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
           <input
             type="tel" placeholder="Teléfono" value={form.customerPhone}
             onChange={update("customerPhone")} required
-            className="w-full rounded-input border border-border bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Procesando..." : "Pagar con Mercado Pago"}
           </button>
@@ -110,13 +110,13 @@ export default function CheckoutPage() {
 
       <div className="md:col-span-2">
         <h2 className="mb-4 font-heading text-xl font-bold">Resumen</h2>
-        <div className="flex flex-col gap-3 rounded-card border border-border bg-white p-4">
+        <div className="flex flex-col gap-3 rounded-card border border-border bg-card p-4">
           {items.map((item) => (
             <div key={item.key} className="flex justify-between text-sm">
               <span>
                 {item.name}{item.color ? ` (${item.color})` : ""} x{item.quantity}
                 {item.discountActive && (
-                  <span className="ml-2 rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold text-fg">
+                  <span className="ml-2 rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold text-accent-fg">
                     {item.discountPercent}% OFF
                   </span>
                 )}

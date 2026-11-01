@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import Navbar from "../Navbar.jsx";
 import { AuthProvider } from "../../context/AuthContext.jsx";
 import { CartProvider } from "../../context/CartContext.jsx";
+import { ThemeProvider } from "../../context/ThemeContext.jsx";
 
 function LocationProbe() {
   const location = useLocation();
@@ -14,12 +15,14 @@ function LocationProbe() {
 function renderNavbar(initialEntries = ["/"]) {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
-      <AuthProvider>
-        <CartProvider>
-          <Navbar />
-          <LocationProbe />
-        </CartProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Navbar />
+            <LocationProbe />
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </MemoryRouter>,
   );
 }
@@ -45,5 +48,19 @@ describe("Navbar", () => {
     expect(screen.getByTestId("location")).toHaveTextContent(
       "/products?search=iphone",
     );
+  });
+
+  it("activa el modo oscuro y lo persiste", async () => {
+    const user = userEvent.setup();
+    renderNavbar();
+
+    await user.click(
+      screen.getAllByRole("button", { name: "Activar modo oscuro" })[0],
+    );
+
+    await waitFor(() => {
+      expect(document.documentElement.classList.contains("dark")).toBe(true);
+    });
+    expect(localStorage.getItem("theme")).toBe("dark");
   });
 });

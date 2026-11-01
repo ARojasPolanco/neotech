@@ -491,10 +491,11 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 **Requerimiento:** 2.
 
-- [ ] Tokens dark en `index.css` + `@custom-variant dark` (Tailwind v4).
-- [ ] Toggle en navbar (desktop y mobile), persistencia en `localStorage`, default según sistema.
-- [ ] Sin flash inicial (script inline antes de React).
-- [ ] Barrido de `bg-white` y colores hardcodeados en storefront y admin.
+- [x] Tokens dark en `index.css` + `@custom-variant dark` (Tailwind v4).
+- [x] Toggle en navbar (desktop y mobile), persistencia en `localStorage`, default según sistema.
+- [x] Sin flash inicial (script inline antes de React).
+- [x] Barrido de `bg-white` y colores hardcodeados en storefront y admin.
+- [x] Logo `logo_dark` automático en modo oscuro.
 
 **Tests integrados:** toggle cambia la clase `dark`, persiste y respeta `prefers-color-scheme`.
 
@@ -580,7 +581,7 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 ```
 [x] Fase A - Búsquedas y UI de bajo riesgo
-[ ] Fase B - Dark mode
+[x] Fase B - Dark mode
 [ ] Fase C - Datos de producto y orden
 [ ] Fase D - Descuentos
 [ ] Fase E - Configuración del sitio y video

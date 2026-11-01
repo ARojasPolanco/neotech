@@ -74,7 +74,7 @@ export default function CatalogPage() {
         <p className="text-lg text-muted">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg"
+          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg"
         >
           Reintentar
         </button>
@@ -100,7 +100,7 @@ export default function CatalogPage() {
       {search && (
         <button
           onClick={handleClearSearch}
-          className="mb-6 inline-flex cursor-pointer items-center gap-1 rounded-full border border-border bg-white px-3 py-1 text-xs text-muted transition-colors hover:text-fg"
+          className="mb-6 inline-flex cursor-pointer items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted transition-colors hover:text-fg"
         >
           Quitar búsqueda: {search}
           <X size={12} />
@@ -115,8 +115,8 @@ export default function CatalogPage() {
               onClick={() => handleSubcategoryClick(sub)}
               className={`cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 subcategory === sub
-                  ? "bg-accent text-fg"
-                  : "border border-border bg-white text-muted hover:bg-surface"
+                  ? "bg-accent text-accent-fg"
+                  : "border border-border bg-card text-muted hover:bg-surface"
               }`}
             >
               {sub}

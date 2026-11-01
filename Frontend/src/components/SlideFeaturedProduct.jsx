@@ -48,7 +48,7 @@ export default function SlideFeaturedProduct({ product }) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-fg"
+            className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-fg"
           >
             <Tag size={16} />
             {Number(product.discountPercent)}% OFF
@@ -82,7 +82,7 @@ export default function SlideFeaturedProduct({ product }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <span className="mt-6 inline-block rounded-lg bg-accent px-8 py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark">
+            <span className="mt-6 inline-block rounded-lg bg-accent px-8 py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark">
               Ver producto
             </span>
           </motion.div>

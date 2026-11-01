@@ -54,7 +54,7 @@ export default function OrderSuccessPage() {
         </p>
         <Link
           to="/products"
-          className="mt-6 inline-block rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          className="mt-6 inline-block rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
         >
           Seguir comprando
         </Link>
@@ -108,7 +108,7 @@ export default function OrderSuccessPage() {
         </Link>
         <Link
           to="/products"
-          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
         >
           Seguir comprando
         </Link>
@@ -131,7 +131,7 @@ function SuccessCheckmark() {
         cx="40"
         cy="40"
         r="36"
-        stroke="#a8e05f"
+        stroke="var(--color-accent)"
         strokeWidth="4"
         variants={{
           hidden: { pathLength: 0, opacity: 0 },
@@ -144,7 +144,7 @@ function SuccessCheckmark() {
       />
       <motion.path
         d="M26 42L36 52L54 32"
-        stroke="#0a0a0a"
+        stroke="var(--color-fg)"
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"

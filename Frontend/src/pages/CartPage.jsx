@@ -19,7 +19,7 @@ export default function CartPage() {
         <p className="text-sm text-muted">Agregá productos para empezar a comprar.</p>
         <Link
           to="/products"
-          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
         >
           Ver productos
         </Link>
@@ -41,7 +41,7 @@ export default function CartPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100, height: 0, marginBottom: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="flex flex-col gap-4 rounded-card border border-border bg-white p-4 sm:flex-row sm:items-center"
+              className="flex flex-col gap-4 rounded-card border border-border bg-card p-4 sm:flex-row sm:items-center"
             >
               <div className="h-24 w-full flex-shrink-0 overflow-hidden rounded-lg bg-surface sm:h-20 sm:w-20">
                 <ProductImage
@@ -66,7 +66,7 @@ export default function CartPage() {
                       <span className="text-xs text-muted line-through">
                         ${Number(item.originalPrice).toLocaleString("es-AR")}
                       </span>
-                      <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-fg">
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-fg">
                         {item.discountPercent}% OFF
                       </span>
                     </>
@@ -113,7 +113,7 @@ export default function CartPage() {
 
       <motion.div
         layout
-        className="mt-6 flex items-center justify-between rounded-card border border-border bg-white p-4"
+        className="mt-6 flex items-center justify-between rounded-card border border-border bg-card p-4"
       >
         <p className="text-lg font-semibold">Total</p>
         <p className="text-2xl font-bold">${totalPrice.toLocaleString("es-AR")}</p>
@@ -123,7 +123,7 @@ export default function CartPage() {
         layout
         whileTap={{ scale: 0.98 }}
         onClick={() => navigate("/checkout")}
-        className="mt-4 w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+        className="mt-4 w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
       >
         Finalizar Compra
       </motion.button>

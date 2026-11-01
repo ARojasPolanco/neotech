@@ -17,7 +17,7 @@ export default function MiniCart({ isOpen, onClose }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="absolute right-0 top-full z-50 mt-2 w-80 rounded-card border border-border bg-white p-4 shadow-xl"
+          className="absolute right-0 top-full z-50 mt-2 w-80 rounded-card border border-border bg-card p-4 shadow-xl"
         >
           <div className="mb-3 flex items-center justify-between">
             <p className="font-heading text-lg font-semibold">
@@ -60,7 +60,7 @@ export default function MiniCart({ isOpen, onClose }) {
                           x{item.quantity} · ${Number(item.price).toLocaleString("es-AR")}
                         </p>
                         {item.discountActive && (
-                          <span className="rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold text-fg">
+                          <span className="rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold text-accent-fg">
                             {item.discountPercent}% OFF
                           </span>
                         )}
@@ -80,7 +80,7 @@ export default function MiniCart({ isOpen, onClose }) {
                 <Link
                   to="/cart"
                   onClick={onClose}
-                  className="block w-full rounded-lg bg-accent py-2.5 text-center text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+                  className="block w-full rounded-lg bg-accent py-2.5 text-center text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
                 >
                   Ir al carrito
                 </Link>

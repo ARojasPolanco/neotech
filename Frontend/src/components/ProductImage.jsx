@@ -26,7 +26,13 @@ export default function ProductImage({
         src="/logo_light_cropped.png"
         alt=""
         aria-hidden="true"
-        className={`${logoClassName} object-contain`}
+        className={`${logoClassName} object-contain dark:hidden`}
+      />
+      <img
+        src="/logo_dark.png"
+        alt=""
+        aria-hidden="true"
+        className={`${logoClassName} hidden object-contain dark:block`}
       />
     </div>
   );
