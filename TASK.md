@@ -519,6 +519,8 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 **Criterio de aceptación:** órdenes nuevas muestran imagen; productos viejos usan logo de fallback.
 
+**Datos demo:** `npm run seed:visual` crea/actualiza el admin demo, productos de prueba y un pedido pagado con imágenes. No se ejecuta en producción salvo `ALLOW_DEMO_SEED=true`.
+
 ### Fase D — Descuentos
 
 **Requerimientos:** 3, 7, 10.
