@@ -7,8 +7,9 @@ import ProductVariant from "./models/productVariantModel.js";
 import "./models/associations.js";
 import sequelize from "./config/database/database.js";
 import { ensureSequence } from "./services/order.service.js";
+import { decrementOrderStock } from "./services/payment.service.js";
 
-let product, variant, createdId;
+let product, variant, createdId, baseProduct, baseOrderId;
 
 export async function runOrderTests() {
   resetCounters();
@@ -69,6 +70,75 @@ export async function runOrderTests() {
     fallo("Get order by ID failed", getRes.body);
   }
 
+  if (createdId) {
+    const firstOrder = await Order.findByPk(createdId, {
+      include: [{ model: OrderItem }],
+    });
+    const variantStockBefore = Number(variant.stock);
+    await decrementOrderStock(firstOrder);
+    await variant.reload();
+
+    if (Number(variant.stock) === variantStockBefore - 2) {
+      ok("Variant stock decremented after payment");
+    } else {
+      fallo("Variant stock not decremented", variant.stock);
+    }
+  }
+
+  baseProduct = await Product.create({
+    name: "Base Product",
+    slug: "base-product",
+    price: 200,
+    color: "Azul",
+    colorHex: "#1e40af",
+    imageUrl: "https://example.com/base-product.png",
+    stock: 3,
+  });
+
+  const baseOrderRes = await callHandler(createOrder, {
+    customerName: "Ana Gomez",
+    customerEmail: "ana@test.com",
+    customerPhone: "5491112345678",
+    items: [
+      {
+        productId: baseProduct.id,
+        productName: baseProduct.name,
+        quantity: 2,
+      },
+    ],
+  });
+
+  if (baseOrderRes.statusCode === 201 && baseOrderRes.body.id) {
+    baseOrderId = baseOrderRes.body.id;
+    const item = baseOrderRes.body.OrderItems?.[0];
+
+    if (
+      item &&
+      item.color === "Azul" &&
+      item.imageUrl === "https://example.com/base-product.png"
+    ) {
+      ok("Order item snapshots base color and image");
+    } else {
+      fallo("Order item base snapshot failed", item);
+    }
+  } else {
+    fallo("Create order without variant failed", baseOrderRes.body);
+  }
+
+  if (baseOrderId) {
+    const baseOrder = await Order.findByPk(baseOrderId, {
+      include: [{ model: OrderItem }],
+    });
+    await decrementOrderStock(baseOrder);
+    await baseProduct.reload();
+
+    if (Number(baseProduct.stock) === 1) {
+      ok("Base product stock decremented after payment");
+    } else {
+      fallo("Base product stock not decremented", baseProduct.stock);
+    }
+  }
+
   // ── NEGATIVOS ──
 
   const noCustomer = await callHandler(createOrder, {
@@ -95,6 +165,14 @@ export async function runOrderTests() {
   }
 
   // Cleanup
+  if (baseOrderId) {
+    await OrderItem.destroy({ where: { orderId: baseOrderId }, force: true });
+    await Order.destroy({ where: { id: baseOrderId }, force: true });
+  }
+  if (baseProduct) {
+    await Product.destroy({ where: { id: baseProduct.id }, force: true });
+  }
+
   await OrderItem.destroy({ where: { orderId: createdId }, force: true });
   await Order.destroy({ where: { id: createdId }, force: true });
   await ProductVariant.destroy({ where: { id: variant.id }, force: true });

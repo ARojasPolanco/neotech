@@ -1,0 +1,82 @@
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import ProductCard from "../ProductCard.jsx";
+
+const baseProduct = {
+  id: "product-1",
+  name: "Auriculares Bluetooth",
+  description: "Sonido de calidad",
+  price: 1000,
+  imageUrl: null,
+  discountActive: false,
+  ProductVariants: [],
+};
+
+function renderCard(product) {
+  return render(
+    <MemoryRouter>
+      <ProductCard product={product} />
+    </MemoryRouter>,
+  );
+}
+
+describe("ProductCard", () => {
+  it("muestra el cartel de última unidad cuando el stock total es 1", () => {
+    renderCard({
+      ...baseProduct,
+      ProductVariants: [
+        { id: "v1", color: "Negro", colorHex: "#000000", stock: 1, imageUrl: null },
+      ],
+    });
+
+    expect(screen.getByText("Última unidad")).toBeInTheDocument();
+  });
+
+  it("no muestra el cartel cuando el stock total es mayor a 1", () => {
+    renderCard({
+      ...baseProduct,
+      ProductVariants: [
+        { id: "v1", color: "Negro", colorHex: "#000000", stock: 2, imageUrl: null },
+      ],
+    });
+
+    expect(screen.queryByText("Última unidad")).not.toBeInTheDocument();
+  });
+
+  it("muestra última unidad cuando el stock base es 1", () => {
+    renderCard({ ...baseProduct, stock: 1 });
+
+    expect(screen.getByText("Última unidad")).toBeInTheDocument();
+  });
+
+  it("muestra sin stock cuando el stock base es 0", () => {
+    renderCard({ ...baseProduct, stock: 0 });
+
+    expect(screen.getByText("Sin stock")).toBeInTheDocument();
+    expect(screen.queryByText("Última unidad")).not.toBeInTheDocument();
+  });
+
+  it("muestra sin stock cuando todas las variantes están agotadas", () => {
+    renderCard({
+      ...baseProduct,
+      ProductVariants: [
+        { id: "v1", color: "Negro", colorHex: "#000000", stock: 0, imageUrl: null },
+        { id: "v2", color: "Blanco", colorHex: "#ffffff", stock: 0, imageUrl: null },
+      ],
+    });
+
+    expect(screen.getByText("Sin stock")).toBeInTheDocument();
+  });
+
+  it("usa el logo local como placeholder cuando no hay imagen", () => {
+    renderCard(baseProduct);
+
+    const placeholder = screen.getByTestId("product-placeholder");
+    expect(placeholder).toBeInTheDocument();
+    expect(placeholder.querySelector("img")).toHaveAttribute(
+      "src",
+      "/logo_light_cropped.png",
+    );
+  });
+});

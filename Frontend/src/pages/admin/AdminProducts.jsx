@@ -1,28 +1,49 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2 } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import api from "../../config/api.js";
 import ConfirmModal from "../../components/ConfirmModal.jsx";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const loadProducts = () => {
-    setLoading(true);
-    api
-      .get("/products")
-      .then((res) => setProducts(res.data))
-      .catch(() => setError("Error al cargar productos"))
-      .finally(() => setLoading(false));
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
-    loadProducts();
-  }, []);
+    let active = true;
+    setFetching(true);
+    setError("");
+
+    const term = debouncedSearch.trim();
+    api
+      .get("/products", { params: term ? { search: term } : {} })
+      .then((res) => {
+        if (active) setProducts(res.data);
+      })
+      .catch(() => {
+        if (active) setError("Error al cargar productos");
+      })
+      .finally(() => {
+        if (active) {
+          setFetching(false);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [debouncedSearch]);
 
   const toggleActive = async (product) => {
     try {
@@ -58,7 +79,7 @@ export default function AdminProducts() {
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="animate-pulse rounded-card border border-border bg-white p-4"
+            className="animate-pulse rounded-card border border-border bg-card p-4"
           >
             <div className="h-5 w-48 rounded bg-surface" />
             <div className="mt-2 h-4 w-24 rounded bg-surface" />
@@ -70,14 +91,30 @@ export default function AdminProducts() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-heading text-2xl font-bold">Productos</h1>
-        <Link
-          to="/admin/products/new"
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
-        >
-          Nuevo producto
-        </Link>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="relative">
+            <Search
+              size={16}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nombre..."
+              aria-label="Buscar productos por nombre"
+              className="w-full rounded-input border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent sm:w-64"
+            />
+          </div>
+          <Link
+            to="/admin/products/new"
+            className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
+          >
+            Nuevo producto
+          </Link>
+        </div>
       </div>
 
       {error && (
@@ -86,7 +123,11 @@ export default function AdminProducts() {
         </p>
       )}
 
-      <div className="overflow-hidden rounded-card border border-border bg-white">
+      {fetching && (
+        <p className="mb-2 text-xs text-muted">Buscando...</p>
+      )}
+
+      <div className="overflow-hidden rounded-card border border-border bg-card">
         <div className="hidden grid-cols-12 gap-4 border-b border-border bg-surface px-4 py-3 text-xs font-semibold text-muted md:grid">
           <div className="col-span-4">Nombre</div>
           <div className="col-span-2">Precio</div>
@@ -159,7 +200,9 @@ export default function AdminProducts() {
 
         {products.length === 0 && (
           <p className="py-8 text-center text-sm text-muted">
-            No hay productos todavía.
+            {debouncedSearch.trim()
+              ? "No encontramos productos con ese nombre."
+              : "No hay productos todavía."}
           </p>
         )}
       </div>

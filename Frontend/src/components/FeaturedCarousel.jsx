@@ -18,7 +18,7 @@ export default function FeaturedCarousel({ products }) {
       <div className="absolute -left-3 top-1/2 z-10 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           onClick={() => scrollBy(-1)}
-          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-surface"
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:bg-surface"
         >
           <ChevronLeft size={18} />
         </button>
@@ -39,7 +39,7 @@ export default function FeaturedCarousel({ products }) {
       <div className="absolute -right-3 top-1/2 z-10 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           onClick={() => scrollBy(1)}
-          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-surface"
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:bg-surface"
         >
           <ChevronRight size={18} />
         </button>

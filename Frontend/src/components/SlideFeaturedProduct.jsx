@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Tag } from "lucide-react";
+import ProductImage from "./ProductImage.jsx";
 
 export default function SlideFeaturedProduct({ product }) {
   if (!product || product.empty) {
@@ -28,31 +29,35 @@ export default function SlideFeaturedProduct({ product }) {
     );
   }
 
-  const placeholder = "https://placehold.co/800x400/1a1a1a/666?text=Neo+Tech";
-  const imgSrc = product.imageUrl || placeholder;
+  const hasDiscount =
+    Boolean(product.discountActive) && Number(product.discountedPrice) > 0;
 
   return (
     <Link
       to={`/products/${product.id}`}
       className="relative block h-full min-h-[280px] overflow-hidden rounded-2xl sm:min-h-[340px]"
     >
-      <img
-        src={imgSrc}
+      <ProductImage
+        src={product.imageUrl}
         alt={product.name}
-        className="absolute inset-0 h-full w-full object-cover blur-sm brightness-50"
+        className="absolute inset-0 h-full w-full"
+        imgClassName="h-full w-full object-cover blur-sm brightness-50"
+        logoClassName="h-1/3 w-1/3 opacity-40"
       />
 
       <div className="relative z-10 flex h-full min-h-[280px] items-center justify-center px-6 py-16 sm:min-h-[340px]">
         <div className="text-center text-white">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-fg"
-          >
-            <Tag size={16} />
-            {Number(product.discountPercent)}% OFF
-          </motion.div>
+          {hasDiscount && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-fg"
+            >
+              <Tag size={16} />
+              {Number(product.discountPercent)}% OFF
+            </motion.div>
+          )}
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -69,12 +74,20 @@ export default function SlideFeaturedProduct({ product }) {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-4 flex items-center justify-center gap-3"
           >
-            <span className="text-lg text-white/50 line-through">
-              ${Number(product.price).toLocaleString("es-AR")}
-            </span>
-            <span className="text-2xl font-bold text-accent sm:text-3xl">
-              ${Number(product.discountedPrice).toLocaleString("es-AR")}
-            </span>
+            {hasDiscount ? (
+              <>
+                <span className="text-lg text-white/50 line-through">
+                  ${Number(product.price).toLocaleString("es-AR")}
+                </span>
+                <span className="text-2xl font-bold text-accent sm:text-3xl">
+                  ${Number(product.discountedPrice).toLocaleString("es-AR")}
+                </span>
+              </>
+            ) : (
+              <span className="text-2xl font-bold text-accent sm:text-3xl">
+                ${Number(product.price).toLocaleString("es-AR")}
+              </span>
+            )}
           </motion.div>
 
           <motion.div
@@ -82,7 +95,7 @@ export default function SlideFeaturedProduct({ product }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <span className="mt-6 inline-block rounded-lg bg-accent px-8 py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark">
+            <span className="mt-6 inline-block rounded-lg bg-accent px-8 py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark">
               Ver producto
             </span>
           </motion.div>

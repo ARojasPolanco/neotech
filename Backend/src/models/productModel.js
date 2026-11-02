@@ -41,6 +41,19 @@ const Product = sequelize.define("Product", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  color: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  colorHex: {
+    type: DataTypes.STRING(7),
+    allowNull: true,
+  },
+  stock: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: null,
+  },
   discountPercent: {
     type: DataTypes.DECIMAL(5, 2),
     allowNull: true,

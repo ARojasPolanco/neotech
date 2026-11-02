@@ -31,6 +31,10 @@ const OrderItem = sequelize.define("OrderItem", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  imageUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   unitPrice: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,

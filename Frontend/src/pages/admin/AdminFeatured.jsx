@@ -143,7 +143,7 @@ export default function AdminFeatured() {
       )}
 
       {current && !selectedProduct && (
-        <div className="mb-6 rounded-card border border-border bg-white p-5">
+        <div className="mb-6 rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-lg font-semibold">
               <Star size={18} className="text-accent" />
@@ -190,7 +190,7 @@ export default function AdminFeatured() {
         </div>
       )}
 
-      <div className="rounded-card border border-border bg-white p-5">
+      <div className="rounded-card border border-border bg-card p-5">
         <h2 className="mb-4 text-lg font-semibold">
           {current ? "Cambiar producto destacado" : "Seleccionar producto destacado"}
         </h2>
@@ -202,7 +202,7 @@ export default function AdminFeatured() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar producto por nombre..."
-            className="w-full rounded-input border border-border bg-white py-3 pl-10 pr-4 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-border bg-card py-3 pl-10 pr-4 text-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
           />
         </div>
 
@@ -287,7 +287,7 @@ export default function AdminFeatured() {
                     setForm((f) => ({ ...f, discountPercent: e.target.value }))
                   }
                   placeholder="Ej: 20"
-                  className="w-full rounded-input border border-border bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+                  className="w-full rounded-input border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
                 />
               </div>
               <div>
@@ -300,7 +300,7 @@ export default function AdminFeatured() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, discountExpiresAt: e.target.value }))
                   }
-                  className="w-full rounded-input border border-border bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+                  className="w-full rounded-input border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
                 />
               </div>
               <div>
@@ -314,7 +314,7 @@ export default function AdminFeatured() {
                     setForm((f) => ({ ...f, subcategory: e.target.value }))
                   }
                   placeholder="Ej: iPhone 13"
-                  className="w-full rounded-input border border-border bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+                  className="w-full rounded-input border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
                 />
               </div>
             </div>
@@ -323,7 +323,7 @@ export default function AdminFeatured() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving ? "Guardando..." : "Guardar como destacado"}
               </button>

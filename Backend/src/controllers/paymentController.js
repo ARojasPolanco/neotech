@@ -8,7 +8,8 @@ const orderService = new OrderService();
 const paymentService = new PaymentService();
 
 export const createPreference = catchAsync(async (req, res, next) => {
-  const { customerName, customerEmail, customerPhone, items } = req.body;
+  const { customerName, customerEmail, customerPhone, items, discountCode } =
+    req.body;
 
   if (!customerName || !customerEmail || !customerPhone) {
     return next(new AppError("Missing customer data", 400));
@@ -24,6 +25,7 @@ export const createPreference = catchAsync(async (req, res, next) => {
     customerPhone,
     items,
     userId: req.sessionUser?.id || null,
+    discountCode: discountCode || null,
   });
 
   const frontendUrl = req.headers.origin || "http://localhost:5173";
@@ -99,8 +101,14 @@ export const simulatePayment = catchAsync(async (req, res, next) => {
   }
 
   const { orderNumber } = req.params;
-  const { force } = req.query;
-  console.log(`[simulatePayment] order ${orderNumber}, force: ${force || false}`);
-  const result = await paymentService.simulateOrderPaid(orderNumber, force === "true");
+  const { force, notify } = req.query;
+  console.log(
+    `[simulatePayment] order ${orderNumber}, force: ${force || false}, notify: ${notify !== "false"}`,
+  );
+  const result = await paymentService.simulateOrderPaid(
+    orderNumber,
+    force === "true",
+    notify !== "false",
+  );
   return res.status(200).json(result);
 });

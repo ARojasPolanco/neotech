@@ -18,7 +18,7 @@ export default function ConfirmModal({ isOpen, title, message, confirmLabel, var
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-card border border-border bg-white p-6 shadow-xl"
+            className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-card border border-border bg-card p-6 shadow-xl"
           >
             <h2 className="font-heading text-lg font-bold">{title}</h2>
             <p className="mt-2 text-sm text-muted">{message}</p>
@@ -34,7 +34,7 @@ export default function ConfirmModal({ isOpen, title, message, confirmLabel, var
                 className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors ${
                   isDanger
                     ? "bg-error hover:bg-error/90"
-                    : "bg-accent text-fg hover:bg-accent-dark"
+                    : "bg-accent text-accent-fg hover:bg-accent-dark"
                 }`}
               >
                 {confirmLabel || "Confirmar"}

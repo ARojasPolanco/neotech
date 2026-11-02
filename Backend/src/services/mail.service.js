@@ -21,6 +21,16 @@ export class MailService {
         `- ${item.productName}${item.color ? ` (${item.color})` : ""} x${item.quantity} = $${Number(item.subtotal).toLocaleString("es-AR")}`,
     ).join("\n");
 
+    const subtotal = Number(
+      order.subtotal ??
+        order.OrderItems.reduce((sum, item) => sum + Number(item.subtotal), 0),
+    );
+    const discountAmount = Number(order.discountAmount || 0);
+    const discountLine =
+      discountAmount > 0
+        ? `Descuento${order.discountCode ? ` (${order.discountCode} -${Number(order.discountPercent)}%)` : ""}: -$${discountAmount.toLocaleString("es-AR")}`
+        : null;
+
     const text = [
       `Nuevo pedido: ${order.orderNumber}`,
       `Cliente: ${order.customerName}`,
@@ -28,6 +38,8 @@ export class MailService {
       `Productos:`,
       items,
       ``,
+      ...(discountAmount > 0 ? [`Subtotal: $${subtotal.toLocaleString("es-AR")}`] : []),
+      ...(discountLine ? [discountLine] : []),
       `Total: $${Number(order.total).toLocaleString("es-AR")}`,
       ``,
       `Contacto: ${order.customerEmail} / ${order.customerPhone}`,
@@ -52,6 +64,16 @@ export class MailService {
         `- ${item.productName}${item.color ? ` (${item.color})` : ""} x${item.quantity}: $${Number(item.subtotal).toLocaleString("es-AR")}`,
     ).join("\n");
 
+    const subtotal = Number(
+      order.subtotal ??
+        order.OrderItems.reduce((sum, item) => sum + Number(item.subtotal), 0),
+    );
+    const discountAmount = Number(order.discountAmount || 0);
+    const discountLine =
+      discountAmount > 0
+        ? `Descuento${order.discountCode ? ` (${order.discountCode} -${Number(order.discountPercent)}%)` : ""}: -$${discountAmount.toLocaleString("es-AR")}`
+        : null;
+
     const text = [
       `Gracias por tu compra en Neo Tech!`,
       ``,
@@ -61,6 +83,8 @@ export class MailService {
       `Resumen:`,
       items,
       ``,
+      ...(discountAmount > 0 ? [`Subtotal: $${subtotal.toLocaleString("es-AR")}`] : []),
+      ...(discountLine ? [discountLine] : []),
       `Total: $${Number(order.total).toLocaleString("es-AR")}`,
       ``,
       `Adjuntamos el recibo en PDF.`,

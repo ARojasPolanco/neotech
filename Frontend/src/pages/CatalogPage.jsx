@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { X } from "lucide-react";
 import ProductCard from "../components/ProductCard.jsx";
 import { getProducts } from "../services/product.service.js";
 
@@ -12,10 +13,10 @@ export default function CatalogPage() {
 
   const category = searchParams.get("category");
   const subcategory = searchParams.get("subcategory");
+  const search = searchParams.get("search");
 
   useEffect(() => {
     const filters = { isActive: "true", includeVariants: "true" };
-    const search = searchParams.get("search");
     if (search) filters.search = search;
     if (category) filters.category = category;
     if (subcategory) filters.subcategory = subcategory;
@@ -33,9 +34,15 @@ export default function CatalogPage() {
       })
       .catch(() => setError("Error al cargar productos"))
       .finally(() => setLoading(false));
-  }, [searchParams, category, subcategory]);
+  }, [searchParams, category, subcategory, search]);
 
   const categoryTitle = category;
+
+  const handleClearSearch = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("search");
+    setSearchParams(params);
+  };
 
   const handleSubcategoryClick = (sub) => {
     const params = new URLSearchParams(searchParams);
@@ -67,7 +74,7 @@ export default function CatalogPage() {
         <p className="text-lg text-muted">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg"
+          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg"
         >
           Reintentar
         </button>
@@ -86,9 +93,19 @@ export default function CatalogPage() {
 
   return (
     <div>
-      <h1 className="mb-6 font-heading text-3xl font-bold">
-        {categoryTitle || "Productos"}
+      <h1 className="mb-4 font-heading text-3xl font-bold">
+        {search ? `Resultados para "${search}"` : categoryTitle || "Productos"}
       </h1>
+
+      {search && (
+        <button
+          onClick={handleClearSearch}
+          className="mb-6 inline-flex cursor-pointer items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted transition-colors hover:text-fg"
+        >
+          Quitar búsqueda: {search}
+          <X size={12} />
+        </button>
+      )}
 
       {subcategories.length > 0 && (
         <div className="mb-6 flex flex-wrap gap-2">
@@ -98,8 +115,8 @@ export default function CatalogPage() {
               onClick={() => handleSubcategoryClick(sub)}
               className={`cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 subcategory === sub
-                  ? "bg-accent text-fg"
-                  : "border border-border bg-white text-muted hover:bg-surface"
+                  ? "bg-accent text-accent-fg"
+                  : "border border-border bg-card text-muted hover:bg-surface"
               }`}
             >
               {sub}

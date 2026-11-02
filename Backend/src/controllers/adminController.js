@@ -1,9 +1,16 @@
 import { AppError, catchAsync } from "../errors/indexError.js";
 import { AdminService } from "../services/admin.service.js";
 import { PaymentService } from "../services/payment.service.js";
+import { DiscountService } from "../services/discount.service.js";
+import {
+  validateCreateDiscountCode,
+  validateUpdateDiscountCode,
+  validateCreateDiscountCampaign,
+} from "../schemas/discount.schema.js";
 
 const adminService = new AdminService();
 const paymentService = new PaymentService();
+const discountService = new DiscountService();
 
 export const uploadImage = catchAsync(async (req, res, next) => {
   if (!req.file) {
@@ -53,4 +60,60 @@ export const notifyOrder = catchAsync(async (req, res, next) => {
     }
     return next(new AppError("Error sending notifications: " + err.message, 500));
   }
+});
+
+export const createDiscountCode = catchAsync(async (req, res) => {
+  const { hasError, errorMessages, codeData } = validateCreateDiscountCode(
+    req.body,
+  );
+
+  if (hasError) {
+    return res.status(422).json({ status: "error", message: errorMessages });
+  }
+
+  const code = await discountService.createCode(codeData);
+  return res.status(201).json(code);
+});
+
+export const getDiscountCodes = catchAsync(async (req, res) => {
+  const codes = await discountService.listCodes();
+  return res.status(200).json(codes);
+});
+
+export const updateDiscountCode = catchAsync(async (req, res) => {
+  const { hasError, errorMessages, codeData } = validateUpdateDiscountCode(
+    req.body,
+  );
+
+  if (hasError) {
+    return res.status(422).json({ status: "error", message: errorMessages });
+  }
+
+  const code = await discountService.setCodeActive(
+    req.params.id,
+    codeData.isActive,
+  );
+  return res.status(200).json(code);
+});
+
+export const getDiscountCampaigns = catchAsync(async (req, res) => {
+  const campaigns = await discountService.listCampaigns();
+  return res.status(200).json(campaigns);
+});
+
+export const createDiscountCampaign = catchAsync(async (req, res) => {
+  const { hasError, errorMessages, campaignData } =
+    validateCreateDiscountCampaign(req.body);
+
+  if (hasError) {
+    return res.status(422).json({ status: "error", message: errorMessages });
+  }
+
+  const campaign = await discountService.createCampaign(campaignData);
+  return res.status(201).json(campaign);
+});
+
+export const endDiscountCampaign = catchAsync(async (req, res) => {
+  const campaign = await discountService.endCampaign(req.params.id);
+  return res.status(200).json(campaign);
 });

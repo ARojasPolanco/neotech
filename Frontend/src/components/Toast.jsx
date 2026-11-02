@@ -9,7 +9,7 @@ export default function Toast({ id, message, actionLabel, actionHref, onClose })
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, x: 100, scale: 0.9 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      className="pointer-events-auto flex min-w-[280px] items-center gap-3 rounded-card border border-border bg-white p-4 shadow-lg"
+      className="pointer-events-auto flex min-w-[280px] items-center gap-3 rounded-card border border-border bg-card p-4 shadow-lg"
     >
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/20 text-lg">
         ✓

@@ -39,7 +39,7 @@ export default function NotFoundPage() {
       >
         <Link
           to="/"
-          className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
         >
           Volver al inicio
         </Link>

@@ -3,6 +3,9 @@ import Order from "../models/orderModel.js";
 import OrderItem from "../models/orderItemModel.js";
 import Product from "../models/productModel.js";
 import ProductVariant from "../models/productVariantModel.js";
+import { DiscountService } from "./discount.service.js";
+
+const discountService = new DiscountService();
 
 async function getNextOrderNumber() {
   const [result] = await sequelize.query(
@@ -13,7 +16,14 @@ async function getNextOrderNumber() {
 }
 
 export class OrderService {
-  async create({ customerName, customerEmail, customerPhone, items, userId }) {
+  async create({
+    customerName,
+    customerEmail,
+    customerPhone,
+    items,
+    userId,
+    discountCode,
+  }) {
     const orderNumber = await getNextOrderNumber();
 
     const verifiedItems = [];
@@ -44,14 +54,26 @@ export class OrderService {
         productId: product.id,
         productVariantId: variant?.id || null,
         productName: product.name,
-        color: variant?.color || item.color || null,
+        color: variant?.color || item.color || product.color || null,
+        imageUrl: variant?.imageUrl || product.imageUrl || null,
         unitPrice,
         quantity: Number(item.quantity),
         subtotal: unitPrice * Number(item.quantity),
       });
     }
 
-    const total = verifiedItems.reduce((sum, item) => sum + item.subtotal, 0);
+    const subtotal = verifiedItems.reduce((sum, item) => sum + item.subtotal, 0);
+    let codeRecord = null;
+    let discountAmount = 0;
+    let total = subtotal;
+
+    if (discountCode) {
+      codeRecord = await discountService.findValidCode(discountCode);
+      discountAmount = Math.round(
+        (subtotal * Number(codeRecord.discountPercent)) / 100,
+      );
+      total = subtotal - discountAmount;
+    }
 
     const order = await Order.create({
       orderNumber,
@@ -59,6 +81,11 @@ export class OrderService {
       customerName,
       customerEmail,
       customerPhone,
+      subtotal,
+      discountCode: codeRecord?.code || null,
+      discountCodeId: codeRecord?.id || null,
+      discountPercent: codeRecord ? Number(codeRecord.discountPercent) : null,
+      discountAmount,
       total,
     });
 

@@ -66,10 +66,22 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 ### Variantes de producto (colores)
 - Un mismo producto puede tener múltiples variantes (ej: "iPhone 15" en Negro, Blanco, Azul).
 - Cada variante tiene: `color`, `colorHex` (código hexadecimal), `imageUrl` (imagen específica), `stock` (stock individual).
+- El producto base puede tener `color` y `colorHex` opcionales. Se muestran como la opción "original" del selector.
 - El precio es el mismo para todas las variantes y vive en el producto base (`Product.price`).
 - Al mostrar un producto, el frontend debe listar los colores disponibles. Al seleccionar un color, la imagen cambia.
-- En la orden (`OrderItem`) se guarda el `variantId` + `color` para que el detalle incluya el color seleccionado.
-- El stock se descuenta de `ProductVariant.stock`, no de `Product.stock`.
+- En la orden (`OrderItem`) se guardan `productVariantId`, `color` e `imageUrl` (snapshot) para que el detalle incluya el color y la imagen del momento de la compra.
+- **Stock:** si el producto tiene variantes, el stock vive en `ProductVariant.stock` y es el que se descuenta al pagar. Si no tiene variantes, se usa `Product.stock` (nullable; `null` = sin control de stock). El stock del producto base se ignora cuando hay variantes.
+
+### Descuentos
+
+- **Descuento de producto:** `Product.discountPercent` + `Product.discountExpiresAt`. Es el descuento individual que se muestra en las cards y en el detalle.
+- **Campañas:** agrupan productos con un nombre, porcentaje y vencimiento opcional. Al aplicarse, pisan el descuento individual de los productos seleccionados. Al finalizarse, se limpian solo los productos que siguen teniendo el descuento de esa campaña.
+- **Códigos:** modelo `DiscountCode` con `code`, `discountPercent`, `maxUses` (1 o 10), `uses`, `expiresAt` (24/48/72 h desde la creación) e `isActive`.
+- El código se aplica al total del carrito, sobre los precios ya descontados por producto. Un código por pedido. Los guests pueden usarlo.
+- El uso se consume **solo al confirmarse el pago**, con un `UPDATE` atómico condicional (`uses < maxUses` y no vencido). Si el webhook se repite para una orden ya pagada, no se consume dos veces.
+- En Mercado Pago, el descuento del código se prorratea entre los ítems enviados para que el total coincida con el de la orden.
+- El panel admin permite generar códigos, desactivarlos, ver usos restantes y crear/finalizar campañas.
+- `POST /discount-codes/validate` tiene rate limit específico para evitar fuerza bruta.
 
 ### Números de pedido
 - Formato: `NT-000001`, incremental, generado en el momento de crear la orden (no antes).
@@ -105,6 +117,15 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 - Gestión de variantes por producto: agregar/editar colores, imagen específica, stock individual por variante.
 - No permitir borrar productos con pedidos asociados: solo desactivar (`isActive: false`).
 
+### Configuración del sitio (video)
+
+- Modelo `Setting` singleton (id fijo) con `videoUrl`, `videoEnabled` y `logoUrl`.
+- El admin sube el video a Cloudinary (`resource_type: "video"`), acepta MP4/WebM de hasta 25 MB y puede reemplazarlo, habilitarlo o deshabilitarlo.
+- El home muestra el video full-width arriba del banner principal. Si no hay video o está deshabilitado, el banner vuelve a su posición original.
+- El video se reproduce muteado, en loop y con `playsInline`; si el usuario tiene `prefers-reduced-motion`, no autoreproduce y muestra controles.
+- `GET /config/site` es público. `GET/PATCH /admin/settings` y `POST /admin/upload-video` requieren rol `ADMIN`.
+- Si el video falla al cargar, se oculta y el home sigue funcionando sin él.
+
 ## Convenciones de código
 
 - Nomenclatura de archivos: `camelCase.js` para services/controllers, `PascalCase.js` para modelos.
@@ -124,4 +145,9 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 
 ## Estado actual
 
-Proyecto avanzado — Fase 3 completada. Backend con auth, productos, variantes, órdenes y Mercado Pago funcionando. Frontend con catálogo, carrito y checkout integrados. Docker Compose configurado. Próximo paso: Fase 4 (mail, PDF, link de WhatsApp).
+Proyecto avanzado. Backend con auth, productos, variantes, órdenes, Mercado Pago, descuentos y configuración del sitio. Frontend con catálogo, carrito, checkout, dark mode, video, panel admin y splash de arranque. Próximo paso: deploy final (merge `dev` → `main`).
+
+### Disponibilidad
+
+- `GET /api/v1/health` es público y verifica la conexión a la base de datos.
+- El frontend muestra un splash inicial mientras espera al backend (Render free). Reintenta hasta 60 segundos y ofrece "Reintentar" o "Continuar de todos modos"; nunca queda bloqueado para siempre.

@@ -5,11 +5,15 @@ import "./models/productModel.js";
 import "./models/productVariantModel.js";
 import "./models/orderModel.js";
 import "./models/orderItemModel.js";
+import "./models/settingModel.js";
 import "./models/associations.js";
 import { ensureSequence } from "./services/order.service.js";
 import { runAuthTests } from "./test-auth.js";
 import { runProductTests } from "./test-products.js";
 import { runOrderTests } from "./test-orders.js";
+import { runDiscountTests } from "./test-discounts.js";
+import { runSettingsTests } from "./test-settings.js";
+import { runHealthTests } from "./test-health.js";
 
 async function main() {
   console.log("\n=== Tests Neo Tech E-commerce ===\n");
@@ -20,6 +24,9 @@ async function main() {
   await runAuthTests();
   await runProductTests();
   await runOrderTests();
+  await runDiscountTests();
+  await runSettingsTests();
+  await runHealthTests();
 
   console.log("\n=== Todos los tests completados ===\n");
 }

@@ -37,12 +37,12 @@ const handleJWTError = () => new AppError("Invalid token. Please login again", 4
 
 const handleMulterError = (err) => {
   if (err.code === "LIMIT_FILE_SIZE") {
-    return new AppError("La imagen es demasiado grande. Intentá con una imagen más pequeña.", 400);
+    return new AppError("El archivo es demasiado grande.", 400);
   }
   if (err.code === "LIMIT_UNEXPECTED_FILE") {
-    return new AppError("Tipo de archivo no válido. Solo se permiten imágenes (JPEG, PNG, WebP, GIF).", 400);
+    return new AppError("Archivo no permitido.", 400);
   }
-  return new AppError("Error al subir la imagen. Intentá con otra imagen.", 400);
+  return new AppError("Error al subir el archivo. Intentá con otro archivo.", 400);
 };
 
 // eslint-disable-next-line no-unused-vars

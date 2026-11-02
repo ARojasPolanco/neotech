@@ -1,9 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import DiscountCodeBox from "../components/DiscountCodeBox.jsx";
+import ProductImage from "../components/ProductImage.jsx";
 import { useCart } from "../context/CartContext.jsx";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, totalPrice } = useCart();
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    totalPrice,
+    appliedCode,
+    discountAmount,
+    finalTotal,
+  } = useCart();
   const navigate = useNavigate();
 
   if (items.length === 0) {
@@ -17,7 +28,7 @@ export default function CartPage() {
         <p className="text-sm text-muted">Agregá productos para empezar a comprar.</p>
         <Link
           to="/products"
-          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+          className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
         >
           Ver productos
         </Link>
@@ -39,10 +50,15 @@ export default function CartPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100, height: 0, marginBottom: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="flex flex-col gap-4 rounded-card border border-border bg-white p-4 sm:flex-row sm:items-center"
+              className="flex flex-col gap-4 rounded-card border border-border bg-card p-4 sm:flex-row sm:items-center"
             >
               <div className="h-24 w-full flex-shrink-0 overflow-hidden rounded-lg bg-surface sm:h-20 sm:w-20">
-                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                <ProductImage
+                  src={item.image || null}
+                  alt={item.name}
+                  className="h-full w-full"
+                  imgClassName="h-full w-full object-cover"
+                />
               </div>
 
               <div className="flex-1">
@@ -50,9 +66,21 @@ export default function CartPage() {
                 {item.color && (
                   <p className="text-sm text-muted">Color: {item.color}</p>
                 )}
-                <p className="text-sm font-semibold">
-                  ${Number(item.price).toLocaleString("es-AR")}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold">
+                    ${Number(item.price).toLocaleString("es-AR")}
+                  </p>
+                  {item.discountActive && (
+                    <>
+                      <span className="text-xs text-muted line-through">
+                        ${Number(item.originalPrice).toLocaleString("es-AR")}
+                      </span>
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-fg">
+                        {item.discountPercent}% OFF
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center justify-between gap-4 sm:justify-start">
@@ -81,9 +109,10 @@ export default function CartPage() {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={() => removeItem(item.key)}
-                  className="cursor-pointer text-sm text-muted hover:text-error transition-colors"
+                  className="cursor-pointer text-muted transition-colors hover:text-error"
+                  aria-label={`Quitar ${item.name}`}
                 >
-                  ✕
+                  <X size={16} />
                 </motion.button>
               </div>
             </motion.div>
@@ -93,17 +122,31 @@ export default function CartPage() {
 
       <motion.div
         layout
-        className="mt-6 flex items-center justify-between rounded-card border border-border bg-white p-4"
+        className="mt-6 rounded-card border border-border bg-card p-4"
       >
-        <p className="text-lg font-semibold">Total</p>
-        <p className="text-2xl font-bold">${totalPrice.toLocaleString("es-AR")}</p>
+        <div className="flex items-center justify-between text-sm text-muted">
+          <span>Subtotal</span>
+          <span>${totalPrice.toLocaleString("es-AR")}</span>
+        </div>
+        {appliedCode && (
+          <div className="mt-1 flex items-center justify-between text-sm text-success">
+            <span>Descuento ({appliedCode.discountPercent}%)</span>
+            <span>{`-$${discountAmount.toLocaleString("es-AR")}`}</span>
+          </div>
+        )}
+        <div className="mt-2 flex items-center justify-between text-lg font-bold">
+          <span>Total</span>
+          <span>${finalTotal.toLocaleString("es-AR")}</span>
+        </div>
       </motion.div>
+
+      <DiscountCodeBox className="mt-4 rounded-card border border-border bg-card p-4" />
 
       <motion.button
         layout
         whileTap={{ scale: 0.98 }}
         onClick={() => navigate("/checkout")}
-        className="mt-4 w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark"
+        className="mt-4 w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark"
       >
         Finalizar Compra
       </motion.button>

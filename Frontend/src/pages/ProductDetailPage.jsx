@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ColorSelector from "../components/ColorSelector.jsx";
+import ProductImage from "../components/ProductImage.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { getProduct, getProductVariants } from "../services/product.service.js";
@@ -43,37 +44,43 @@ export default function ProductDetailPage() {
     setSelected(null);
   };
 
-  const placeholder = "https://placehold.co/600x600/e0e0e0/666?text=Neo+Tech";
-  const displayImg = selected?.imageUrl || product?.imageUrl || placeholder;
+  const displayImg = selected?.imageUrl || product?.imageUrl || null;
 
+  const variantImages = variants.filter((v) => v.imageUrl);
+  const baseOffset = product?.imageUrl ? 1 : 0;
   const imageList = [
-    product?.imageUrl || placeholder,
-    ...variants.filter((v) => v.imageUrl).map((v) => v.imageUrl),
+    ...(product?.imageUrl ? [product.imageUrl] : []),
+    ...variantImages.map((v) => v.imageUrl),
   ];
 
   const currentImageIndex = selected
-    ? variants.filter((v) => v.imageUrl).indexOf(selected) + 1
+    ? variantImages.indexOf(selected) + baseOffset
     : 0;
 
+  const selectionFromIndex = (index) => {
+    const variantIndex = index - baseOffset;
+    return variantIndex >= 0 ? variantImages[variantIndex] : null;
+  };
+
   const nextImage = () => {
-    const nextIdx = (currentImageIndex + 1) % imageList.length;
-    if (nextIdx === 0) {
-      setSelected(null);
-    } else {
-      setSelected(variants.filter((v) => v.imageUrl)[nextIdx - 1]);
-    }
+    if (imageList.length === 0) return;
+    setSelected(selectionFromIndex((currentImageIndex + 1) % imageList.length));
   };
 
   const prevImage = () => {
-    const prevIdx = (currentImageIndex - 1 + imageList.length) % imageList.length;
-    if (prevIdx === 0) {
-      setSelected(null);
-    } else {
-      setSelected(variants.filter((v) => v.imageUrl)[prevIdx - 1]);
-    }
+    if (imageList.length === 0) return;
+    setSelected(
+      selectionFromIndex(
+        (currentImageIndex - 1 + imageList.length) % imageList.length,
+      ),
+    );
   };
 
-  const stock = selected ? selected.stock : null;
+  const stock = selected
+    ? selected.stock
+    : product?.stock !== undefined && product?.stock !== null
+      ? Number(product.stock)
+      : null;
 
   if (loading) {
     return (
@@ -89,7 +96,7 @@ export default function ProductDetailPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <p className="text-lg text-muted">{error || "Producto no encontrado"}</p>
-        <Link to="/products" className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-fg">
+        <Link to="/products" className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-accent-fg">
           Volver al catálogo
         </Link>
       </div>
@@ -104,23 +111,40 @@ export default function ProductDetailPage() {
 
       <div className="flex flex-col gap-8 md:flex-row">
         <div className="relative aspect-square overflow-hidden rounded-card bg-surface md:w-1/2">
-          <img src={displayImg} alt={product.name} className="h-full w-full object-cover" />
+          <ProductImage
+            src={displayImg}
+            alt={product.name}
+            className="h-full w-full"
+            imgClassName="h-full w-full object-cover"
+          />
 
           {imageList.length > 1 && (
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 shadow transition-colors hover:bg-white"
+                className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 shadow transition-colors hover:bg-card"
               >
                 <ChevronLeft size={20} />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 shadow transition-colors hover:bg-white"
+                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 shadow transition-colors hover:bg-card"
               >
                 <ChevronRight size={20} />
               </button>
             </>
+          )}
+
+          {stock === 0 && (
+            <span className="absolute bottom-3 left-3 rounded-full bg-error px-4 py-1.5 text-sm font-bold text-white shadow-sm">
+              Sin stock
+            </span>
+          )}
+
+          {stock === 1 && (
+            <span className="absolute bottom-3 left-3 rounded-full bg-[#bcff7b] px-4 py-1.5 text-sm font-bold text-accent-fg shadow-sm">
+              Última unidad
+            </span>
           )}
         </div>
 
@@ -132,7 +156,7 @@ export default function ProductDetailPage() {
 
           {product.discountActive ? (
             <div className="flex items-center gap-3">
-              <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-fg">
+              <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-fg">
                 {Number(product.discountPercent)}% OFF
               </span>
               <span className="text-lg text-muted line-through">
@@ -165,7 +189,7 @@ export default function ProductDetailPage() {
           <button
             onClick={handleAdd}
             disabled={stock !== null && stock <= 0}
-            className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
             Agregar al carrito
           </button>

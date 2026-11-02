@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Headphones, Keyboard, Mic, Speaker, Zap, Cable, Smartphone } from "lucide-react";
+import BackgroundVideo from "../components/BackgroundVideo.jsx";
 import FeaturedCarousel from "../components/FeaturedCarousel.jsx";
 import HeroSlider from "../components/HeroSlider.jsx";
 import { getFeaturedProducts, getFeaturedHighlight } from "../services/product.service.js";
+import { getSiteSettings } from "../services/site.service.js";
 
 const categories = [
   { name: "Auriculares", desc: "Sumergite en el sonido", icon: Headphones },
@@ -19,22 +21,30 @@ const categories = [
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [highlight, setHighlight] = useState(null);
+  const [siteSettings, setSiteSettings] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       getFeaturedProducts().catch(() => []),
       getFeaturedHighlight().catch(() => null),
+      getSiteSettings().catch(() => null),
     ])
-      .then(([products, hl]) => {
+      .then(([products, hl, settings]) => {
         setFeaturedProducts(products);
         setHighlight(hl);
+        setSiteSettings(settings);
       })
       .finally(() => setLoading(false));
   }, []);
 
   return (
     <div>
+      <BackgroundVideo
+        src={siteSettings?.videoUrl}
+        enabled={siteSettings?.videoEnabled}
+      />
+
       <HeroSlider featuredProduct={highlight} />
 
       {featuredProducts.length > 0 && (
@@ -78,7 +88,7 @@ export default function HomePage() {
             >
               <motion.div
                 whileHover={{ y: -4 }}
-                className="flex flex-col items-center rounded-card border border-border bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+                className="flex flex-col items-center rounded-card border border-border bg-card p-6 text-center shadow-sm transition-shadow hover:shadow-md"
               >
                 <cat.icon size={28} className="text-accent" />
                 <h3 className="mt-3 font-heading text-lg font-semibold">{cat.name}</h3>

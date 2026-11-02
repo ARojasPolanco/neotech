@@ -12,6 +12,13 @@ const createProductSchema = z.object({
   isActive: z.boolean().optional(),
   category: z.string().optional(),
   subcategory: z.string().max(100).optional().nullable(),
+  color: z.string().max(50).optional().nullable(),
+  colorHex: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, { message: "Invalid hex color" })
+    .optional()
+    .nullable(),
+  stock: z.number().int().min(0, { message: "Stock cannot be negative" }).optional().nullable(),
 });
 
 const updateProductSchema = createProductSchema.partial();

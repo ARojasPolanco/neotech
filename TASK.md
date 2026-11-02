@@ -439,3 +439,155 @@ export function callHandler(handler, body = {}, query = {}) {
 | `test-orders.js` | creación de orden, orderNumber, estados | ✅ crear orden con items, ✅ orderNumber formato NT-000001, ❌ crear orden sin items |
 | `test-payments.js` | createPreference, webhook, idempotencia | ✅ webhook recibe notificación y cambia a paid, ✅ webhook duplicado no re-procesa, ❤ webhook con firma inválida |
 | `test-notifications.js` | WhatsApp, mail, PDF | ✅ sendOwnerAlert genera mensaje correcto, ✅ generateReceipt crea PDF, ❌ enviar sin WHATSAPP_TOKEN |
+
+---
+
+# FASE 7+ — Requerimientos del cliente
+
+Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (integrado + manual), se commitea con Semantic Commits y se pushea a `dev`. Al cerrar todas las fases, `dev` se mergea a `main` para deploy.
+
+## Decisiones acordadas
+
+- **Marca:** "LIER" en el copyright del footer es correcta y NO se toca. El `NEO TECH` del navbar/footer es la marca de la tienda.
+- **Buscador:** en mobile (lupa) y desktop (input), solo por nombre, navega a `/products?search=`.
+- **Dark mode:** incluye storefront y admin; default según sistema operativo con toggle persistido. Paleta: `#043f51` fondo, `#192734` superficies/tarjetas, `#bcff7b` acento.
+- **Tests frontend:** se agrega Vitest + React Testing Library como devDependencies.
+- **Stock:** se agrega `stock` al producto base. `ProductVariant.stock` sigue existiendo. "Última unidad" cuando el stock disponible es 1.
+- **Color base:** `color` y `colorHex` opcionales en `Product`; la imagen del color base es `product.imageUrl`.
+- **Descuentos masivos:** se implementan como campaña con nombre y productos asociados, para poder quitarlos en bloque. Pisan descuentos individuales con aviso.
+- **Códigos:** descuentan sobre el total del carrito, se combinan con descuentos de producto (sobre el precio ya descontado), un código por pedido, guest permitido, vencimiento desde la creación, usos globales, se consumen al confirmar el pago con revalidación, prorrateo en los `unit_price` de Mercado Pago.
+- **Imagen en resumen:** se muestra en la pantalla de pedido confirmado y en el detalle admin. En PDF solo si es JPG/PNG (si es WebP se omite). Mail sin cambios.
+- **Video:** bloque full-width arriba del hero, autoplay/muted/loop/sin controles, MP4 hasta 25 MB, switch independiente, poster/fallback, `prefers-reduced-motion`.
+- **Configuración:** tabla `Settings` singleton (video, logo y futuros ajustes).
+- **Tests backend:** se mantiene el runner casero y se agregan suites.
+- **DB de test:** `.env.test` con base separada; los tests nunca corren si `NODE_ENV=production`.
+- **Git:** rama `feature/*` por fase desde `dev`, merge a `dev`; al final `dev` → `main`.
+- **Esquema:** se empieza a usar migraciones Sequelize para los cambios de esta etapa en lugar de `sync({ alter: true })`.
+
+## Fases
+
+### Fase A — Búsquedas y UI de bajo riesgo
+
+**Requerimientos:** 1, 5, 6, 7, 11.
+
+- [x] Buscador en navbar: lupa en mobile, input en desktop. Envía a `/products?search=`.
+- [x] Buscador en gestión de productos admin (debounce, server-side).
+- [x] Logo real `Frontend/public/logo.png` en navbar, footer y placeholders de producto.
+- [x] Cartel "Última unidad" cuando el stock disponible es 1 (variante seleccionada o producto base).
+- [x] Cartel de descuento consistente en carrito, mini-carrito y checkout (precio tachado + % OFF).
+
+**Tests integrados (frontend):**
+- Navbar mobile: abrir lupa, escribir y navegar con `search`.
+- AdminProducts: la búsqueda llama a la API con `search` y renderiza resultados.
+- ProductCard: muestra "Última unidad" con stock 1 y no lo muestra con stock 2.
+- CartPage/MiniCart: muestra precio original tachado y precio final con descuento.
+- Placeholder: producto sin imagen renderiza el logo local, no `placehold.co`.
+
+**Prueba manual:** mobile y desktop; búsqueda con y sin resultados; producto sin imagen; producto con stock 1; producto con descuento agregado al carrito.
+
+**Criterio de aceptación:** no queda ninguna referencia a `placehold.co`; la búsqueda funciona desde cualquier página; lint y build sin errores.
+
+### Fase B — Dark mode
+
+**Requerimiento:** 2.
+
+- [x] Tokens dark en `index.css` + `@custom-variant dark` (Tailwind v4).
+- [x] Toggle en navbar (desktop y mobile), persistencia en `localStorage`, default según sistema.
+- [x] Sin flash inicial (script inline antes de React).
+- [x] Barrido de `bg-white` y colores hardcodeados en storefront y admin.
+- [x] Logo `logo_dark` automático en modo oscuro.
+
+**Tests integrados:** toggle cambia la clase `dark`, persiste y respeta `prefers-color-scheme`.
+
+**Prueba manual:** todas las pantallas del storefront y admin en claro/oscuro, incluyendo modales, toasts, skeletons y estados vacíos.
+
+**Criterio de aceptación:** no quedan parches blancos ni texto ilegible en modo oscuro.
+
+### Fase C — Datos de producto y orden
+
+**Requerimientos:** 4, 6 (parte 2), 8.
+
+- [x] `Product.color` y `Product.colorHex` opcionales; variante "original" con color en el selector.
+- [x] `Product.stock` para productos sin variantes.
+- [x] `OrderItem.imageUrl` (snapshot) + imagen en confirmación de pedido, pago y detalle admin.
+- [x] Migraciones Sequelize para los nuevos campos (`npm run migrate`).
+- [x] Actualizar `AGENTS.md` (stock base y variantes).
+
+**Tests integrados (backend):** producto con color base; orden guarda `imageUrl`; producto sin variante descuenta stock base; "última unidad" con stock base = 1.
+
+**Prueba manual:** crear producto con color base, comprarlo y verificar imagen en el resumen y en el admin; producto sin variantes con stock 1.
+
+**Criterio de aceptación:** órdenes nuevas muestran imagen; productos viejos usan logo de fallback.
+
+**Datos demo:** `npm run seed:visual` crea/actualiza el admin demo, productos de prueba, un pedido pagado con imágenes, el código `NEO-DEMO10` y un pedido pendiente con ese código. No se ejecuta en producción salvo `ALLOW_DEMO_SEED=true`.
+
+### Fase D — Descuentos
+
+**Requerimientos:** 3, 7, 10.
+
+- [x] Campaña de descuento masivo: nombre, porcentaje, vencimiento y selección múltiple de productos.
+- [x] Modelo `DiscountCode`: código, porcentaje, `maxUses`, `uses`, `expiresAt`, `isActive`.
+- [x] CRUD admin de códigos, con usos restantes y vencimiento.
+- [x] Validación de código en checkout + rate limit.
+- [x] `Order.subtotal`, `discountCode`, `discountAmount`; impacto en total, MP, mail, PDF y admin.
+- [x] Consumo de uso al confirmar pago, atómico e idempotente.
+- [x] Carteles de descuento consistentes en todas las superficies.
+- [x] Pantalla admin de descuentos (códigos + campañas).
+
+**Tests integrados (backend):** código válido/vencido/agotado/inexistente; un solo uso con dos órdenes concurrentes; idempotencia del webhook; total con descuento de producto + código; prorrateo en MP; campaña masiva pisa descuentos individuales.
+
+**Prueba manual:** generar códigos de 1 y 10 usos, con 24/48/72 h; comprar como guest; verificar recibo, mail y MP; reintentar webhook.
+
+**Criterio de aceptación:** ningún uso se consume antes del pago; no hay doble descuento ni doble mail.
+
+### Fase E — Configuración del sitio y video
+
+**Requerimiento:** 9.
+
+- [x] Modelo `Setting` singleton (`videoUrl`, `videoEnabled`, `logoUrl`).
+- [x] Upload de video a Cloudinary (`resource_type: "video"`, límite 25 MB, MP4/WebM).
+- [x] Pantalla admin: subir, reemplazar, habilitar/deshabilitar y quitar.
+- [x] Home: video full-width arriba; hero debajo; sin video o deshabilitado, hero vuelve arriba.
+- [x] Poster, fallback, `muted`, `playsInline`, loop y `prefers-reduced-motion`.
+
+**Tests integrados:** lectura pública de settings; upload rechaza formato/tamaño inválido; flag deshabilitado oculta el video.
+
+**Prueba manual:** subir video, recargar home, verificar el layout en mobile y desktop; deshabilitar y confirmar que el hero vuelve arriba.
+
+**Criterio de aceptación:** el home no se rompe sin video y el video no bloquea la carga del catálogo.
+
+### Fase F — Pantalla de carga por espera de DB
+
+**Requerimiento:** 12.
+
+- [x] `GET /health` (sin auth) que verifique DB.
+- [x] Splash inicial con logo y mensaje de "Despertando el servidor", reintento y timeout.
+- [x] No bloquear para siempre: ofrecer reintentar o continuar.
+
+**Tests integrados:** health OK y health con DB caída; splash desaparece al responder y muestra reintento al agotar el timeout.
+
+**Prueba manual:** simular cold start (backend apagado) y verificar la UX; recarga normal sin splash innecesario.
+
+**Criterio de aceptación:** ningún usuario queda en pantalla de carga infinita.
+
+## Flujo de trabajo por fase
+
+1. Rama `feature/fase-x-...` desde `dev`.
+2. Implementación backend/frontend.
+3. Tests integrados nuevos + suite existente en verde.
+4. Prueba manual con el checklist de la fase.
+5. `npm run lint` (backend y frontend) y `npm run build` (frontend).
+6. Commit semántico y merge a `dev`. Push de `dev`.
+7. Marcar la fase como completada en este archivo.
+
+## Checklist de fases
+
+```
+[x] Fase A - Búsquedas y UI de bajo riesgo
+[x] Fase B - Dark mode
+[x] Fase C - Datos de producto y orden
+[x] Fase D - Descuentos
+[x] Fase E - Configuración del sitio y video
+[x] Fase F - Pantalla de carga por espera de DB
+[ ] Deploy - merge dev → main
+```

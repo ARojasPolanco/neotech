@@ -1,20 +1,31 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ProductImage from "./ProductImage.jsx";
 import VariantDots from "./VariantDots.jsx";
 
 export default function ProductCard({ product }) {
   const [imageIndex, setImageIndex] = useState(-1);
   const variants = product.ProductVariants || [];
-  const placeholder = "https://placehold.co/400x400/e0e0e0/666?text=Neo+Tech";
 
   const images = [
-    product.imageUrl || placeholder,
+    product.imageUrl,
     ...variants.filter((v) => v.imageUrl).map((v) => v.imageUrl),
-  ];
+  ].filter(Boolean);
 
-  const currentImg = images[Math.max(0, imageIndex)] || placeholder;
+  const currentImg =
+    images.length > 0
+      ? images[Math.min(Math.max(imageIndex, 0), images.length - 1)]
+      : null;
   const hasMultiple = images.length > 1;
+
+  const totalStock = variants.length
+    ? variants.reduce((sum, v) => sum + Number(v.stock || 0), 0)
+    : product.stock !== undefined && product.stock !== null
+      ? Number(product.stock)
+      : null;
+  const isLastUnit = totalStock === 1;
+  const isOutOfStock = totalStock === 0;
 
   const nextImage = (e) => {
     e.preventDefault();
@@ -29,18 +40,31 @@ export default function ProductCard({ product }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-card border border-border bg-white transition-shadow hover:shadow-lg"
+      className="group flex flex-col overflow-hidden rounded-card border border-border bg-card transition-shadow hover:shadow-lg"
     >
       <div className="relative aspect-square overflow-hidden bg-surface">
-        <img
+        <ProductImage
           src={currentImg}
           alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full"
+          imgClassName="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
 
         {product.discountActive && (
-          <span className="absolute left-2 top-2 z-10 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-fg">
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-accent-fg">
             {Number(product.discountPercent)}% OFF
+          </span>
+        )}
+
+        {isOutOfStock && (
+          <span className="absolute bottom-2 left-2 z-10 rounded-full bg-error px-3 py-1 text-xs font-bold text-white shadow-sm">
+            Sin stock
+          </span>
+        )}
+
+        {isLastUnit && (
+          <span className="absolute bottom-2 left-2 z-10 rounded-full bg-[#bcff7b] px-3 py-1 text-xs font-bold text-accent-fg shadow-sm">
+            Última unidad
           </span>
         )}
 
@@ -48,13 +72,13 @@ export default function ProductCard({ product }) {
           <>
             <button
               onClick={prevImage}
-              className="absolute left-1 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute left-1 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 opacity-0 transition-opacity group-hover:opacity-100"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 opacity-0 transition-opacity group-hover:opacity-100"
             >
               <ChevronRight size={16} />
             </button>
@@ -90,6 +114,7 @@ export default function ProductCard({ product }) {
               currentIndex={imageIndex}
               onSelect={setImageIndex}
               size="sm"
+              baseColorHex={product.colorHex}
             />
           )}
         </div>

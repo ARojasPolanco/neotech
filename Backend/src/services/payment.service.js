@@ -1,6 +1,8 @@
 import { client, Preference } from "../config/mercadopago.js";
+import Product from "../models/productModel.js";
 import ProductVariant from "../models/productVariantModel.js";
 import { envs } from "../config/enviroments/enviroments.js";
+import { DiscountService } from "./discount.service.js";
 
 async function fetchPaymentById(paymentId) {
   const response = await fetch(
@@ -89,7 +91,70 @@ async function sendOrderNotifications(order) {
   }
 }
 
-async function handleOrderPaid(order) {
+export function buildPreferenceItems(order) {
+  const orderItems = order.OrderItems || [];
+  const subtotal = Number(
+    order.subtotal ??
+      orderItems.reduce((sum, item) => sum + Number(item.subtotal), 0),
+  );
+  const discountAmount = Number(order.discountAmount || 0);
+
+  if (discountAmount <= 0 || subtotal <= 0) {
+    return orderItems.map((item) => ({
+      title: item.color
+        ? `${item.productName} - ${item.color}`
+        : item.productName,
+      quantity: Number(item.quantity),
+      unit_price: Number(item.unitPrice),
+      currency_id: "ARS",
+    }));
+  }
+
+  const subtotalCents = Math.round(subtotal * 100);
+  const discountCents = Math.round(discountAmount * 100);
+  let remainingDiscount = discountCents;
+
+  return orderItems.map((item, index) => {
+    const itemCents = Math.round(Number(item.subtotal) * 100);
+    const isLast = index === orderItems.length - 1;
+    const itemDiscount = isLast
+      ? remainingDiscount
+      : Math.round((itemCents * discountCents) / subtotalCents);
+
+    remainingDiscount -= itemDiscount;
+    const adjustedCents = Math.max(0, itemCents - itemDiscount);
+    const quantity = Number(item.quantity);
+
+    return {
+      title: `${item.productName}${item.color ? ` - ${item.color}` : ""} (x${quantity})`,
+      quantity: 1,
+      unit_price: adjustedCents / 100,
+      currency_id: "ARS",
+    };
+  });
+}
+
+export async function decrementOrderStock(order) {
+  for (const item of order.OrderItems || []) {
+    if (item.productVariantId) {
+      await ProductVariant.decrement("stock", {
+        by: item.quantity,
+        where: { id: item.productVariantId },
+      });
+      continue;
+    }
+
+    const product = await Product.findByPk(item.productId);
+    if (product && product.stock !== null && product.stock !== undefined) {
+      await product.decrement("stock", { by: item.quantity });
+    }
+  }
+}
+
+async function handleOrderPaid(
+  order,
+  { throwOnNotificationError = false, skipNotifications = false } = {},
+) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
 
@@ -101,50 +166,57 @@ async function handleOrderPaid(order) {
   if (order.status !== "paid") {
     console.log(`[handleOrderPaid] marking order ${order.orderNumber} as paid`);
     await orderService.updateStatus(order, "paid");
+    await decrementOrderStock(order);
 
-    for (const item of order.OrderItems) {
-      if (item.productVariantId) {
-        await ProductVariant.decrement("stock", {
-          by: item.quantity,
-          where: { id: item.productVariantId },
-        });
+    if (order.discountCodeId && !order.discountCodeConsumedAt) {
+      const discountService = new DiscountService();
+      const consumed = await discountService.consumeCode(order.discountCodeId);
+
+      if (consumed) {
+        await order.update({ discountCodeConsumedAt: new Date() });
+      } else {
+        console.warn(
+          `[handleOrderPaid] no se pudo consumir el código ${order.discountCode} (vencido, agotado o inactivo)`,
+        );
       }
     }
   } else {
     console.log(`[handleOrderPaid] order ${order.orderNumber} already paid, sending notifications only`);
   }
 
+  if (skipNotifications) return;
+
   try {
     await sendOrderNotifications(order);
   } catch (err) {
     console.error("[handleOrderPaid] notification error:", err);
+    if (throwOnNotificationError) throw err;
   }
 }
 
 export class PaymentService {
   async createPreference(order, frontendUrl) {
-    const items = order.OrderItems.map((item) => ({
-      title: item.color
-        ? `${item.productName} - ${item.color}`
-        : item.productName,
-      quantity: item.quantity,
-      unit_price: Number(item.unitPrice),
-      currency_id: "ARS",
-    }));
+    const items = buildPreferenceItems(order);
+    const notificationBaseUrl = envs.BASE_URL || frontendUrl;
 
-    const preference = await new Preference(client).create({
-      body: {
-        items,
-        external_reference: order.orderNumber,
-        auto_return: "approved",
-        notification_url: `${envs.BASE_URL}/api/v1/payments/webhook`,
-        back_urls: {
-          success: `${frontendUrl}/payment-result`,
-          failure: `${frontendUrl}/cart`,
-          pending: `${frontendUrl}/payment-result`,
-        },
+    const body = {
+      items,
+      external_reference: order.orderNumber,
+      notification_url: `${notificationBaseUrl}/api/v1/payments/webhook`,
+      back_urls: {
+        success: `${frontendUrl}/payment-result`,
+        failure: `${frontendUrl}/cart`,
+        pending: `${frontendUrl}/payment-result`,
       },
-    });
+    };
+
+    // Mercado Pago exige URLs HTTPS para el retorno automático.
+    // En local (http://localhost) el usuario vuelve manualmente desde el checkout.
+    if (frontendUrl.startsWith("https://")) {
+      body.auto_return = "approved";
+    }
+
+    const preference = await new Preference(client).create({ body });
 
     await order.update({ preferenceId: preference.id });
     return preference;
@@ -207,7 +279,7 @@ export class PaymentService {
     return { found: true, status: order.status };
   }
 
-  async simulateOrderPaid(orderNumber, force = false) {
+  async simulateOrderPaid(orderNumber, force = false, notify = true) {
     const isProdWithoutSimulate = process.env.NODE_ENV === "production" && process.env.ALLOW_SIMULATE_DEV !== "true";
     if (isProdWithoutSimulate) {
       throw new Error("Payment simulation is not allowed in production");
@@ -226,7 +298,7 @@ export class PaymentService {
       return { simulated: false, status: "paid", message: "Order already paid. Use ?force=true to resend notifications." };
     }
 
-    await handleOrderPaid(order);
+    await handleOrderPaid(order, { skipNotifications: !notify });
     return { simulated: true, status: "paid" };
   }
 
@@ -240,11 +312,7 @@ export class PaymentService {
       throw new Error("Order not found");
     }
 
-    if (order.status !== "paid") {
-      await orderService.updateStatus(order, "paid");
-    }
-
-    await sendOrderNotifications(order);
+    await handleOrderPaid(order, { throwOnNotificationError: true });
     return { notified: true, orderNumber, status: "paid" };
   }
 }
