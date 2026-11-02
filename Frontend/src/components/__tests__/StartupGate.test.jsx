@@ -4,6 +4,22 @@ import userEvent from "@testing-library/user-event";
 import StartupGate from "../StartupGate.jsx";
 
 describe("StartupGate", () => {
+  it("muestra mensajes de carga mientras espera al backend", () => {
+    const healthCheck = vi.fn(() => new Promise(() => {}));
+    const { unmount } = render(
+      <StartupGate healthCheck={healthCheck}>
+        <p>App lista</p>
+      </StartupGate>,
+    );
+
+    expect(
+      screen.getByText("Conectando con la tienda..."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Cargando productos...")).toBeInTheDocument();
+
+    unmount();
+  });
+
   it("muestra la app cuando el health check responde", async () => {
     const healthCheck = vi.fn().mockResolvedValue();
 

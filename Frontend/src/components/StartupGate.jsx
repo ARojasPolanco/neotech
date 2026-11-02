@@ -6,6 +6,13 @@ const DEFAULT_TIMEOUT_MS = 60000;
 const DEFAULT_RETRY_DELAY = 2000;
 const REQUEST_TIMEOUT_MS = 5000;
 
+const LOADING_MESSAGES = [
+  "Cargando productos...",
+  "Preparando la tienda...",
+  "Despertando el servidor...",
+  "Casi listo...",
+];
+
 async function defaultHealthCheck() {
   await api.get("/health", { timeout: REQUEST_TIMEOUT_MS });
 }
@@ -17,7 +24,7 @@ export default function StartupGate({
   retryDelay = DEFAULT_RETRY_DELAY,
 }) {
   const [status, setStatus] = useState("checking");
-  const [slow, setSlow] = useState(false);
+  const [messageIndex, setMessageIndex] = useState(0);
   const [skip, setSkip] = useState(false);
   const attemptsRef = useRef(0);
   const deadlineRef = useRef(0);
@@ -63,9 +70,12 @@ export default function StartupGate({
   useEffect(() => {
     if (status !== "checking") return;
 
-    setSlow(false);
-    const timer = setTimeout(() => setSlow(true), 3000);
-    return () => clearTimeout(timer);
+    setMessageIndex(0);
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [status]);
 
   if (status === "ready" || skip) return children;
@@ -81,10 +91,8 @@ export default function StartupGate({
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-accent motion-reduce:animate-none" />
           <div>
             <p className="text-sm font-medium">Conectando con la tienda...</p>
-            <p className="mt-1 text-xs text-muted">
-              {slow
-                ? "El servidor estaba dormido. Puede tardar unos segundos en despertar."
-                : "Esto toma solo un momento."}
+            <p className="mt-1 text-xs text-muted" aria-live="polite">
+              {LOADING_MESSAGES[messageIndex]}
             </p>
           </div>
         </>
