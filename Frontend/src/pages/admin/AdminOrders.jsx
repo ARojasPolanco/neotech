@@ -287,6 +287,26 @@ function OrderDetail({ order, onClose }) {
         </div>
 
         <div className="border-t border-border pt-4">
+          {Number(order.discountAmount || 0) > 0 && (
+            <div className="mb-1 space-y-1 text-sm">
+              <div className="flex items-center justify-between text-muted">
+                <span>Subtotal</span>
+                <span>${Number(order.subtotal || 0).toLocaleString("es-AR")}</span>
+              </div>
+              <div className="flex items-center justify-between text-success">
+                <span>
+                  Descuento
+                  {order.discountCode
+                    ? ` (${order.discountCode} -${Number(order.discountPercent)}%)`
+                    : ""}
+                </span>
+                <span>
+                  {`-$${Number(order.discountAmount).toLocaleString("es-AR")}`}
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <span className="text-lg font-semibold">Total</span>
             <span className="text-2xl font-bold">

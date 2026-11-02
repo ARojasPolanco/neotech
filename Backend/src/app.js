@@ -53,8 +53,20 @@ const authLimiter = rateLimit({
   skipFailedRequests: true,
 });
 
+const discountCodeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: envs.NODE_ENV === "test" ? 10000 : 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: "fail",
+    message: "Demasiados intentos de código. Probá de nuevo en un minuto.",
+  },
+});
+
 app.use("/api/v1", globalLimiter);
 app.use("/api/v1/auth/login", authLimiter);
+app.use("/api/v1/discount-codes/validate", discountCodeLimiter);
 
 app.use(express.json());
 

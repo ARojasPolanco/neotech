@@ -245,7 +245,14 @@ export default function PaymentResultPage() {
       </motion.p>
 
       <motion.div variants={itemVariants} className="mt-6">
-        <OrderItemsSummary items={order.OrderItems} total={order.total} />
+        <OrderItemsSummary
+          items={order.OrderItems}
+          total={order.total}
+          subtotal={order.subtotal}
+          discountCode={order.discountCode}
+          discountPercent={order.discountPercent}
+          discountAmount={order.discountAmount}
+        />
       </motion.div>
 
       <motion.p variants={itemVariants} className="mt-4 text-sm text-muted">

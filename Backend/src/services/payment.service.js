@@ -2,6 +2,7 @@ import { client, Preference } from "../config/mercadopago.js";
 import Product from "../models/productModel.js";
 import ProductVariant from "../models/productVariantModel.js";
 import { envs } from "../config/enviroments/enviroments.js";
+import { DiscountService } from "./discount.service.js";
 
 async function fetchPaymentById(paymentId) {
   const response = await fetch(
@@ -90,6 +91,49 @@ async function sendOrderNotifications(order) {
   }
 }
 
+export function buildPreferenceItems(order) {
+  const orderItems = order.OrderItems || [];
+  const subtotal = Number(
+    order.subtotal ??
+      orderItems.reduce((sum, item) => sum + Number(item.subtotal), 0),
+  );
+  const discountAmount = Number(order.discountAmount || 0);
+
+  if (discountAmount <= 0 || subtotal <= 0) {
+    return orderItems.map((item) => ({
+      title: item.color
+        ? `${item.productName} - ${item.color}`
+        : item.productName,
+      quantity: Number(item.quantity),
+      unit_price: Number(item.unitPrice),
+      currency_id: "ARS",
+    }));
+  }
+
+  const subtotalCents = Math.round(subtotal * 100);
+  const discountCents = Math.round(discountAmount * 100);
+  let remainingDiscount = discountCents;
+
+  return orderItems.map((item, index) => {
+    const itemCents = Math.round(Number(item.subtotal) * 100);
+    const isLast = index === orderItems.length - 1;
+    const itemDiscount = isLast
+      ? remainingDiscount
+      : Math.round((itemCents * discountCents) / subtotalCents);
+
+    remainingDiscount -= itemDiscount;
+    const adjustedCents = Math.max(0, itemCents - itemDiscount);
+    const quantity = Number(item.quantity);
+
+    return {
+      title: `${item.productName}${item.color ? ` - ${item.color}` : ""} (x${quantity})`,
+      quantity: 1,
+      unit_price: adjustedCents / 100,
+      currency_id: "ARS",
+    };
+  });
+}
+
 export async function decrementOrderStock(order) {
   for (const item of order.OrderItems || []) {
     if (item.productVariantId) {
@@ -107,7 +151,7 @@ export async function decrementOrderStock(order) {
   }
 }
 
-async function handleOrderPaid(order) {
+async function handleOrderPaid(order, { throwOnNotificationError = false } = {}) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
 
@@ -120,6 +164,19 @@ async function handleOrderPaid(order) {
     console.log(`[handleOrderPaid] marking order ${order.orderNumber} as paid`);
     await orderService.updateStatus(order, "paid");
     await decrementOrderStock(order);
+
+    if (order.discountCodeId && !order.discountCodeConsumedAt) {
+      const discountService = new DiscountService();
+      const consumed = await discountService.consumeCode(order.discountCodeId);
+
+      if (consumed) {
+        await order.update({ discountCodeConsumedAt: new Date() });
+      } else {
+        console.warn(
+          `[handleOrderPaid] no se pudo consumir el código ${order.discountCode} (vencido, agotado o inactivo)`,
+        );
+      }
+    }
   } else {
     console.log(`[handleOrderPaid] order ${order.orderNumber} already paid, sending notifications only`);
   }
@@ -128,19 +185,13 @@ async function handleOrderPaid(order) {
     await sendOrderNotifications(order);
   } catch (err) {
     console.error("[handleOrderPaid] notification error:", err);
+    if (throwOnNotificationError) throw err;
   }
 }
 
 export class PaymentService {
   async createPreference(order, frontendUrl) {
-    const items = order.OrderItems.map((item) => ({
-      title: item.color
-        ? `${item.productName} - ${item.color}`
-        : item.productName,
-      quantity: item.quantity,
-      unit_price: Number(item.unitPrice),
-      currency_id: "ARS",
-    }));
+    const items = buildPreferenceItems(order);
 
     const preference = await new Preference(client).create({
       body: {
@@ -250,11 +301,7 @@ export class PaymentService {
       throw new Error("Order not found");
     }
 
-    if (order.status !== "paid") {
-      await orderService.updateStatus(order, "paid");
-    }
-
-    await sendOrderNotifications(order);
+    await handleOrderPaid(order, { throwOnNotificationError: true });
     return { notified: true, orderNumber, status: "paid" };
   }
 }

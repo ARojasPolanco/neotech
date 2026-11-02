@@ -5,6 +5,7 @@ import { router as orderRouter } from "./orderRoutes.js";
 import { router as paymentRouter } from "./paymentRoutes.js";
 import { router as configRouter } from "./configRoutes.js";
 import { router as adminRouter } from "./adminRoutes.js";
+import { router as discountRouter } from "./discountRoutes.js";
 
 export const router = Router();
 
@@ -13,4 +14,5 @@ router.use("/products", productRouter);
 router.use("/orders", orderRouter);
 router.use("/payments", paymentRouter);
 router.use("/config", configRouter);
+router.use("/discount-codes", discountRouter);
 router.use("/admin", adminRouter);

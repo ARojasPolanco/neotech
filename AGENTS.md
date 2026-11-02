@@ -72,6 +72,17 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 - En la orden (`OrderItem`) se guardan `productVariantId`, `color` e `imageUrl` (snapshot) para que el detalle incluya el color y la imagen del momento de la compra.
 - **Stock:** si el producto tiene variantes, el stock vive en `ProductVariant.stock` y es el que se descuenta al pagar. Si no tiene variantes, se usa `Product.stock` (nullable; `null` = sin control de stock). El stock del producto base se ignora cuando hay variantes.
 
+### Descuentos
+
+- **Descuento de producto:** `Product.discountPercent` + `Product.discountExpiresAt`. Es el descuento individual que se muestra en las cards y en el detalle.
+- **Campañas:** agrupan productos con un nombre, porcentaje y vencimiento opcional. Al aplicarse, pisan el descuento individual de los productos seleccionados. Al finalizarse, se limpian solo los productos que siguen teniendo el descuento de esa campaña.
+- **Códigos:** modelo `DiscountCode` con `code`, `discountPercent`, `maxUses` (1 o 10), `uses`, `expiresAt` (24/48/72 h desde la creación) e `isActive`.
+- El código se aplica al total del carrito, sobre los precios ya descontados por producto. Un código por pedido. Los guests pueden usarlo.
+- El uso se consume **solo al confirmarse el pago**, con un `UPDATE` atómico condicional (`uses < maxUses` y no vencido). Si el webhook se repite para una orden ya pagada, no se consume dos veces.
+- En Mercado Pago, el descuento del código se prorratea entre los ítems enviados para que el total coincida con el de la orden.
+- El panel admin permite generar códigos, desactivarlos, ver usos restantes y crear/finalizar campañas.
+- `POST /discount-codes/validate` tiene rate limit específico para evitar fuerza bruta.
+
 ### Números de pedido
 - Formato: `NT-000001`, incremental, generado en el momento de crear la orden (no antes).
 - Usar una secuencia de Postgres o un contador atómico (`SELECT ... FOR UPDATE` o secuencia nativa) para evitar duplicados con pedidos concurrentes. No generar el número con `Math.random()` ni con el `id` autoincremental crudo sin formatear.

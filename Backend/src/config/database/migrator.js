@@ -1,12 +1,18 @@
 import logger from "../logger/logger.js";
 import sequelize from "./database.js";
 import * as faseC from "../../../migrations/20261101-fase-c-product-color-stock-order-item-image.js";
+import * as faseD from "../../../migrations/20261102-fase-d-discounts.js";
 
 const migrations = [
   {
     name: faseC.name,
     up: faseC.up,
     down: faseC.down,
+  },
+  {
+    name: faseD.name,
+    up: faseD.up,
+    down: faseD.down,
   },
 ];
 

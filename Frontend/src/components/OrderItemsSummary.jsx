@@ -1,7 +1,19 @@
 import ProductImage from "./ProductImage.jsx";
 
-export default function OrderItemsSummary({ items = [], total }) {
+export default function OrderItemsSummary({
+  items = [],
+  total,
+  subtotal,
+  discountCode,
+  discountPercent,
+  discountAmount,
+}) {
   if (!items || items.length === 0) return null;
+
+  const itemsSubtotal = Number(
+    subtotal ?? items.reduce((sum, item) => sum + Number(item.subtotal), 0),
+  );
+  const discount = Number(discountAmount || 0);
 
   return (
     <div className="rounded-card border border-border bg-card p-4 text-left">
@@ -29,11 +41,32 @@ export default function OrderItemsSummary({ items = [], total }) {
           </div>
         ))}
       </div>
-      <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-        <span className="text-sm font-medium">Total</span>
-        <span className="text-lg font-bold">
-          ${Number(total).toLocaleString("es-AR")}
-        </span>
+
+      <div className="mt-3 space-y-1 border-t border-border pt-3">
+        {discount > 0 && (
+          <>
+            <div className="flex items-center justify-between text-xs text-muted">
+              <span>Subtotal</span>
+              <span>${itemsSubtotal.toLocaleString("es-AR")}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-success">
+              <span>
+                Descuento
+                {discountCode
+                  ? ` (${discountCode} -${Number(discountPercent)}%)`
+                  : ""}
+              </span>
+              <span>{`-$${discount.toLocaleString("es-AR")}`}</span>
+            </div>
+          </>
+        )}
+
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-sm font-medium">Total</span>
+          <span className="text-lg font-bold">
+            ${Number(total).toLocaleString("es-AR")}
+          </span>
+        </div>
       </div>
     </div>
   );

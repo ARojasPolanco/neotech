@@ -519,19 +519,20 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 **Criterio de aceptación:** órdenes nuevas muestran imagen; productos viejos usan logo de fallback.
 
-**Datos demo:** `npm run seed:visual` crea/actualiza el admin demo, productos de prueba y un pedido pagado con imágenes. No se ejecuta en producción salvo `ALLOW_DEMO_SEED=true`.
+**Datos demo:** `npm run seed:visual` crea/actualiza el admin demo, productos de prueba, un pedido pagado con imágenes, el código `NEO-DEMO10` y un pedido pendiente con ese código. No se ejecuta en producción salvo `ALLOW_DEMO_SEED=true`.
 
 ### Fase D — Descuentos
 
 **Requerimientos:** 3, 7, 10.
 
-- [ ] Campaña de descuento masivo: nombre, porcentaje, vencimiento y selección múltiple de productos.
-- [ ] Modelo `DiscountCode`: código, porcentaje, `maxUses`, `uses`, `expiresAt`, `isActive`.
-- [ ] CRUD admin de códigos, con usos restantes y vencimiento.
-- [ ] Validación de código en checkout/carrito + rate limit.
-- [ ] `Order.discountCode` y `Order.discountAmount`; impacto en total, MP, mail, PDF y admin.
-- [ ] Consumo de uso al confirmar pago, atómico e idempotente.
-- [ ] Carteles de descuento consistentes en todas las superficies.
+- [x] Campaña de descuento masivo: nombre, porcentaje, vencimiento y selección múltiple de productos.
+- [x] Modelo `DiscountCode`: código, porcentaje, `maxUses`, `uses`, `expiresAt`, `isActive`.
+- [x] CRUD admin de códigos, con usos restantes y vencimiento.
+- [x] Validación de código en checkout + rate limit.
+- [x] `Order.subtotal`, `discountCode`, `discountAmount`; impacto en total, MP, mail, PDF y admin.
+- [x] Consumo de uso al confirmar pago, atómico e idempotente.
+- [x] Carteles de descuento consistentes en todas las superficies.
+- [x] Pantalla admin de descuentos (códigos + campañas).
 
 **Tests integrados (backend):** código válido/vencido/agotado/inexistente; un solo uso con dos órdenes concurrentes; idempotencia del webhook; total con descuento de producto + código; prorrateo en MP; campaña masiva pisa descuentos individuales.
 
@@ -585,7 +586,7 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 [x] Fase A - Búsquedas y UI de bajo riesgo
 [x] Fase B - Dark mode
 [x] Fase C - Datos de producto y orden
-[ ] Fase D - Descuentos
+[x] Fase D - Descuentos
 [ ] Fase E - Configuración del sitio y video
 [ ] Fase F - Pantalla de carga por espera de DB
 [ ] Deploy - merge dev → main

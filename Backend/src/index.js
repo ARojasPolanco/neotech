@@ -8,6 +8,9 @@ import "./models/productModel.js";
 import "./models/productVariantModel.js";
 import "./models/orderModel.js";
 import "./models/orderItemModel.js";
+import "./models/discountCodeModel.js";
+import "./models/discountCampaignModel.js";
+import "./models/discountCampaignProductModel.js";
 import "./models/associations.js";
 import { ensureSequence } from "./services/order.service.js";
 

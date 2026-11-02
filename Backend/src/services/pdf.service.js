@@ -47,7 +47,25 @@ export class PdfService {
       );
     }
 
+    const subtotal = Number(
+      order.subtotal ??
+        order.OrderItems.reduce((sum, item) => sum + Number(item.subtotal), 0),
+    );
+    const discountAmount = Number(order.discountAmount || 0);
+
     y -= 10;
+
+    if (discountAmount > 0) {
+      drawLine(`Subtotal: $${subtotal.toLocaleString("es-AR")}`, { size: 11 });
+      const discountLabel = order.discountCode
+        ? `Descuento (${order.discountCode} -${Number(order.discountPercent)}%)`
+        : "Descuento";
+      drawLine(`${discountLabel}: -$${discountAmount.toLocaleString("es-AR")}`, {
+        size: 11,
+        color: rgb(0.2, 0.55, 0.2),
+      });
+    }
+
     drawLine(
       `Total: $${Number(order.total).toLocaleString("es-AR")}`,
       { bold: true, size: 16 },

@@ -30,4 +30,21 @@ describe("OrderItemsSummary", () => {
 
     expect(screen.getByTestId("product-placeholder")).toBeInTheDocument();
   });
+
+  it("muestra subtotal, descuento y total final", () => {
+    render(
+      <OrderItemsSummary
+        items={[item]}
+        total={1440}
+        subtotal={1600}
+        discountCode="NEO-TEST"
+        discountPercent={10}
+        discountAmount={160}
+      />,
+    );
+
+    expect(screen.getByText(/NEO-TEST/)).toBeInTheDocument();
+    expect(screen.getByText("-$160")).toBeInTheDocument();
+    expect(screen.getByText("$1.440")).toBeInTheDocument();
+  });
 });

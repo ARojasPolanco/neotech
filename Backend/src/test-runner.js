@@ -10,6 +10,7 @@ import { ensureSequence } from "./services/order.service.js";
 import { runAuthTests } from "./test-auth.js";
 import { runProductTests } from "./test-products.js";
 import { runOrderTests } from "./test-orders.js";
+import { runDiscountTests } from "./test-discounts.js";
 
 async function main() {
   console.log("\n=== Tests Neo Tech E-commerce ===\n");
@@ -20,6 +21,7 @@ async function main() {
   await runAuthTests();
   await runProductTests();
   await runOrderTests();
+  await runDiscountTests();
 
   console.log("\n=== Todos los tests completados ===\n");
 }

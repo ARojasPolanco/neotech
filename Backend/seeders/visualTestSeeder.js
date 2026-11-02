@@ -5,6 +5,7 @@ import Product from "../src/models/productModel.js";
 import ProductVariant from "../src/models/productVariantModel.js";
 import Order from "../src/models/orderModel.js";
 import OrderItem from "../src/models/orderItemModel.js";
+import DiscountCode from "../src/models/discountCodeModel.js";
 import "../src/models/associations.js";
 import { encryptedPassword } from "../src/config/plugins/encrypted-password.js";
 import { OrderService, ensureSequence } from "../src/services/order.service.js";
@@ -12,6 +13,8 @@ import { OrderService, ensureSequence } from "../src/services/order.service.js";
 const DEMO_ADMIN_EMAIL = "admin.demo@neotech.com";
 const DEMO_ADMIN_PASSWORD = "Demo1234";
 const DEMO_CUSTOMER_EMAIL = "cliente.demo@neotech.com";
+const DEMO_CODE_CUSTOMER_EMAIL = "cliente.codigo@neotech.com";
+const DEMO_CODE = "NEO-DEMO10";
 
 async function upsertAdmin() {
   const existing = await User.findOne({ where: { email: DEMO_ADMIN_EMAIL } });
@@ -77,6 +80,25 @@ async function main() {
   await ensureSequence();
 
   const adminState = await upsertAdmin();
+
+  const demoCodeExpiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
+  const [demoCode] = await DiscountCode.findOrCreate({
+    where: { code: DEMO_CODE },
+    defaults: {
+      discountPercent: 10,
+      maxUses: 10,
+      uses: 0,
+      expiresAt: demoCodeExpiresAt,
+      isActive: true,
+    },
+  });
+  await demoCode.update({
+    discountPercent: 10,
+    maxUses: 10,
+    uses: 0,
+    expiresAt: demoCodeExpiresAt,
+    isActive: true,
+  });
 
   const demoImages = [
     "/demo/auriculares.png",
@@ -248,6 +270,29 @@ async function main() {
 
   await order.update({ status: "paid" });
 
+  const oldCodeOrders = await Order.findAll({
+    where: { customerEmail: DEMO_CODE_CUSTOMER_EMAIL },
+  });
+
+  for (const oldCodeOrder of oldCodeOrders) {
+    await OrderItem.destroy({ where: { orderId: oldCodeOrder.id }, force: true });
+    await oldCodeOrder.destroy({ force: true });
+  }
+
+  const codeOrder = await orderService.create({
+    customerName: "Cliente Código Demo",
+    customerEmail: DEMO_CODE_CUSTOMER_EMAIL,
+    customerPhone: "5491112345678",
+    discountCode: DEMO_CODE,
+    items: [
+      {
+        productId: baseProduct.id,
+        productName: baseProduct.name,
+        quantity: 1,
+      },
+    ],
+  });
+
   console.log("\n=== Datos demo listos ===\n");
   console.log(`Admin (${adminState}): ${DEMO_ADMIN_EMAIL} / ${DEMO_ADMIN_PASSWORD}`);
   console.log(`Producto base + stock 1: ${baseProduct.name}`);
@@ -258,7 +303,11 @@ async function main() {
   console.log(`  http://localhost:5173/products/${discountProduct.id}`);
   console.log(`Pedido demo pagado: ${order.orderNumber}`);
   console.log(`  http://localhost:5173/orders/${order.orderNumber}`);
+  console.log(`Código demo: ${DEMO_CODE} (10% OFF, 10 usos, 72 h)`);
+  console.log(`Pedido demo con código (pendiente): ${codeOrder.orderNumber}`);
+  console.log(`  http://localhost:5173/orders/${codeOrder.orderNumber}`);
   console.log(`  Admin pedidos: http://localhost:5173/admin/orders`);
+  console.log(`  Admin descuentos: http://localhost:5173/admin/discounts`);
   console.log("");
 
   process.exit(0);

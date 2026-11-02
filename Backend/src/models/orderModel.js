@@ -38,6 +38,34 @@ const Order = sequelize.define("Order", {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
+  subtotal: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    defaultValue: null,
+  },
+  discountCode: {
+    type: DataTypes.STRING(30),
+    allowNull: true,
+  },
+  discountCodeId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: { model: "DiscountCodes", key: "id" },
+  },
+  discountPercent: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    defaultValue: null,
+  },
+  discountAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    defaultValue: 0,
+  },
+  discountCodeConsumedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   preferenceId: {
     type: DataTypes.STRING,
     allowNull: true,

@@ -4,7 +4,8 @@ import { OrderService } from "../services/order.service.js";
 const orderService = new OrderService();
 
 export const createOrder = catchAsync(async (req, res, next) => {
-  const { customerName, customerEmail, customerPhone, items } = req.body;
+  const { customerName, customerEmail, customerPhone, items, discountCode } =
+    req.body;
 
   if (!customerName || !customerEmail || !customerPhone) {
     return next(new AppError("Missing customer data", 400));
@@ -21,6 +22,7 @@ export const createOrder = catchAsync(async (req, res, next) => {
       customerPhone,
       items,
       userId: req.sessionUser?.id || null,
+      discountCode: discountCode || null,
     });
 
     return res.status(201).json(order);
@@ -64,7 +66,11 @@ export const getOrderByNumber = catchAsync(async (req, res, next) => {
       id: order.id,
       orderNumber: order.orderNumber,
       status: order.status,
+      subtotal: order.subtotal,
       total: order.total,
+      discountCode: order.discountCode,
+      discountPercent: order.discountPercent,
+      discountAmount: order.discountAmount,
       customerEmail: order.customerEmail,
       createdAt: order.createdAt,
       OrderItems: order.OrderItems?.map((item) => ({
