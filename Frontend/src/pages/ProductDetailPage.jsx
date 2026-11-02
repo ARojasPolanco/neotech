@@ -135,6 +135,12 @@ export default function ProductDetailPage() {
             </>
           )}
 
+          {stock === 0 && (
+            <span className="absolute bottom-3 left-3 rounded-full bg-error px-4 py-1.5 text-sm font-bold text-white shadow-sm">
+              Sin stock
+            </span>
+          )}
+
           {stock === 1 && (
             <span className="absolute bottom-3 left-3 rounded-full bg-[#bcff7b] px-4 py-1.5 text-sm font-bold text-accent-fg shadow-sm">
               Última unidad

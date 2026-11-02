@@ -50,6 +50,25 @@ describe("ProductCard", () => {
     expect(screen.getByText("Última unidad")).toBeInTheDocument();
   });
 
+  it("muestra sin stock cuando el stock base es 0", () => {
+    renderCard({ ...baseProduct, stock: 0 });
+
+    expect(screen.getByText("Sin stock")).toBeInTheDocument();
+    expect(screen.queryByText("Última unidad")).not.toBeInTheDocument();
+  });
+
+  it("muestra sin stock cuando todas las variantes están agotadas", () => {
+    renderCard({
+      ...baseProduct,
+      ProductVariants: [
+        { id: "v1", color: "Negro", colorHex: "#000000", stock: 0, imageUrl: null },
+        { id: "v2", color: "Blanco", colorHex: "#ffffff", stock: 0, imageUrl: null },
+      ],
+    });
+
+    expect(screen.getByText("Sin stock")).toBeInTheDocument();
+  });
+
   it("usa el logo local como placeholder cuando no hay imagen", () => {
     renderCard(baseProduct);
 
