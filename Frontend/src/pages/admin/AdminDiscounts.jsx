@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Check, Copy, Megaphone, Search, Ticket } from "lucide-react";
 import api from "../../config/api.js";
+import ConfirmModal from "../../components/ConfirmModal.jsx";
 import ProductImage from "../../components/ProductImage.jsx";
 
 function formatDate(value) {
@@ -62,6 +63,7 @@ export default function AdminDiscounts() {
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [productSearch, setProductSearch] = useState("");
   const [creatingCampaign, setCreatingCampaign] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
 
   const loadAll = async () => {
     setLoading(true);
@@ -151,7 +153,7 @@ export default function AdminDiscounts() {
     );
   };
 
-  const handleCreateCampaign = async (e) => {
+  const handleCreateCampaign = (e) => {
     e.preventDefault();
     setError("");
     setNotice("");
@@ -161,11 +163,11 @@ export default function AdminDiscounts() {
       return;
     }
 
-    const confirmed = window.confirm(
-      "Esto reemplaza los descuentos individuales de los productos seleccionados. ¿Continuar?",
-    );
-    if (!confirmed) return;
+    setConfirmAction({ type: "create-campaign" });
+  };
 
+  const confirmCreateCampaign = async () => {
+    setConfirmAction(null);
     setCreatingCampaign(true);
 
     try {
@@ -203,12 +205,12 @@ export default function AdminDiscounts() {
     }
   };
 
-  const handleEndCampaign = async (campaign) => {
-    const confirmed = window.confirm(
-      `Finalizar la campaña "${campaign.name}" y quitar el descuento?`,
-    );
-    if (!confirmed) return;
+  const handleEndCampaign = (campaign) => {
+    setConfirmAction({ type: "end-campaign", campaign });
+  };
 
+  const confirmEndCampaign = async (campaign) => {
+    setConfirmAction(null);
     setError("");
     setNotice("");
 
@@ -596,6 +598,32 @@ export default function AdminDiscounts() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={Boolean(confirmAction)}
+        title={
+          confirmAction?.type === "end-campaign"
+            ? "Finalizar campaña"
+            : "Aplicar campaña"
+        }
+        message={
+          confirmAction?.type === "end-campaign"
+            ? `¿Finalizar la campaña "${confirmAction.campaign.name}" y quitar el descuento de sus productos?`
+            : "Esto reemplaza los descuentos individuales de los productos seleccionados. ¿Continuar?"
+        }
+        confirmLabel={
+          confirmAction?.type === "end-campaign" ? "Finalizar" : "Aplicar"
+        }
+        variant={confirmAction?.type === "end-campaign" ? "danger" : "default"}
+        onConfirm={() => {
+          if (confirmAction?.type === "end-campaign") {
+            confirmEndCampaign(confirmAction.campaign);
+          } else {
+            confirmCreateCampaign();
+          }
+        }}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 }
