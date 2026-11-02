@@ -560,9 +560,9 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 **Requerimiento:** 12.
 
-- [ ] `GET /health` (sin auth) que verifique DB.
-- [ ] Splash inicial con logo y mensaje de "Despertando el servidor", reintento y timeout.
-- [ ] No bloquear para siempre: ofrecer reintentar o continuar.
+- [x] `GET /health` (sin auth) que verifique DB.
+- [x] Splash inicial con logo y mensaje de "Despertando el servidor", reintento y timeout.
+- [x] No bloquear para siempre: ofrecer reintentar o continuar.
 
 **Tests integrados:** health OK y health con DB caída; splash desaparece al responder y muestra reintento al agotar el timeout.
 
@@ -588,6 +588,6 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 [x] Fase C - Datos de producto y orden
 [x] Fase D - Descuentos
 [x] Fase E - Configuración del sitio y video
-[ ] Fase F - Pantalla de carga por espera de DB
+[x] Fase F - Pantalla de carga por espera de DB
 [ ] Deploy - merge dev → main
 ```

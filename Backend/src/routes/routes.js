@@ -6,8 +6,11 @@ import { router as paymentRouter } from "./paymentRoutes.js";
 import { router as configRouter } from "./configRoutes.js";
 import { router as adminRouter } from "./adminRoutes.js";
 import { router as discountRouter } from "./discountRoutes.js";
+import { healthCheck } from "../controllers/healthController.js";
 
 export const router = Router();
+
+router.get("/health", healthCheck);
 
 router.use("/auth", authRouter);
 router.use("/products", productRouter);

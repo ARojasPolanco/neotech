@@ -13,6 +13,7 @@ import { runProductTests } from "./test-products.js";
 import { runOrderTests } from "./test-orders.js";
 import { runDiscountTests } from "./test-discounts.js";
 import { runSettingsTests } from "./test-settings.js";
+import { runHealthTests } from "./test-health.js";
 
 async function main() {
   console.log("\n=== Tests Neo Tech E-commerce ===\n");
@@ -25,6 +26,7 @@ async function main() {
   await runOrderTests();
   await runDiscountTests();
   await runSettingsTests();
+  await runHealthTests();
 
   console.log("\n=== Todos los tests completados ===\n");
 }

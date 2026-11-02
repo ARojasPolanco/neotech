@@ -145,4 +145,9 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 
 ## Estado actual
 
-Proyecto avanzado — Fase 3 completada. Backend con auth, productos, variantes, órdenes y Mercado Pago funcionando. Frontend con catálogo, carrito y checkout integrados. Docker Compose configurado. Próximo paso: Fase 4 (mail, PDF, link de WhatsApp).
+Proyecto avanzado. Backend con auth, productos, variantes, órdenes, Mercado Pago, descuentos y configuración del sitio. Frontend con catálogo, carrito, checkout, dark mode, video, panel admin y splash de arranque. Próximo paso: deploy final (merge `dev` → `main`).
+
+### Disponibilidad
+
+- `GET /api/v1/health` es público y verifica la conexión a la base de datos.
+- El frontend muestra un splash inicial mientras espera al backend (Render free). Reintenta hasta 60 segundos y ofrece "Reintentar" o "Continuar de todos modos"; nunca queda bloqueado para siempre.
