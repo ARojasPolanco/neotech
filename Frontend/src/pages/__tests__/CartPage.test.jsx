@@ -33,5 +33,6 @@ describe("CartPage", () => {
     expect(screen.getAllByText("$800").length).toBeGreaterThan(0);
     expect(screen.getByText("$1.000")).toBeInTheDocument();
     expect(screen.getByText("20% OFF")).toBeInTheDocument();
+    expect(screen.getByLabelText("Código de descuento")).toBeInTheDocument();
   });
 });

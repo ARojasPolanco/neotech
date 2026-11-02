@@ -1,11 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import DiscountCodeBox from "../components/DiscountCodeBox.jsx";
 import ProductImage from "../components/ProductImage.jsx";
 import { useCart } from "../context/CartContext.jsx";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, totalPrice } = useCart();
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    totalPrice,
+    appliedCode,
+    discountAmount,
+    finalTotal,
+  } = useCart();
   const navigate = useNavigate();
 
   if (items.length === 0) {
@@ -113,11 +122,25 @@ export default function CartPage() {
 
       <motion.div
         layout
-        className="mt-6 flex items-center justify-between rounded-card border border-border bg-card p-4"
+        className="mt-6 rounded-card border border-border bg-card p-4"
       >
-        <p className="text-lg font-semibold">Total</p>
-        <p className="text-2xl font-bold">${totalPrice.toLocaleString("es-AR")}</p>
+        <div className="flex items-center justify-between text-sm text-muted">
+          <span>Subtotal</span>
+          <span>${totalPrice.toLocaleString("es-AR")}</span>
+        </div>
+        {appliedCode && (
+          <div className="mt-1 flex items-center justify-between text-sm text-success">
+            <span>Descuento ({appliedCode.discountPercent}%)</span>
+            <span>{`-$${discountAmount.toLocaleString("es-AR")}`}</span>
+          </div>
+        )}
+        <div className="mt-2 flex items-center justify-between text-lg font-bold">
+          <span>Total</span>
+          <span>${finalTotal.toLocaleString("es-AR")}</span>
+        </div>
       </motion.div>
+
+      <DiscountCodeBox className="mt-4 rounded-card border border-border bg-card p-4" />
 
       <motion.button
         layout

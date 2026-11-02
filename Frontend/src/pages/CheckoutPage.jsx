@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import DiscountCodeBox from "../components/DiscountCodeBox.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import api from "../config/api.js";
 
 export default function CheckoutPage() {
-  const { items, totalPrice, clearCart } = useCart();
+  const {
+    items,
+    totalPrice,
+    clearCart,
+    appliedCode,
+    clearAppliedCode,
+    discountAmount,
+    finalTotal,
+  } = useCart();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     customerName: "",
@@ -13,47 +22,9 @@ export default function CheckoutPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [code, setCode] = useState("");
-  const [appliedCode, setAppliedCode] = useState(null);
-  const [codeError, setCodeError] = useState("");
-  const [applyingCode, setApplyingCode] = useState(false);
 
   const update = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  const discountAmount = appliedCode
-    ? Math.round((totalPrice * appliedCode.discountPercent) / 100)
-    : 0;
-  const finalTotal = totalPrice - discountAmount;
-
-  const handleApplyCode = async () => {
-    const normalized = code.trim().toUpperCase();
-    if (!normalized) return;
-
-    setApplyingCode(true);
-    setCodeError("");
-
-    try {
-      const res = await api.post("/discount-codes/validate", {
-        code: normalized,
-      });
-      setAppliedCode(res.data);
-      setCode(res.data.code);
-    } catch (err) {
-      setAppliedCode(null);
-      setCodeError(
-        err.response?.data?.message || "No pudimos validar el código",
-      );
-    } finally {
-      setApplyingCode(false);
-    }
-  };
-
-  const handleRemoveCode = () => {
-    setAppliedCode(null);
-    setCode("");
-    setCodeError("");
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,8 +67,7 @@ export default function CheckoutPage() {
       setError(message);
 
       if (String(message).toLowerCase().includes("código")) {
-        setAppliedCode(null);
-        setCodeError(message);
+        clearAppliedCode();
       }
     } finally {
       setLoading(false);
@@ -191,52 +161,7 @@ export default function CheckoutPage() {
             </div>
           ))}
 
-          <div className="border-t border-border pt-3">
-            <label
-              htmlFor="discount-code"
-              className="mb-1 block text-xs font-medium text-muted"
-            >
-              Código de descuento
-            </label>
-
-            {appliedCode ? (
-              <div className="flex items-center justify-between rounded-lg bg-success/10 px-3 py-2">
-                <span className="text-sm font-semibold text-success">
-                  {appliedCode.code} · -{appliedCode.discountPercent}%
-                </span>
-                <button
-                  type="button"
-                  onClick={handleRemoveCode}
-                  className="cursor-pointer text-xs text-muted transition-colors hover:text-error"
-                >
-                  Quitar
-                </button>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <input
-                  id="discount-code"
-                  type="text"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="NEO-XXXXXX"
-                  className="w-full rounded-input border border-border bg-card px-3 py-2 text-sm uppercase outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
-                />
-                <button
-                  type="button"
-                  onClick={handleApplyCode}
-                  disabled={applyingCode || !code.trim()}
-                  className="shrink-0 cursor-pointer rounded-lg border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {applyingCode ? "..." : "Aplicar"}
-                </button>
-              </div>
-            )}
-
-            {codeError && (
-              <p className="mt-1 text-xs text-error">{codeError}</p>
-            )}
-          </div>
+          <DiscountCodeBox className="border-t border-border pt-3" />
 
           <div className="border-t border-border pt-3">
             <div className="flex items-center justify-between text-sm text-muted">

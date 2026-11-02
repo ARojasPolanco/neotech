@@ -1,23 +1,43 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext(null);
+const CART_KEY = "cart";
+const CODE_KEY = "discountCode";
 
 function loadCart() {
   try {
-    const saved = localStorage.getItem("cart");
+    const saved = localStorage.getItem(CART_KEY);
     return saved ? JSON.parse(saved) : [];
   } catch {
     return [];
   }
 }
 
+function loadAppliedCode() {
+  try {
+    const saved = localStorage.getItem(CODE_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function CartProvider({ children }) {
   const [items, setItems] = useState(loadCart);
+  const [appliedCode, setAppliedCode] = useState(loadAppliedCode);
   const [lastAdded, setLastAdded] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(items));
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
   }, [items]);
+
+  useEffect(() => {
+    if (appliedCode) {
+      localStorage.setItem(CODE_KEY, JSON.stringify(appliedCode));
+    } else {
+      localStorage.removeItem(CODE_KEY);
+    }
+  }, [appliedCode]);
 
   const addItem = (product, variant, quantity = 1) => {
     setItems((prev) => {
@@ -62,16 +82,39 @@ export function CartProvider({ children }) {
     );
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = () => {
+    setItems([]);
+    setAppliedCode(null);
+  };
 
   const clearLastAdded = () => setLastAdded(null);
+  const clearAppliedCode = () => setAppliedCode(null);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const discountAmount = appliedCode
+    ? Math.round((totalPrice * appliedCode.discountPercent) / 100)
+    : 0;
+  const finalTotal = totalPrice - discountAmount;
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice, lastAdded, clearLastAdded }}
+      value={{
+        items,
+        addItem,
+        removeItem,
+        updateQuantity,
+        clearCart,
+        totalItems,
+        totalPrice,
+        appliedCode,
+        setAppliedCode,
+        clearAppliedCode,
+        discountAmount,
+        finalTotal,
+        lastAdded,
+        clearLastAdded,
+      }}
     >
       {children}
     </CartContext.Provider>
