@@ -1,4 +1,10 @@
-export default function VariantDots({ variants, currentIndex, onSelect, size = "md" }) {
+export default function VariantDots({
+  variants,
+  currentIndex,
+  onSelect,
+  size = "md",
+  baseColorHex = null,
+}) {
   if (!variants || variants.length === 0) return null;
 
   const dotSize = size === "sm" ? "h-3 w-3" : "h-4 w-4";
@@ -16,7 +22,8 @@ export default function VariantDots({ variants, currentIndex, onSelect, size = "
             ? "border-fg bg-fg/20"
             : "border-muted/40 hover:border-muted"
         }`}
-        title="Producto"
+        style={baseColorHex ? { backgroundColor: baseColorHex } : undefined}
+        title="Producto original"
       />
       {variants
         .filter((v) => v.imageUrl)

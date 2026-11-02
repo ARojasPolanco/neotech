@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../config/api.js";
+import ProductImage from "../../components/ProductImage.jsx";
 
 const statusLabels = {
   pending: { label: "Pendiente", bg: "bg-warning/20", text: "text-warning" },
@@ -256,19 +257,30 @@ function OrderDetail({ order, onClose }) {
             {order.OrderItems?.map((item) => (
               <div
                 key={item.id}
-                className="rounded-lg border border-border bg-card p-3"
+                className="flex gap-3 rounded-lg border border-border bg-card p-3"
               >
-                <p className="text-sm font-medium">{item.productName}</p>
-                {item.color && (
-                  <p className="text-xs text-muted">Color: {item.color}</p>
-                )}
-                <p className="text-xs text-muted">
-                  x{item.quantity} · $
-                  {Number(item.unitPrice).toLocaleString("es-AR")} c/u
-                </p>
-                <p className="text-sm font-semibold">
-                  ${Number(item.subtotal).toLocaleString("es-AR")}
-                </p>
+                <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-surface">
+                  <ProductImage
+                    src={item.imageUrl || null}
+                    alt={item.productName}
+                    className="h-full w-full"
+                    imgClassName="h-full w-full object-cover"
+                    logoClassName="h-9 w-9"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">{item.productName}</p>
+                  {item.color && (
+                    <p className="text-xs text-muted">Color: {item.color}</p>
+                  )}
+                  <p className="text-xs text-muted">
+                    x{item.quantity} · $
+                    {Number(item.unitPrice).toLocaleString("es-AR")} c/u
+                  </p>
+                  <p className="text-sm font-semibold">
+                    ${Number(item.subtotal).toLocaleString("es-AR")}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

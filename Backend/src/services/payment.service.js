@@ -1,4 +1,5 @@
 import { client, Preference } from "../config/mercadopago.js";
+import Product from "../models/productModel.js";
 import ProductVariant from "../models/productVariantModel.js";
 import { envs } from "../config/enviroments/enviroments.js";
 
@@ -89,6 +90,23 @@ async function sendOrderNotifications(order) {
   }
 }
 
+export async function decrementOrderStock(order) {
+  for (const item of order.OrderItems || []) {
+    if (item.productVariantId) {
+      await ProductVariant.decrement("stock", {
+        by: item.quantity,
+        where: { id: item.productVariantId },
+      });
+      continue;
+    }
+
+    const product = await Product.findByPk(item.productId);
+    if (product && product.stock !== null && product.stock !== undefined) {
+      await product.decrement("stock", { by: item.quantity });
+    }
+  }
+}
+
 async function handleOrderPaid(order) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
@@ -101,15 +119,7 @@ async function handleOrderPaid(order) {
   if (order.status !== "paid") {
     console.log(`[handleOrderPaid] marking order ${order.orderNumber} as paid`);
     await orderService.updateStatus(order, "paid");
-
-    for (const item of order.OrderItems) {
-      if (item.productVariantId) {
-        await ProductVariant.decrement("stock", {
-          by: item.quantity,
-          where: { id: item.productVariantId },
-        });
-      }
-    }
+    await decrementOrderStock(order);
   } else {
     console.log(`[handleOrderPaid] order ${order.orderNumber} already paid, sending notifications only`);
   }

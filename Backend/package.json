@@ -7,6 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "node src/test-runner.js",
+    "migrate": "node src/config/database/migrate.js",
     "seed": "node seeders/adminSeeder.js && node seeders/productSeeder.js",
     "lint": "eslint src/ seeders/",
     "lint:fix": "eslint src/ seeders/ --fix",

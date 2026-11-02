@@ -507,11 +507,11 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 **Requerimientos:** 4, 6 (parte 2), 8.
 
-- [ ] `Product.color` y `Product.colorHex` opcionales; variante "original" con color en el selector.
-- [ ] `Product.stock` para productos sin variantes.
-- [ ] `OrderItem.imageUrl` (snapshot) + imagen en confirmación de pedido y detalle admin.
-- [ ] Migraciones Sequelize para los nuevos campos.
-- [ ] Actualizar `AGENTS.md` (stock base y variantes).
+- [x] `Product.color` y `Product.colorHex` opcionales; variante "original" con color en el selector.
+- [x] `Product.stock` para productos sin variantes.
+- [x] `OrderItem.imageUrl` (snapshot) + imagen en confirmación de pedido, pago y detalle admin.
+- [x] Migraciones Sequelize para los nuevos campos (`npm run migrate`).
+- [x] Actualizar `AGENTS.md` (stock base y variantes).
 
 **Tests integrados (backend):** producto con color base; orden guarda `imageUrl`; producto sin variante descuenta stock base; "última unidad" con stock base = 1.
 
@@ -582,7 +582,7 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 ```
 [x] Fase A - Búsquedas y UI de bajo riesgo
 [x] Fase B - Dark mode
-[ ] Fase C - Datos de producto y orden
+[x] Fase C - Datos de producto y orden
 [ ] Fase D - Descuentos
 [ ] Fase E - Configuración del sitio y video
 [ ] Fase F - Pantalla de carga por espera de DB

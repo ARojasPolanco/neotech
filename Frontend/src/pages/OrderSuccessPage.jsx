@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import api from "../config/api.js";
+import OrderItemsSummary from "../components/OrderItemsSummary.jsx";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -92,7 +93,11 @@ export default function OrderSuccessPage() {
         Si no lo ves, revisá tu carpeta de <strong>SPAM</strong> o correo no deseado.
       </motion.p>
 
-      <motion.p variants={itemVariants} className="mt-1 text-sm text-muted">
+      <motion.div variants={itemVariants} className="mt-6">
+        <OrderItemsSummary items={order.OrderItems} total={order.total} />
+      </motion.div>
+
+      <motion.p variants={itemVariants} className="mt-4 text-sm text-muted">
         Si creás una cuenta, podés seguir tu pedido y recibir ofertas exclusivas.
       </motion.p>
 

@@ -44,6 +44,12 @@ describe("ProductCard", () => {
     expect(screen.queryByText("Última unidad")).not.toBeInTheDocument();
   });
 
+  it("muestra última unidad cuando el stock base es 1", () => {
+    renderCard({ ...baseProduct, stock: 1 });
+
+    expect(screen.getByText("Última unidad")).toBeInTheDocument();
+  });
+
   it("usa el logo local como placeholder cuando no hay imagen", () => {
     renderCard(baseProduct);
 

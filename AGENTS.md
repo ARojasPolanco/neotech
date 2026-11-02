@@ -66,10 +66,11 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 ### Variantes de producto (colores)
 - Un mismo producto puede tener múltiples variantes (ej: "iPhone 15" en Negro, Blanco, Azul).
 - Cada variante tiene: `color`, `colorHex` (código hexadecimal), `imageUrl` (imagen específica), `stock` (stock individual).
+- El producto base puede tener `color` y `colorHex` opcionales. Se muestran como la opción "original" del selector.
 - El precio es el mismo para todas las variantes y vive en el producto base (`Product.price`).
 - Al mostrar un producto, el frontend debe listar los colores disponibles. Al seleccionar un color, la imagen cambia.
-- En la orden (`OrderItem`) se guarda el `variantId` + `color` para que el detalle incluya el color seleccionado.
-- El stock se descuenta de `ProductVariant.stock`, no de `Product.stock`.
+- En la orden (`OrderItem`) se guardan `productVariantId`, `color` e `imageUrl` (snapshot) para que el detalle incluya el color y la imagen del momento de la compra.
+- **Stock:** si el producto tiene variantes, el stock vive en `ProductVariant.stock` y es el que se descuenta al pagar. Si no tiene variantes, se usa `Product.stock` (nullable; `null` = sin control de stock). El stock del producto base se ignora cuando hay variantes.
 
 ### Números de pedido
 - Formato: `NT-000001`, incremental, generado en el momento de crear la orden (no antes).

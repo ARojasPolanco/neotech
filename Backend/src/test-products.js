@@ -68,6 +68,24 @@ export async function runProductTests() {
     fallo("Update product failed", updateRes.body);
   }
 
+  const baseFieldsRes = await callHandler(
+    updateProduct,
+    { color: "Azul", colorHex: "#1e40af", stock: 1 },
+    {},
+    { id: createdId },
+  );
+
+  if (
+    baseFieldsRes.statusCode === 200 &&
+    baseFieldsRes.body.color === "Azul" &&
+    baseFieldsRes.body.colorHex === "#1e40af" &&
+    Number(baseFieldsRes.body.stock) === 1
+  ) {
+    ok("Update product base color and stock");
+  } else {
+    fallo("Update product base color and stock failed", baseFieldsRes.body);
+  }
+
   // ── Variant tests ──
 
   const variantRes = await callHandler(
@@ -178,6 +196,32 @@ export async function runProductTests() {
   }
 
   // ── Variant negative tests ──
+
+  const invalidBaseColor = await callHandler(
+    updateProduct,
+    { colorHex: "azul" },
+    {},
+    { id: createdId },
+  );
+
+  if (invalidBaseColor.statusCode === 422) {
+    rechazo("Update product with invalid base color hex rejected");
+  } else {
+    fallo("Invalid base color hex should return 422", invalidBaseColor.body);
+  }
+
+  const negativeBaseStock = await callHandler(
+    updateProduct,
+    { stock: -1 },
+    {},
+    { id: createdId },
+  );
+
+  if (negativeBaseStock.statusCode === 422) {
+    rechazo("Update product with negative base stock rejected");
+  } else {
+    fallo("Negative base stock should return 422", negativeBaseStock.body);
+  }
 
   const variantInvalid = await callHandler(
     createVariant,

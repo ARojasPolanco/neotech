@@ -107,6 +107,7 @@ export default function ProductCard({ product }) {
               currentIndex={imageIndex}
               onSelect={setImageIndex}
               size="sm"
+              baseColorHex={product.colorHex}
             />
           )}
         </div>

@@ -32,7 +32,7 @@ export function CartProvider({ children }) {
         originalPrice: Number(product.price),
         discountActive: Boolean(product.discountActive),
         discountPercent: product.discountActive ? Number(product.discountPercent) : null,
-        color: variant?.color || null,
+        color: variant?.color || product.color || null,
         image: variant?.imageUrl || product.imageUrl || "",
         quantity,
       };
