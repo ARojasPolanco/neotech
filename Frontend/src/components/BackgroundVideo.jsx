@@ -40,12 +40,12 @@ export default function BackgroundVideo({ src, enabled = false }) {
     : undefined;
 
   return (
-    <div className="relative mb-8 overflow-hidden rounded-2xl bg-black">
+    <div className="relative mb-8 overflow-hidden rounded-2xl bg-[#043f51]">
       <video
         data-testid="background-video"
         src={src}
         poster={poster}
-        className="h-[32vh] w-full object-cover sm:h-[45vh]"
+        className="block max-h-[60vh] w-full object-contain"
         autoPlay={!reducedMotion}
         loop={!reducedMotion}
         muted
