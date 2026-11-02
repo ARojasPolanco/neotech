@@ -15,7 +15,10 @@ import OrderItem from "./models/orderItemModel.js";
 import "./models/associations.js";
 import { ensureSequence, OrderService } from "./services/order.service.js";
 import { DiscountService } from "./services/discount.service.js";
-import { buildPreferenceItems } from "./services/payment.service.js";
+import {
+  PaymentService,
+  buildPreferenceItems,
+} from "./services/payment.service.js";
 
 export async function runDiscountTests() {
   resetCounters();
@@ -103,17 +106,52 @@ export async function runDiscountTests() {
     fallo("Mercado Pago proration failed", preferenceTotal);
   }
 
-  const firstConsume = await discountService.consumeCode(code.id);
-  const secondConsume = await discountService.consumeCode(code.id);
+  const paymentService = new PaymentService();
+  const simulation = await paymentService.simulateOrderPaid(
+    order.orderNumber,
+    false,
+    false,
+  );
+  await order.reload();
   await code.reload();
 
-  if (firstConsume === true && secondConsume === false && Number(code.uses) === 1) {
+  if (
+    simulation.simulated === true &&
+    order.status === "paid" &&
+    Number(code.uses) === 1 &&
+    order.discountCodeConsumedAt
+  ) {
+    ok("Payment confirmation consumes the code without notifications");
+  } else {
+    fallo("Payment confirmation did not consume the code", {
+      simulation,
+      status: order.status,
+      uses: code.uses,
+      consumedAt: order.discountCodeConsumedAt,
+    });
+  }
+
+  const atomicCode = await discountService.createCode({
+    discountPercent: 5,
+    maxUses: 1,
+    expiresInHours: 24,
+  });
+
+  const firstConsume = await discountService.consumeCode(atomicCode.id);
+  const secondConsume = await discountService.consumeCode(atomicCode.id);
+  await atomicCode.reload();
+
+  if (
+    firstConsume === true &&
+    secondConsume === false &&
+    Number(atomicCode.uses) === 1
+  ) {
     ok("Discount code consumed exactly once under concurrency");
   } else {
     fallo("Discount code consumption is not atomic", {
       firstConsume,
       secondConsume,
-      uses: code.uses,
+      uses: atomicCode.uses,
     });
   }
 
@@ -200,7 +238,7 @@ export async function runDiscountTests() {
   });
   await DiscountCampaign.destroy({ where: { id: campaign.id }, force: true });
   await DiscountCode.destroy({
-    where: { id: [code.id, expiredCode.id] },
+    where: { id: [code.id, expiredCode.id, atomicCode.id] },
     force: true,
   });
   await Product.destroy({

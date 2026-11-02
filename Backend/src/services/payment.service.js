@@ -151,7 +151,10 @@ export async function decrementOrderStock(order) {
   }
 }
 
-async function handleOrderPaid(order, { throwOnNotificationError = false } = {}) {
+async function handleOrderPaid(
+  order,
+  { throwOnNotificationError = false, skipNotifications = false } = {},
+) {
   const { OrderService } = await import("./order.service.js");
   const orderService = new OrderService();
 
@@ -181,6 +184,8 @@ async function handleOrderPaid(order, { throwOnNotificationError = false } = {})
     console.log(`[handleOrderPaid] order ${order.orderNumber} already paid, sending notifications only`);
   }
 
+  if (skipNotifications) return;
+
   try {
     await sendOrderNotifications(order);
   } catch (err) {
@@ -192,20 +197,26 @@ async function handleOrderPaid(order, { throwOnNotificationError = false } = {})
 export class PaymentService {
   async createPreference(order, frontendUrl) {
     const items = buildPreferenceItems(order);
+    const notificationBaseUrl = envs.BASE_URL || frontendUrl;
 
-    const preference = await new Preference(client).create({
-      body: {
-        items,
-        external_reference: order.orderNumber,
-        auto_return: "approved",
-        notification_url: `${envs.BASE_URL}/api/v1/payments/webhook`,
-        back_urls: {
-          success: `${frontendUrl}/payment-result`,
-          failure: `${frontendUrl}/cart`,
-          pending: `${frontendUrl}/payment-result`,
-        },
+    const body = {
+      items,
+      external_reference: order.orderNumber,
+      notification_url: `${notificationBaseUrl}/api/v1/payments/webhook`,
+      back_urls: {
+        success: `${frontendUrl}/payment-result`,
+        failure: `${frontendUrl}/cart`,
+        pending: `${frontendUrl}/payment-result`,
       },
-    });
+    };
+
+    // Mercado Pago exige URLs HTTPS para el retorno automático.
+    // En local (http://localhost) el usuario vuelve manualmente desde el checkout.
+    if (frontendUrl.startsWith("https://")) {
+      body.auto_return = "approved";
+    }
+
+    const preference = await new Preference(client).create({ body });
 
     await order.update({ preferenceId: preference.id });
     return preference;
@@ -268,7 +279,7 @@ export class PaymentService {
     return { found: true, status: order.status };
   }
 
-  async simulateOrderPaid(orderNumber, force = false) {
+  async simulateOrderPaid(orderNumber, force = false, notify = true) {
     const isProdWithoutSimulate = process.env.NODE_ENV === "production" && process.env.ALLOW_SIMULATE_DEV !== "true";
     if (isProdWithoutSimulate) {
       throw new Error("Payment simulation is not allowed in production");
@@ -287,7 +298,7 @@ export class PaymentService {
       return { simulated: false, status: "paid", message: "Order already paid. Use ?force=true to resend notifications." };
     }
 
-    await handleOrderPaid(order);
+    await handleOrderPaid(order, { skipNotifications: !notify });
     return { simulated: true, status: "paid" };
   }
 

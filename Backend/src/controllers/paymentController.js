@@ -101,8 +101,14 @@ export const simulatePayment = catchAsync(async (req, res, next) => {
   }
 
   const { orderNumber } = req.params;
-  const { force } = req.query;
-  console.log(`[simulatePayment] order ${orderNumber}, force: ${force || false}`);
-  const result = await paymentService.simulateOrderPaid(orderNumber, force === "true");
+  const { force, notify } = req.query;
+  console.log(
+    `[simulatePayment] order ${orderNumber}, force: ${force || false}, notify: ${notify !== "false"}`,
+  );
+  const result = await paymentService.simulateOrderPaid(
+    orderNumber,
+    force === "true",
+    notify !== "false",
+  );
   return res.status(200).json(result);
 });
