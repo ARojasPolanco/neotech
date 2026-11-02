@@ -56,7 +56,7 @@ export default function ProductCard({ product }) {
         )}
 
         {isLastUnit && (
-          <span className="absolute bottom-2 left-2 z-10 rounded-full bg-warning px-2 py-0.5 text-[11px] font-bold text-accent-fg">
+          <span className="absolute bottom-2 left-2 z-10 rounded-full bg-[#bcff7b] px-3 py-1 text-xs font-bold text-accent-fg shadow-sm">
             Última unidad
           </span>
         )}

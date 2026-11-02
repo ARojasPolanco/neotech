@@ -136,7 +136,7 @@ export default function ProductDetailPage() {
           )}
 
           {stock === 1 && (
-            <span className="absolute bottom-3 left-3 rounded-full bg-warning px-3 py-1 text-xs font-bold text-accent-fg">
+            <span className="absolute bottom-3 left-3 rounded-full bg-[#bcff7b] px-4 py-1.5 text-sm font-bold text-accent-fg shadow-sm">
               Última unidad
             </span>
           )}
