@@ -71,6 +71,7 @@ export const getOrderByNumber = catchAsync(async (req, res, next) => {
         id: item.id,
         productName: item.productName,
         color: item.color,
+        imageUrl: item.imageUrl,
         unitPrice: item.unitPrice,
         quantity: item.quantity,
         subtotal: item.subtotal,
