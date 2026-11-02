@@ -29,6 +29,9 @@ export default function SlideFeaturedProduct({ product }) {
     );
   }
 
+  const hasDiscount =
+    Boolean(product.discountActive) && Number(product.discountedPrice) > 0;
+
   return (
     <Link
       to={`/products/${product.id}`}
@@ -44,15 +47,17 @@ export default function SlideFeaturedProduct({ product }) {
 
       <div className="relative z-10 flex h-full min-h-[280px] items-center justify-center px-6 py-16 sm:min-h-[340px]">
         <div className="text-center text-white">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-fg"
-          >
-            <Tag size={16} />
-            {Number(product.discountPercent)}% OFF
-          </motion.div>
+          {hasDiscount && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-fg"
+            >
+              <Tag size={16} />
+              {Number(product.discountPercent)}% OFF
+            </motion.div>
+          )}
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -69,12 +74,20 @@ export default function SlideFeaturedProduct({ product }) {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-4 flex items-center justify-center gap-3"
           >
-            <span className="text-lg text-white/50 line-through">
-              ${Number(product.price).toLocaleString("es-AR")}
-            </span>
-            <span className="text-2xl font-bold text-accent sm:text-3xl">
-              ${Number(product.discountedPrice).toLocaleString("es-AR")}
-            </span>
+            {hasDiscount ? (
+              <>
+                <span className="text-lg text-white/50 line-through">
+                  ${Number(product.price).toLocaleString("es-AR")}
+                </span>
+                <span className="text-2xl font-bold text-accent sm:text-3xl">
+                  ${Number(product.discountedPrice).toLocaleString("es-AR")}
+                </span>
+              </>
+            ) : (
+              <span className="text-2xl font-bold text-accent sm:text-3xl">
+                ${Number(product.price).toLocaleString("es-AR")}
+              </span>
+            )}
           </motion.div>
 
           <motion.div
