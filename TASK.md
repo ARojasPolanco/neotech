@@ -544,11 +544,11 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 
 **Requerimiento:** 9.
 
-- [ ] Modelo `Settings` singleton (`videoUrl`, `videoEnabled`, `logoUrl`).
-- [ ] Upload de video a Cloudinary (`resource_type: "video"`, límite 25 MB, MIME mp4).
-- [ ] Pantalla admin: subir, reemplazar, habilitar/deshabilitar.
-- [ ] Home: video full-width arriba; hero debajo; sin video o deshabilitado, hero vuelve arriba.
-- [ ] Poster/fallback, `muted`, `playsInline`, loop, `prefers-reduced-motion`.
+- [x] Modelo `Setting` singleton (`videoUrl`, `videoEnabled`, `logoUrl`).
+- [x] Upload de video a Cloudinary (`resource_type: "video"`, límite 25 MB, MP4/WebM).
+- [x] Pantalla admin: subir, reemplazar, habilitar/deshabilitar y quitar.
+- [x] Home: video full-width arriba; hero debajo; sin video o deshabilitado, hero vuelve arriba.
+- [x] Poster, fallback, `muted`, `playsInline`, loop y `prefers-reduced-motion`.
 
 **Tests integrados:** lectura pública de settings; upload rechaza formato/tamaño inválido; flag deshabilitado oculta el video.
 
@@ -587,7 +587,7 @@ Relevamiento de 12 requerimientos nuevos. Cada fase se implementa, se testea (in
 [x] Fase B - Dark mode
 [x] Fase C - Datos de producto y orden
 [x] Fase D - Descuentos
-[ ] Fase E - Configuración del sitio y video
+[x] Fase E - Configuración del sitio y video
 [ ] Fase F - Pantalla de carga por espera de DB
 [ ] Deploy - merge dev → main
 ```

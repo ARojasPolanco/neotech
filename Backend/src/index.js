@@ -11,6 +11,7 @@ import "./models/orderItemModel.js";
 import "./models/discountCodeModel.js";
 import "./models/discountCampaignModel.js";
 import "./models/discountCampaignProductModel.js";
+import "./models/settingModel.js";
 import "./models/associations.js";
 import { ensureSequence } from "./services/order.service.js";
 

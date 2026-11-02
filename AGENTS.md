@@ -117,6 +117,15 @@ El usuario tiene experiencia específica en esto — respetar el patrón:
 - Gestión de variantes por producto: agregar/editar colores, imagen específica, stock individual por variante.
 - No permitir borrar productos con pedidos asociados: solo desactivar (`isActive: false`).
 
+### Configuración del sitio (video)
+
+- Modelo `Setting` singleton (id fijo) con `videoUrl`, `videoEnabled` y `logoUrl`.
+- El admin sube el video a Cloudinary (`resource_type: "video"`), acepta MP4/WebM de hasta 25 MB y puede reemplazarlo, habilitarlo o deshabilitarlo.
+- El home muestra el video full-width arriba del banner principal. Si no hay video o está deshabilitado, el banner vuelve a su posición original.
+- El video se reproduce muteado, en loop y con `playsInline`; si el usuario tiene `prefers-reduced-motion`, no autoreproduce y muestra controles.
+- `GET /config/site` es público. `GET/PATCH /admin/settings` y `POST /admin/upload-video` requieren rol `ADMIN`.
+- Si el video falla al cargar, se oculta y el home sigue funcionando sin él.
+
 ## Convenciones de código
 
 - Nomenclatura de archivos: `camelCase.js` para services/controllers, `PascalCase.js` para modelos.

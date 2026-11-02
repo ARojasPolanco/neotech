@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { protect, restrictTo } from "../middlewares/auth.middleware.js";
-import { upload } from "../middlewares/upload.js";
+import { upload, uploadVideo as videoUpload } from "../middlewares/upload.js";
 import { validateUUID } from "../middlewares/validateUUID.middleware.js";
 import {
   uploadImage,
@@ -15,12 +15,20 @@ import {
   createDiscountCampaign,
   endDiscountCampaign,
 } from "../controllers/adminController.js";
+import {
+  getSettings,
+  updateSettings,
+  uploadVideo,
+} from "../controllers/settingsController.js";
 
 export const router = Router();
 
 router.use(protect, restrictTo("ADMIN"));
 
 router.post("/upload", upload.single("image"), uploadImage);
+router.post("/upload-video", videoUpload.single("video"), uploadVideo);
+router.get("/settings", getSettings);
+router.patch("/settings", updateSettings);
 router.get("/stats", getStats);
 router.get("/orders", getOrders);
 router.get("/orders/:id", getOrderById);

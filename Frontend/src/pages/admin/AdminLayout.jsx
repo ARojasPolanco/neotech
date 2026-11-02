@@ -6,6 +6,7 @@ const tabs = [
   { to: "/admin/products", label: "Productos" },
   { to: "/admin/featured", label: "Destacado" },
   { to: "/admin/discounts", label: "Descuentos" },
+  { to: "/admin/settings", label: "Video" },
   { to: "/admin/orders", label: "Pedidos" },
 ];
 

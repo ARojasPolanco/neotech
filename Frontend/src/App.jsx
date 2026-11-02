@@ -20,6 +20,7 @@ import AdminProductForm from "./pages/admin/AdminProductForm.jsx";
 import AdminFeatured from "./pages/admin/AdminFeatured.jsx";
 import AdminOrders from "./pages/admin/AdminOrders.jsx";
 import AdminDiscounts from "./pages/admin/AdminDiscounts.jsx";
+import AdminSettings from "./pages/admin/AdminSettings.jsx";
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="products/:id/edit" element={<AdminProductForm />} />
             <Route path="featured" element={<AdminFeatured />} />
             <Route path="discounts" element={<AdminDiscounts />} />
+            <Route path="settings" element={<AdminSettings />} />
             <Route path="orders" element={<AdminOrders />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />

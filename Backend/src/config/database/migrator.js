@@ -2,6 +2,7 @@ import logger from "../logger/logger.js";
 import sequelize from "./database.js";
 import * as faseC from "../../../migrations/20261101-fase-c-product-color-stock-order-item-image.js";
 import * as faseD from "../../../migrations/20261102-fase-d-discounts.js";
+import * as faseE from "../../../migrations/20261103-fase-e-settings.js";
 
 const migrations = [
   {
@@ -13,6 +14,11 @@ const migrations = [
     name: faseD.name,
     up: faseD.up,
     down: faseD.down,
+  },
+  {
+    name: faseE.name,
+    up: faseE.up,
+    down: faseE.down,
   },
 ];
 
